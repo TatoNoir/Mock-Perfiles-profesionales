@@ -67,7 +67,7 @@ import { SupabaseService } from './services/supabase.service';
   `]
 })
 export class App implements OnInit {
-  isAuthenticated = false;
+  isAuthenticated = true;
 
   constructor(private supabaseService: SupabaseService) {}
 
