@@ -72,9 +72,9 @@ export class App implements OnInit {
   constructor(private supabaseService: SupabaseService) {}
 
   ngOnInit() {
-    this.supabaseService.currentUser.subscribe(user => {
-      this.isAuthenticated = user !== null;
-    });
+    // this.supabaseService.currentUser.subscribe(user => {
+    //   this.isAuthenticated = user !== null;
+    // });
   }
 
   async onLogout() {
