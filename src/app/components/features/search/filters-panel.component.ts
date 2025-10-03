@@ -8,30 +8,21 @@ import { CommonModule } from '@angular/common';
   template: `
     <section class="filters-card">
       <div class="filters-grid">
-        <div class="filter-group">
-          <label class="filter-label">Especialidad/Rubro</label>
-          <select class="filter-select">
-            <option value="">Todas</option>
-            <option value="medico">Médico</option>
-            <option value="abogado">Abogado</option>
-            <option value="ingeniero">Ingeniero</option>
-            <option value="arquitecto">Arquitecto</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Experiencia</label>
-          <select class="filter-select">
-            <option value="">Cualquiera</option>
-            <option value="junior">0-2 años</option>
-            <option value="mid">3-5 años</option>
-            <option value="senior">5+ años</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Ubicación</label>
-          <input type="text" class="filter-input" placeholder="Ciudad">
+        <div class="filter-column">
+          <div class="filter-group">
+            <label class="filter-label">Ubicación</label>
+            <input type="text" class="filter-input" placeholder="Ciudad">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Especialidad/Rubro</label>
+            <select class="filter-select">
+              <option value="">Todas</option>
+              <option value="medico">Médico</option>
+              <option value="abogado">Abogado</option>
+              <option value="ingeniero">Ingeniero</option>
+              <option value="arquitecto">Arquitecto</option>
+            </select>
+          </div>
         </div>
 
         <div class="filter-group">
@@ -54,7 +45,7 @@ import { CommonModule } from '@angular/common';
       </div>
 
       <div class="actions">
-        <button class="apply-button">Aplicar Filtros</button>
+        <button class="apply-button">Buscar</button>
         <button class="clear-button">Limpiar</button>
       </div>
     </section>
@@ -70,12 +61,18 @@ import { CommonModule } from '@angular/common';
 
     .filters-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .filter-column {
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
     }
 
     @media (max-width: 1024px) {
-      .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filters-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
@@ -89,7 +86,7 @@ import { CommonModule } from '@angular/common';
     .checkbox-group { display: flex; flex-direction: column; gap: 0.5rem; }
     .checkbox-label { display: flex; align-items: center; gap: 0.5rem; color: #555; font-size: 0.875rem; }
 
-    .actions { margin-top: 1rem; display: flex; gap: 0.75rem; }
+    .actions { margin-top: 2rem; display: flex; gap: 0.75rem; }
     .apply-button { padding: 0.6rem 1.25rem; background-color: #4a90e2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
     .apply-button:hover { background-color: #357abd; }
     .clear-button { padding: 0.6rem 1.25rem; background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; border-radius: 4px; cursor: pointer; }
