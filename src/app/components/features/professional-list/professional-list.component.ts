@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Professional } from '../../../models/professional.model';
 
 @Component({
   selector: 'app-professional-list',
@@ -161,7 +162,7 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class ProfessionalListComponent {
-  professionals = [
+  professionals: Professional[] = [
     {
       name: 'Ana García',
       initials: 'AG',
