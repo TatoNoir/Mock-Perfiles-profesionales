@@ -52,12 +52,13 @@ import { CommonModule } from '@angular/common';
     </aside>
   `,
   styles: [`
-    .sidebar { background: linear-gradient(180deg, #2a6cc5, #3b82f6); padding: 1.25rem; height: 100%; color: #eaf2ff; border-right: 1px solid rgba(255,255,255,0.15); }
+    .sidebar { background-color: #f8f9fa; padding: 1.25rem; height: 100%; color: #2d3748; border-right: 1px solid #e2e8f0; }
     .menu { display: flex; flex-direction: column; gap: 1rem; }
-    .menu-item { display: flex; align-items: center; gap: 0.75rem; color: #eaf2ff; text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 1.1rem; }
-    .icon { display: inline-flex; width: 20px; height: 20px; color: #eaf2ff; opacity: 0.95; }
-    .menu-item:hover { background-color: rgba(255,255,255,0.12); }
-    .menu-item.active { background-color: rgba(255,255,255,0.2); }
+    .menu-item { display: flex; align-items: center; gap: 0.75rem; color: #2d3748; text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 1.1rem; transition: background-color 0.2s ease; }
+    .icon { display: inline-flex; width: 20px; height: 20px; color: #2d3748; opacity: 0.8; }
+    .menu-item:hover { background-color: #e2e8f0; }
+    .menu-item.active { background-color: #cbd5e0; color: #1a202c; }
+    .menu-item.active .icon { color: #1a202c; opacity: 1; }
   `]
 })
 export class SidebarComponent {
