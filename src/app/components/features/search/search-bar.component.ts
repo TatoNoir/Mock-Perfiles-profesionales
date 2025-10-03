@@ -20,6 +20,8 @@ import { CommonModule } from '@angular/common';
       display: flex;
       gap: 1rem;
       margin-bottom: 2rem;
+      margin-left: 1rem;
+      max-width: 700px;
     }
 
     .search-input {
@@ -37,7 +39,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .search-button {
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 2.5rem;
       background-color: #4a90e2;
       color: white;
       border: none;
