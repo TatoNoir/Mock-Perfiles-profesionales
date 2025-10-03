@@ -8,6 +8,14 @@ import { CommonModule } from '@angular/common';
   template: `
     <aside class="sidebar">
       <nav class="menu">
+        <a class="menu-item" [class.active]="active==='dashboard'" (click)="navigate.emit('dashboard')">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
         <a class="menu-item" [class.active]="active==='profesionales'" (click)="navigate.emit('profesionales')">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -53,6 +61,6 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class SidebarComponent {
-  @Output() navigate = new EventEmitter<'profesionales' | 'usuarios' | 'zonas' | 'actividades'>();
-  active: 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'profesionales';
+  @Output() navigate = new EventEmitter<'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades'>();
+  active: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'dashboard';
 }

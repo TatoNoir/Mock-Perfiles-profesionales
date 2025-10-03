@@ -7,6 +7,7 @@ import { SearchBarComponent } from './components/features/search/search-bar.comp
 import { ProfessionalListComponent } from './components/features/professional-list/professional-list.component';
 import { FiltersPanelComponent } from './components/features/search/filters-panel.component';
 import { UsersComponent } from './components/features/users/users.component';
+import { DashboardComponent } from './components/features/dashboard/dashboard.component';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,8 @@ import { UsersComponent } from './components/features/users/users.component';
     SearchBarComponent,
     FiltersPanelComponent,
     ProfessionalListComponent,
-    UsersComponent
+    UsersComponent,
+    DashboardComponent
   ],
   template: `
     <div class="app-container">
@@ -26,17 +28,26 @@ import { UsersComponent } from './components/features/users/users.component';
       <div class="main-layout">
         <app-sidebar (navigate)="onNavigate($event)"></app-sidebar>
         <main class="main-content">
-          <app-search-bar></app-search-bar>
           <ng-container [ngSwitch]="section">
+            <ng-container *ngSwitchCase="'dashboard'">
+              <app-dashboard></app-dashboard>
+            </ng-container>
             <ng-container *ngSwitchCase="'profesionales'">
+              <app-search-bar></app-search-bar>
               <app-filters-panel></app-filters-panel>
               <app-professional-list></app-professional-list>
             </ng-container>
             <ng-container *ngSwitchCase="'usuarios'">
               <app-users></app-users>
             </ng-container>
-            <ng-container *ngSwitchDefault>
+            <ng-container *ngSwitchCase="'zonas'">
               <div>Sección en construcción…</div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'actividades'">
+              <div>Sección en construcción…</div>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <app-dashboard></app-dashboard>
             </ng-container>
           </ng-container>
         </main>
@@ -78,7 +89,7 @@ export class AppComponent {
   async onLogout() {
     console.log('Logout pulsado (autenticación deshabilitada)');
   }
-  section: 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'profesionales';
-  onNavigate(s: 'profesionales' | 'usuarios' | 'zonas' | 'actividades') { this.section = s; }
+  section: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'dashboard';
+  onNavigate(s: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades') { this.section = s; }
 }
 
