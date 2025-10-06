@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Professional } from '../../../models/professional.model';
+import { Professional, ProfessionalProfile } from '../../../models/professional.model';
 
 @Component({
   selector: 'app-professional-list',
@@ -9,8 +9,8 @@ import { Professional } from '../../../models/professional.model';
   template: `
     <div class="professional-list">
       <h2 class="list-title">Profesionales Disponibles</h2>
-      <div class="professionals-grid">
-        <div class="professional-card" *ngFor="let professional of professionals">
+        <div class="professionals-grid">
+        <div class="professional-card" *ngFor="let professional of professionals" (click)="onSelect(professional)">
           <div class="card-header">
             <div class="avatar">{{ professional.initials }}</div>
             <div class="info">
@@ -26,7 +26,7 @@ import { Professional } from '../../../models/professional.model';
           </div>
           <div class="card-footer">
             <span class="experience">{{ professional.experience }} años exp.</span>
-            <button class="contact-button">Contactar</button>
+            <button class="contact-button" (click)="$event.stopPropagation()">Contactar</button>
           </div>
         </div>
       </div>
@@ -61,6 +61,7 @@ import { Professional } from '../../../models/professional.model';
       flex-direction: column;
       gap: 1rem;
       transition: box-shadow 0.3s ease;
+      cursor: pointer;
     }
 
     .professional-card:hover {
@@ -159,12 +160,27 @@ import { Professional } from '../../../models/professional.model';
     .contact-button:hover {
       background-color: #357abd;
     }
+    .back-btn { margin-bottom: 1rem; background: #1f4c85; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.9rem; cursor: pointer; }
   `]
 })
 export class ProfessionalListComponent {
+  @Output() selectProfessional = new EventEmitter<ProfessionalProfile>();
+  onSelect(p: Professional) { this.selectProfessional.emit(this.toProfile(p)); }
+  toProfile(p: Professional): ProfessionalProfile {
+    return {
+      id: p.id,
+      name: p.name,
+      specialty: p.specialty,
+      description: p.description,
+      location: '—',
+      skills: p.skills,
+      experienceYears: p.experience
+    };
+  }
   professionals: Professional[] = [
     {
-      name: 'Ana García',
+      id: 1,
+      name: 'Carlos García',
       initials: 'AG',
       specialty: 'Médico Cirujano',
       description: 'Especialista en cirugía general con amplia experiencia en procedimientos complejos.',
@@ -172,6 +188,7 @@ export class ProfessionalListComponent {
       experience: 8
     },
     {
+      id: 2,
       name: 'Carlos Rodríguez',
       initials: 'CR',
       specialty: 'Abogado Corporativo',
@@ -180,6 +197,7 @@ export class ProfessionalListComponent {
       experience: 12
     },
     {
+      id: 3,
       name: 'María López',
       initials: 'ML',
       specialty: 'Ingeniera de Software',
@@ -188,6 +206,7 @@ export class ProfessionalListComponent {
       experience: 6
     },
     {
+      id: 4,
       name: 'Juan Martínez',
       initials: 'JM',
       specialty: 'Arquitecto',

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { UsersService, ApiUser } from '../../../services/users.service';
 
 type User = {
   name: string;
@@ -13,7 +15,7 @@ type User = {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
   template: `
     <section class="users">
       <h2 class="title">Usuarios</h2>
@@ -81,6 +83,16 @@ export class UsersComponent {
     { name: 'María López', email: 'maria@example.com', role: 'viewer', status: 'inactivo', lastAccess: '2025-08-21 09:11', createdAt: '2023-12-05' },
     { name: 'Juan Martínez', email: 'juan@example.com', role: 'viewer', status: 'activo', lastAccess: '2025-10-01 22:15', createdAt: '2024-02-19' }
   ];
+
+  // Datos remotos disponibles bajo demanda sin afectar la tabla mock
+  apiUsers: ApiUser[] = [];
+  constructor(private usersService: UsersService) {}
+  loadUsersFromApi() {
+    this.usersService.getUsers().subscribe({
+      next: (data) => { this.apiUsers = data; },
+      error: (err) => { console.error('Error cargando usuarios', err); }
+    });
+  }
 }
 
 

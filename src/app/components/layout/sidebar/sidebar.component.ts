@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <aside class="sidebar">
       <nav class="menu">
@@ -16,7 +17,7 @@ import { CommonModule } from '@angular/common';
           </span>
           <span>Dashboard</span>
         </a>
-        <a class="menu-item" [class.active]="active==='profesionales'" (click)="navigate.emit('profesionales')">
+        <a class="menu-item" [class.active]="active==='profesionales'" routerLink="/profesionales" (click)="navigate.emit('profesionales')">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
@@ -24,7 +25,7 @@ import { CommonModule } from '@angular/common';
           </span>
           <span>Profesionales</span>
         </a>
-        <a class="menu-item" [class.active]="active==='usuarios'" (click)="navigate.emit('usuarios')">
+        <a class="menu-item" [class.active]="active==='usuarios'" routerLink="/usuarios" (click)="navigate.emit('usuarios')">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -32,7 +33,7 @@ import { CommonModule } from '@angular/common';
           </span>
           <span>Usuarios</span>
         </a>
-        <a class="menu-item" [class.active]="active==='zonas'" (click)="navigate.emit('zonas')">
+        <a class="menu-item" [class.active]="active==='zonas'" routerLink="/zonas" (click)="navigate.emit('zonas')">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
@@ -40,7 +41,7 @@ import { CommonModule } from '@angular/common';
           </span>
           <span>Zonas</span>
         </a>
-        <a class="menu-item" [class.active]="active==='actividades'" (click)="navigate.emit('actividades')">
+        <a class="menu-item" [class.active]="active==='actividades'" routerLink="/actividades" (click)="navigate.emit('actividades')">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14l4-4h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>

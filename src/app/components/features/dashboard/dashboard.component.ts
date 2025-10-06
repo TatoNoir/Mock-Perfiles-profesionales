@@ -62,6 +62,7 @@ import { CommonModule } from '@angular/common';
 
       <!-- Data Table -->
       <div class="data-table-container">
+        <div class="table-header"><h3 class="table-title">Últimos usuarios registrados</h3></div>
         <table class="data-table">
           <thead>
             <tr>
@@ -74,32 +75,32 @@ import { CommonModule } from '@angular/common';
           </thead>
           <tbody>
             <tr>
-              <td>Ana García</td>
+              <td>Carlos García</td>
               <td>Médico</td>
               <td><span class="status-badge active">Activo</span></td>
               <td>15/03/2024</td>
-              <td><button class="action-button">Editar</button></td>
+              <td><button class="action-button">Ver Perfil</button></td>
             </tr>
             <tr>
               <td>Carlos Rodríguez</td>
               <td>Abogado</td>
               <td><span class="status-badge inactive">Inactivo</span></td>
               <td>08/01/2024</td>
-              <td><button class="action-button">Editar</button></td>
+              <td><button class="action-button">Ver Perfil</button></td>
             </tr>
             <tr>
               <td>María López</td>
               <td>Ingeniera</td>
               <td><span class="status-badge active">Activo</span></td>
               <td>17/11/2023</td>
-              <td><button class="action-button">Editar</button></td>
+              <td><button class="action-button">Ver Perfil</button></td>
             </tr>
             <tr>
               <td>Juan Martínez</td>
               <td>Arquitecto</td>
               <td><span class="status-badge active">Activo</span></td>
               <td>29/09/2023</td>
-              <td><button class="action-button">Editar</button></td>
+              <td><button class="action-button">Ver Perfil</button></td>
             </tr>
           </tbody>
         </table>
@@ -179,6 +180,8 @@ import { CommonModule } from '@angular/common';
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+    .table-header { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+    .table-title { margin: 0; font-size: 1.1rem; color: #1f2937; font-weight: 600; }
 
     .data-table {
       width: 100%;

@@ -3,13 +3,13 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './components/layout/header/header.component';
 import { SidebarComponent } from './components/layout/sidebar/sidebar.component';
-import { SearchBarComponent } from './components/features/search/search-bar.component';
-import { ProfessionalListComponent } from './components/features/professional-list/professional-list.component';
-import { FiltersPanelComponent } from './components/features/search/filters-panel.component';
+import { RouterOutlet } from '@angular/router';
 import { UsersComponent } from './components/features/users/users.component';
 import { DashboardComponent } from './components/features/dashboard/dashboard.component';
 import { ZonesComponent } from './components/features/zones/zones.component';
 import { ActivitiesComponent } from './components/features/activities/activities.component';
+import { ProfessionalDetailComponent } from './components/features/professional-detail/professional-detail.component';
+import { ProfessionalProfile } from './models/professional.model';
 
 @Component({
   selector: 'app-root',
@@ -18,13 +18,12 @@ import { ActivitiesComponent } from './components/features/activities/activities
     CommonModule,
     HeaderComponent,
     SidebarComponent,
-    SearchBarComponent,
-    FiltersPanelComponent,
-    ProfessionalListComponent,
+    RouterOutlet,
     UsersComponent,
     DashboardComponent,
     ZonesComponent,
-    ActivitiesComponent
+    ActivitiesComponent,
+    ProfessionalDetailComponent
   ],
   template: `
     <div class="app-container">
@@ -37,9 +36,7 @@ import { ActivitiesComponent } from './components/features/activities/activities
               <app-dashboard></app-dashboard>
             </ng-container>
             <ng-container *ngSwitchCase="'profesionales'">
-              <app-search-bar></app-search-bar>
-              <app-filters-panel></app-filters-panel>
-              <app-professional-list></app-professional-list>
+              <router-outlet></router-outlet>
             </ng-container>
             <ng-container *ngSwitchCase="'usuarios'">
               <app-users></app-users>
@@ -95,5 +92,7 @@ export class AppComponent {
   }
   section: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'dashboard';
   onNavigate(s: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades') { this.section = s; }
+  selectedProfile?: ProfessionalProfile;
+  onProfessionalSelected(p: ProfessionalProfile) { this.selectedProfile = p; }
 }
 
