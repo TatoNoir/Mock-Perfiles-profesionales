@@ -8,6 +8,7 @@ import { ProfessionalListComponent } from './components/features/professional-li
 import { FiltersPanelComponent } from './components/features/search/filters-panel.component';
 import { UsersComponent } from './components/features/users/users.component';
 import { DashboardComponent } from './components/features/dashboard/dashboard.component';
+import { ZonesComponent } from './components/features/zones/zones.component';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ import { DashboardComponent } from './components/features/dashboard/dashboard.co
     FiltersPanelComponent,
     ProfessionalListComponent,
     UsersComponent,
-    DashboardComponent
+    DashboardComponent,
+    ZonesComponent
   ],
   template: `
     <div class="app-container">
@@ -41,7 +43,7 @@ import { DashboardComponent } from './components/features/dashboard/dashboard.co
               <app-users></app-users>
             </ng-container>
             <ng-container *ngSwitchCase="'zonas'">
-              <div>Sección en construcción…</div>
+              <app-zones></app-zones>
             </ng-container>
             <ng-container *ngSwitchCase="'actividades'">
               <div>Sección en construcción…</div>
