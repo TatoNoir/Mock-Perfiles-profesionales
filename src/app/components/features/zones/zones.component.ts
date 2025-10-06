@@ -25,8 +25,8 @@ interface ZoneRow {
       <div class="filters">
         <div class="field">
           <label>País</label>
-          <select [(ngModel)]="filters.country" disabled>
-            <option>Argentinanía</option>
+          <select [(ngModel)]="filters.country">
+            <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
           </select>
         </div>
         <div class="field">
@@ -118,9 +118,10 @@ interface ZoneRow {
   `]
 })
 export class ZonesComponent {
-  filters = { country: 'Argentinanía', province: '', city: '', postalCode: '' };
+  countries: string[] = ['Argentina', 'CMX', 'Chile'];
+  filters = { country: 'Argentina', province: '', city: '', postalCode: '' };
   rows: ZoneRow[] = [
-    { flag: '🇦🇷', country: 'Argentin', province: 'Buenos Aires', city: 'La Plata', postalCode: '1900', neighborhood: 'Microcentro', type: 'Urbana' },
+    { flag: '🇦🇷', country: 'Argentina', province: 'Buenos Aires', city: 'La Plata', postalCode: '1900', neighborhood: 'Microcentro', type: 'Urbana' },
     { flag: '🇲🇽', country: 'CMX', province: 'CDMX', city: 'Coyoacán', postalCode: '04100', neighborhood: 'Roma Sur', type: 'Suburbana' },
     { flag: '🇨🇱', country: 'Chile', province: 'Región Metropolitana', city: 'Santiago', postalCode: '8320000', neighborhood: 'Ñuñoa', type: 'Urbana' }
   ];

@@ -43,8 +43,7 @@ type User = {
               <td class="muted">{{ u.lastAccess }}</td>
               <td class="muted">{{ u.createdAt }}</td>
               <td class="actions">
-                <button class="btn">Ver</button>
-                <button class="btn btn-secondary">Editar</button>
+                <button class="btn primary">Ver</button>
               </td>
             </tr>
           </tbody>
@@ -55,18 +54,17 @@ type User = {
   styles: [`
     .users { display: flex; flex-direction: column; gap: 1rem; }
     .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #1f2937; }
-    .table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+    .table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
     .table { width: 100%; border-collapse: collapse; }
-    thead { background: #f9fafb; }
-    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+    thead { background: #f8fafc; }
+    th, td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
     th { font-weight: 600; color: #374151; font-size: 0.9rem; }
     td { color: #374151; font-size: 0.95rem; }
     .muted { color: #6b7280; }
     .actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
-    .btn { padding: 0.35rem 0.8rem; background: #4a90e2; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-    .btn:hover { background: #357abd; }
-    .btn-secondary { background: #eef2f7; color: #1f2937; }
-    .btn-secondary:hover { background: #e5e7eb; }
+    .btn { padding: 0.35rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn.primary { background: #1f4c85; color: #fff; }
+    .btn.primary:hover { background: #183c69; }
     .badge { padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; text-transform: capitalize; }
     .badge-admin { background: #fee2e2; color: #991b1b; }
     .badge-editor { background: #e0e7ff; color: #3730a3; }
