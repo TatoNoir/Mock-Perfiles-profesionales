@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="dashboard">
-      <h1 class="dashboard-title">Dashboard</h1>
+      <h1 class="dashboard-title">Dashboard Principal</h1>
       
       <!-- Summary Cards -->
       <div class="summary-cards">

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,14 +11,16 @@ import { CommonModule } from '@angular/common';
         type="text"
         class="search-input"
         placeholder="Buscar profesionales por nombre"
+        (input)="onInput($event)"
       >
-      <button class="search-button">Buscar</button>
+      <button class="search-button" (click)="emitSearch()">Buscar</button>
     </div>
   `,
   styles: [`
     .search-bar {
       display: flex;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
       margin-bottom: 2rem;
       margin-left: 1rem;
       max-width: 700px;
@@ -26,6 +28,7 @@ import { CommonModule } from '@angular/common';
 
     .search-input {
       flex: 1;
+      margin-top: 0.5rem;
       padding: 0.75rem 1rem;
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -55,4 +58,13 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class SearchBarComponent {}
+export class SearchBarComponent {
+  @Output() search = new EventEmitter<string>();
+  private currentValue = '';
+  onInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.currentValue = target.value;
+    this.search.emit(this.currentValue.trim());
+  }
+  emitSearch() { this.search.emit(this.currentValue.trim()); }
+}

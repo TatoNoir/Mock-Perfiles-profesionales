@@ -1,45 +1,54 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SearchBarComponent } from './search-bar.component';
 
 @Component({
   selector: 'app-filters-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SearchBarComponent],
   template: `
     <section class="filters-card">
-      <div class="filters-grid">
-        <div class="filter-group">
-          <label class="filter-label">Ubicación</label>
-          <input type="text" class="filter-input" placeholder="Ciudad">
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Especialidad/Rubro</label>
-          <select class="filter-select">
-            <option value="">Todas</option>
-            <option value="medico">Médico</option>
-            <option value="abogado">Abogado</option>
-            <option value="ingeniero">Ingeniero</option>
-            <option value="arquitecto">Arquitecto</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Disponibilidad</label>
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" class="checkbox">
-              <span>Inmediata</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" class="checkbox">
-              <span>Esta semana</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" class="checkbox">
-              <span>Este mes</span>
-            </label>
+      <div class="filters-row">
+        <div class="filters-left">
+          <div class="filter-group">
+            <label class="filter-label">Ubicación</label>
+            <input type="text" class="filter-input" placeholder="Ciudad">
           </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Especialidad/Rubro</label>
+            <select class="filter-select">
+              <option value="">Todas</option>
+              <option value="medico">Médico</option>
+              <option value="abogado">Abogado</option>
+              <option value="ingeniero">Ingeniero</option>
+              <option value="arquitecto">Arquitecto</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Disponibilidad</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" class="checkbox">
+                <span>Inmediata</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" class="checkbox">
+                <span>Esta semana</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" class="checkbox">
+                <span>Este mes</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="vertical-separator" aria-hidden="true"></div>
+
+        <div class="search-right">
+          <app-search-bar (search)="emitSearch($event)"></app-search-bar>
         </div>
       </div>
 
@@ -58,13 +67,10 @@ import { CommonModule } from '@angular/common';
       margin-bottom: 1.5rem;
     }
 
-    .filters-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-left: 1rem;
-      max-width: 700px;
-    }
+    .filters-row { display: flex; flex-direction: row; gap: 1.5rem; align-items: flex-start; }
+    .filters-left { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+    .search-right { width: 420px; max-width: 100%; }
+    .vertical-separator { width: 1px; background-color: #e0e0e0; align-self: stretch; }
 
     .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
     .filter-label { font-size: 0.875rem; color: #555; }
@@ -73,13 +79,22 @@ import { CommonModule } from '@angular/common';
     .checkbox-group { display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; }
     .checkbox-label { display: flex; align-items: center; gap: 0.5rem; color: #555; font-size: 0.875rem; }
 
-    .actions { margin-top: 2rem; margin-left: 1rem; display: flex; gap: 1rem; }
+    .actions { margin-top: 2rem; display: flex; gap: 1rem; }
     .apply-button { padding: 0.75rem 2rem; background-color: #4a90e2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 500; }
     .apply-button:hover { background-color: #357abd; }
     .clear-button { padding: 0.75rem 2rem; background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 500; }
     .clear-button:hover { background-color: #e5e7eb; }
+
+    @media (max-width: 900px) {
+      .filters-row { flex-direction: column; }
+      .vertical-separator { display: none; }
+      .search-right { width: 100%; }
+    }
   `]
 })
-export class FiltersPanelComponent {}
+export class FiltersPanelComponent {
+  @Output() search = new EventEmitter<string>();
+  emitSearch(term: string) { this.search.emit(term); }
+}
 
 

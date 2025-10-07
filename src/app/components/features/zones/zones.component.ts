@@ -118,12 +118,12 @@ interface ZoneRow {
   `]
 })
 export class ZonesComponent {
-  countries: string[] = ['Argentina', 'CMX', 'Chile'];
+  countries: string[] = ['Argentina', 'Perú', 'Chile'];
   filters = { country: 'Argentina', province: '', city: '', postalCode: '' };
   rows: ZoneRow[] = [
     { flag: '🇦🇷', country: 'Argentina', province: 'Buenos Aires', city: 'La Plata', postalCode: '1900', neighborhood: 'Microcentro', type: 'Urbana' },
-    { flag: '🇲🇽', country: 'CMX', province: 'CDMX', city: 'Coyoacán', postalCode: '04100', neighborhood: 'Roma Sur', type: 'Suburbana' },
-    { flag: '🇨🇱', country: 'Chile', province: 'Región Metropolitana', city: 'Santiago', postalCode: '8320000', neighborhood: 'Ñuñoa', type: 'Urbana' }
+    { flag: '🇦🇷', country: 'Argentina', province: 'Buenos Aires', city: 'Capital Federal', postalCode: '1900', neighborhood: 'Microcentro', type: 'Urbana'  },
+    { flag: '🇦🇷', country: 'Argentina', province: 'Buenos Aires', city: 'Escobar', postalCode: '1900', neighborhood: 'Microcentro', type: 'Urbana'  }
   ];
 
   onSearch() {}
