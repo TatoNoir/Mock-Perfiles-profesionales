@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Professional, ProfessionalProfile } from '../../../models/professional.model';
 
@@ -177,7 +177,7 @@ export class ProfessionalListComponent {
       experienceYears: p.experience
     };
   }
-  professionals: Professional[] = [
+  @Input() professionals: Professional[] = [
     {
       id: 1,
       name: 'Carlos García',

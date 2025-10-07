@@ -17,7 +17,7 @@ import { ProfessionalProfile } from '../../../models/professional.model';
           <div class="location">{{ profile?.location || 'Córdoba, Argentina' }}</div>
         </div>
         <div class="hero-actions">
-          <button class="btn primary">Contactar</button>
+          <button class="btn primary">Ver perfil Profesional</button>
           <button class="link">Reportar perfil</button>
         </div>
       </div>

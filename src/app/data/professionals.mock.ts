@@ -9,7 +9,7 @@ type ProfessionalWithId = Professional & { id: number; location: string; avatarU
 export const PROFESSIONALS: ProfessionalWithId[] = [
   {
     id: 1,
-    name: 'Ana García', initials: 'AG', specialty: 'Médico Cirujano',
+    name: 'Marcos García', initials: 'AG', specialty: 'Médico Cirujano',
     description: 'Especialista en cirugía general con amplia experiencia en procedimientos complejos.',
     skills: ['Cirugía', 'Emergencias', 'Diagnóstico'], experience: 8,
     location: 'Buenos Aires, Argentina', email: 'ana@example.com'
