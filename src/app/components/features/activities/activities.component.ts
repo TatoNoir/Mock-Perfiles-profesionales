@@ -17,7 +17,7 @@ interface ActivityRow {
   imports: [CommonModule, FormsModule],
   template: `
     <section class="activities">
-      <h2 class="title">Actividades Profesionales</h2>
+      <h2 class="title"><svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></svg><span>Actividades Profesionales</span></h2>
 
       <div class="filters">
         <div class="field">
@@ -79,7 +79,8 @@ interface ActivityRow {
   `,
   styles: [`
     .activities { display: grid; gap: 1.25rem; }
-    .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #0f172a; }
+    .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #0f172a; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .title-icon { width: 22px; height: 22px; fill: currentColor; }
 
     .filters { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; background: #fff; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 12px; }
     .field { display: grid; gap: 0.35rem; }

@@ -20,7 +20,7 @@ interface ZoneRow {
   imports: [CommonModule, FormsModule],
   template: `
     <section class="zones">
-      <h2 class="title">Zonas</h2>
+      <h2 class="title"><svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"></path></svg><span>Zonas</span></h2>
 
       <div class="filters">
         <div class="field">
@@ -89,7 +89,8 @@ interface ZoneRow {
   `,
   styles: [`
     .zones { display: grid; gap: 1.25rem; }
-    .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #0f172a; }
+    .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #0f172a; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .title-icon { width: 22px; height: 22px; fill: currentColor; }
 
     .filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; gap: 0.75rem; align-items: end; background: #fff; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 12px; }
     .field { display: grid; gap: 0.35rem; }
