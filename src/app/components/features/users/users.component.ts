@@ -18,7 +18,10 @@ type User = {
   imports: [CommonModule, HttpClientModule],
   template: `
     <section class="users">
-      <h2 class="title"><svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg><span>Usuarios</span></h2>
+      <div class="header">
+        <h2 class="title"><svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg><span>Usuarios</span></h2>
+        <!-- <button class="btn secondary" (click)="loadUsersFromApi()">Cargar desde API</button> -->
+      </div>
       <div class="table-wrap">
         <table class="table">
           <thead>
@@ -55,6 +58,7 @@ type User = {
   `,
   styles: [`
     .users { display: flex; flex-direction: column; gap: 1rem; }
+    .header { display: flex; align-items: center; justify-content: space-between; }
     .title { margin: 0; font-size: 1.5rem; font-weight: 600; color: #1f2937; display: inline-flex; align-items: center; gap: 0.5rem; }
     .title-icon { width: 22px; height: 22px; fill: currentColor; }
     .table-wrap { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
@@ -68,6 +72,8 @@ type User = {
     .btn { padding: 0.35rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
     .btn.primary { background: #1f4c85; color: #fff; }
     .btn.primary:hover { background: #183c69; }
+    .btn.secondary { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+    .btn.secondary:hover { background: #e5e7eb; }
     .badge { padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; text-transform: capitalize; }
     .badge-admin { background: #fee2e2; color: #991b1b; }
     .badge-editor { background: #e0e7ff; color: #3730a3; }
@@ -90,7 +96,9 @@ export class UsersComponent {
   constructor(private usersService: UsersService) {}
   loadUsersFromApi() {
     this.usersService.getUsers().subscribe({
-      next: (data) => { this.apiUsers = data; },
+      next: (data) => { 
+        /* console.log('getUsers() ->', data); */
+        this.apiUsers = data; },
       error: (err) => { console.error('Error cargando usuarios', err); }
     });
   }
