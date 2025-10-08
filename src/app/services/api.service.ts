@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,13 +10,24 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService
+  ) {}
 
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
+    const token = this.tokenService.getToken();
+    const headers: { [key: string]: string } = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
-    });
+    };
+
+    // Agregar el token de autorización si está disponible
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return new HttpHeaders(headers);
   }
 
   get<T>(endpoint: string, params?: any): Observable<T> {

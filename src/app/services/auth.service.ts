@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, throwError, tap } from 'rxjs';
 import { ApiService } from './api.service';
+import { TokenService } from './token.service';
 
 export interface AuthUser {
   id: number;
@@ -38,10 +39,12 @@ export interface LoginResponse {
 export class AuthService {
   private currentUserSubject: BehaviorSubject<AuthUser | null> = new BehaviorSubject<AuthUser | null>(null);
   public currentUser: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
-  private readonly TOKEN_KEY = 'access_token';
   private readonly USER_KEY = 'current_user';
 
-  constructor(private apiService: ApiService) {
+  constructor(
+    private apiService: ApiService,
+    private tokenService: TokenService
+  ) {
     // Verificar si hay un usuario guardado al inicializar el servicio
     this.loadStoredUser();
   }
@@ -51,20 +54,20 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.tokenService.getToken();
   }
 
   isAuthenticated(): boolean {
     const token = this.getToken();
     const user = this.currentUserValue;
-    return !!(token && user);
+    return !!(token && user && this.tokenService.isTokenValid());
   }
 
   private loadStoredUser(): void {
     const storedUser = localStorage.getItem(this.USER_KEY);
-    const token = localStorage.getItem(this.TOKEN_KEY);
+    const token = this.tokenService.getToken();
     
-    if (storedUser && token) {
+    if (storedUser && token && this.tokenService.isTokenValid()) {
       try {
         const user: AuthUser = JSON.parse(storedUser);
         this.currentUserSubject.next(user);
@@ -72,17 +75,20 @@ export class AuthService {
         console.error('Error al cargar usuario guardado:', error);
         this.clearStorage();
       }
+    } else if (token && !this.tokenService.isTokenValid()) {
+      console.log('Token expirado, limpiando sesión');
+      this.clearStorage();
     }
   }
 
   private saveUserData(response: LoginResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.access_token);
+    this.tokenService.setToken(response.access_token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
     this.currentUserSubject.next(response.user);
   }
 
   private clearStorage(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    this.tokenService.removeToken();
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
   }

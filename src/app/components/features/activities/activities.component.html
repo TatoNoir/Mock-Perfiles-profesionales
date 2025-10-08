@@ -1,0 +1,130 @@
+<section class="activities">
+  <h2 class="title">
+    <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path>
+    </svg>
+    <span>Actividades Profesionales</span>
+  </h2>
+
+  <div class="filters">
+    <div class="field">
+      <label>Categoría</label>
+      <select [(ngModel)]="filters.category">
+        <option value="">Todas</option>
+        <option *ngFor="let category of categories" [ngValue]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Actividad</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filters.activity" 
+        placeholder="Electricista" 
+      />
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="filters.status">
+        <option value="">Todos</option>
+        <option value="Activa">Activa</option>
+        <option value="Inactiva">Inactiva</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn primary" (click)="onSearch()" [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" *ngIf="!loading">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+        </svg>
+        <svg class="icon loading" viewBox="0 0 24 24" aria-hidden="true" *ngIf="loading">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+        </svg>
+        <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header" *ngIf="activities.length > 0">
+      <span class="results-count">{{ activities.length }} actividad{{ activities.length !== 1 ? 'es' : '' }} encontrada{{ activities.length !== 1 ? 's' : '' }}</span>
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Actividad</th>
+          <th>Descripción breve</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
+          <td>{{ activity.category }}</td>
+          <td>{{ activity.activity }}</td>
+          <td class="muted">{{ activity.description }}</td>
+          <td>
+            <span 
+              class="badge" 
+              [class.green]="activity.status === 'Activa'" 
+              [class.gray]="activity.status === 'Inactiva'"
+            >
+              {{ activity.status }}
+            </span>
+          </td>
+          <td class="row-actions">
+            <button 
+              class="link" 
+              (click)="onEdit(activity)"
+              [title]="'Editar ' + activity.activity"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04a1 1 0 0 0 0-1.41l-1.51-1.51a1 1 0 0 0-1.41 0l-1.12 1.12 3.75 3.75 1.29-1.29z"></path>
+              </svg>
+              <span>Editar</span>
+            </button>
+            <button 
+              class="link" 
+              (click)="onToggleStatus(activity)"
+              [title]="'Cambiar estado de ' + activity.activity"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+              </svg>
+              <span>{{ activity.status === 'Activa' ? 'Desactivar' : 'Activar' }}</span>
+            </button>
+            <button 
+              class="link danger" 
+              (click)="onDelete(activity)"
+              [title]="'Eliminar ' + activity.activity"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 1h4v2H4V5h4l1-1z"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="activities.length === 0 && !loading">
+      <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path>
+      </svg>
+      <h3>No se encontraron actividades</h3>
+      <p>Intenta ajustar los filtros de búsqueda o agrega una nueva actividad.</p>
+    </div>
+
+    <div class="table-footer">
+      <button class="btn primary" (click)="onAdd()">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path>
+        </svg>
+        <span>Agregar Actividad</span>
+      </button>
+    </div>
+  </div>
+</section>
