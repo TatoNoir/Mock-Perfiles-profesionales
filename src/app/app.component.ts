@@ -3,12 +3,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './components/layout/header/header.component';
 import { SidebarComponent } from './components/layout/sidebar/sidebar.component';
-import { RouterOutlet } from '@angular/router';
-import { UsersComponent } from './components/features/users/users.component';
-import { DashboardComponent } from './components/features/dashboard/dashboard.component';
-import { ZonesComponent } from './components/features/zones/zones.component';
-import { ActivitiesComponent } from './components/features/activities/activities.component';
-import { ProfessionalDetailComponent } from './components/features/professional-detail/professional-detail.component';
+import { Router, RouterOutlet } from '@angular/router';
 import { ProfessionalProfile } from './models/professional.model';
 
 @Component({
@@ -18,42 +13,24 @@ import { ProfessionalProfile } from './models/professional.model';
     CommonModule,
     HeaderComponent,
     SidebarComponent,
-    RouterOutlet,
-    UsersComponent,
-    DashboardComponent,
-    ZonesComponent,
-    ActivitiesComponent,
-    ProfessionalDetailComponent
+    RouterOutlet
   ],
   template: `
-    <div class="app-container">
-      <app-header (logout)="onLogout()"></app-header>
-      <div class="main-layout">
-        <app-sidebar (navigate)="onNavigate($event)"></app-sidebar>
-        <main class="main-content">
-          <ng-container [ngSwitch]="section">
-            <ng-container *ngSwitchCase="'dashboard'">
-              <app-dashboard></app-dashboard>
-            </ng-container>
-            <ng-container *ngSwitchCase="'profesionales'">
-              <router-outlet></router-outlet>
-            </ng-container>
-            <ng-container *ngSwitchCase="'usuarios'">
-              <app-users></app-users>
-            </ng-container>
-            <ng-container *ngSwitchCase="'zonas'">
-              <app-zones></app-zones>
-            </ng-container>
-            <ng-container *ngSwitchCase="'actividades'">
-              <app-activities></app-activities>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-              <app-dashboard></app-dashboard>
-            </ng-container>
-          </ng-container>
-        </main>
+    <ng-container *ngIf="!isAuthRoute; else authLayout">
+      <div class="app-container">
+        <app-header (logout)="onLogout()"></app-header>
+        <div class="main-layout">
+          <app-sidebar></app-sidebar>
+          <main class="main-content">
+            <router-outlet></router-outlet>
+          </main>
+        </div>
       </div>
-    </div>
+    </ng-container>
+
+    <ng-template #authLayout>
+      <router-outlet></router-outlet>
+    </ng-template>
   `,
   styles: [`
     .app-container {
@@ -87,12 +64,12 @@ import { ProfessionalProfile } from './models/professional.model';
   `]
 })
 export class AppComponent {
+  constructor(private router: Router) {}
   async onLogout() {
     console.log('Logout pulsado (autenticación deshabilitada)');
   }
-  section: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades' = 'dashboard';
-  onNavigate(s: 'dashboard' | 'profesionales' | 'usuarios' | 'zonas' | 'actividades') { this.section = s; }
-  selectedProfile?: ProfessionalProfile;
-  onProfessionalSelected(p: ProfessionalProfile) { this.selectedProfile = p; }
+  get isAuthRoute(): boolean {
+    return this.router.url.startsWith('/login');
+  }
 }
 

@@ -1,191 +1,202 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../../services/supabase.service';
+import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h1 class="auth-title">Portal de Profesionales</h1>
-          <p class="auth-subtitle">{{ isLogin ? 'Inicia sesión' : 'Crea tu cuenta' }}</p>
-        </div>
+    <div class="page">
+      <h1 class="brand">Portal de Profesionales</h1>
 
-        <form class="auth-form" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input
-              type="email"
-              class="form-input"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="tu@email.com"
-              required
-            >
-          </div>
+      <div class="card">
+        <h2 class="card-title">Ingresar</h2>
 
-          <div class="form-group">
-            <label class="form-label">Contraseña</label>
+        <form class="form" (ngSubmit)="onSubmit()">
+          <label class="label">Email o usuario</label>
+          <input
+            class="input"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="tu@email.com"
+            required
+          >
+
+          <label class="label">Contraseña</label>
+          <div class="password-row">
             <input
-              type="password"
-              class="form-input"
+              class="input"
+              [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="password"
               name="password"
               placeholder="••••••••"
               required
             >
+            <button type="button" class="icon-button" (click)="togglePassword()" aria-label="Mostrar u ocultar contraseña">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
           </div>
 
-          <div *ngIf="errorMessage" class="error-message">
+          <label class="remember">
+            <input type="checkbox" [(ngModel)]="remember" name="remember">
+            Recordarme
+          </label>
+
+          <div *ngIf="errorMessage" class="error">
             {{ errorMessage }}
           </div>
 
-          <button type="submit" class="submit-button" [disabled]="loading">
-            {{ loading ? 'Cargando...' : (isLogin ? 'Iniciar Sesión' : 'Registrarse') }}
+          <button type="submit" class="primary" [disabled]="loading">
+            <span class="spinner" *ngIf="loading"></span>
+            Ingresar
           </button>
         </form>
 
-        <div class="auth-footer">
-          <p class="toggle-text">
-            {{ isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
-            <button class="toggle-button" (click)="toggleMode()" type="button">
-              {{ isLogin ? 'Regístrate' : 'Inicia sesión' }}
-            </button>
-          </p>
-        </div>
+        <button class="link" type="button">Olvidé mi contraseña</button>
       </div>
     </div>
   `,
   styles: [`
-    .auth-container {
+    .page {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 1rem;
+      background: #f8fbff;
+      padding: 3rem 1rem;
+      gap: 2rem;
     }
 
-    .auth-card {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      width: 100%;
-      max-width: 420px;
-      padding: 2.5rem;
-    }
-
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .auth-title {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1a1a1a;
-    }
-
-    .auth-subtitle {
+    .brand {
       margin: 0;
+      color: #1e3a8a;
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(2, 18, 54, 0.08);
+      padding: 2rem;
+    }
+
+    .card-title {
+      margin: 0 0 1.25rem 0;
+      font-size: 1.25rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      color: #334155;
+      font-weight: 600;
+      margin-top: 0.35rem;
+    }
+
+    .input {
+      padding: 0.9rem 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
       font-size: 1rem;
-      color: #666;
+      background: #fff;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+    .input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
+    .password-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
       gap: 0.5rem;
     }
 
-    .form-label {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .form-input {
-      padding: 0.875rem 1rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .error-message {
-      padding: 0.75rem 1rem;
-      background-color: #fee;
-      border: 1px solid #fcc;
-      border-radius: 8px;
-      color: #c33;
-      font-size: 0.875rem;
-    }
-
-    .submit-button {
-      padding: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .submit-button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+    .remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem 0 0.25rem;
+      color: #334155;
+      font-size: 0.95rem;
     }
 
-    .submit-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .error {
+      margin-top: 0.5rem;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
     }
 
-    .auth-footer {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e0e0e0;
-      text-align: center;
+    .primary {
+      margin-top: 0.5rem;
+      height: 46px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    .toggle-text {
-      margin: 0;
-      font-size: 0.875rem;
-      color: #666;
+    .primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .toggle-button {
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .link {
+      margin-top: 1rem;
       background: none;
       border: none;
-      color: #667eea;
+      color: #1d4ed8;
       font-weight: 600;
       cursor: pointer;
       text-decoration: underline;
-      padding: 0;
-      margin-left: 0.25rem;
-    }
-
-    .toggle-button:hover {
-      color: #764ba2;
     }
   `]
 })
@@ -194,9 +205,11 @@ export class LoginComponent {
   password = '';
   loading = false;
   errorMessage = '';
-  isLogin = true;
+  isLogin = false;
+  showPassword = false;
+  remember = false;
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   toggleMode() {
     this.isLogin = !this.isLogin;
@@ -214,14 +227,17 @@ export class LoginComponent {
 
     try {
       if (this.isLogin) {
-        await this.supabaseService.signIn(this.email, this.password);
+        await this.authService.signIn(this.email, this.password);
       } else {
-        await this.supabaseService.signUp(this.email, this.password);
+        await this.authService.signUp(this.email, this.password);
       }
+      this.router.navigateByUrl('/dashboard');
     } catch (error: any) {
       this.errorMessage = error.message || 'Ocurrió un error. Por favor intenta de nuevo.';
     } finally {
       this.loading = false;
     }
   }
+
+  togglePassword() { this.showPassword = !this.showPassword; }
 }

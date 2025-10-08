@@ -11,7 +11,7 @@ src/
 │   │   ├── layout/           # Componentes de layout (header, sidebar)
 │   │   ├── features/         # Componentes de funcionalidades (search, professional-list)
 │   │   └── auth/            # Componentes de autenticación (login)
-│   ├── services/            # Servicios (Supabase)
+│   ├── services/            # Servicios (Auth mock)
 │   ├── models/              # Interfaces y tipos
 │   └── app.component.ts     # Componente principal
 ├── assets/
@@ -50,7 +50,7 @@ src/
 - ✅ Lista de profesionales con datos mock
 - ✅ Filtros y búsqueda
 - ✅ Diseño responsive
-- ✅ Integración opcional con Supabase
+- ✅ Autenticación mock (antes Supabase)
 
 
 VISTAS:
