@@ -5,6 +5,7 @@ import { HeaderComponent } from './components/layout/header/header.component';
 import { SidebarComponent } from './components/layout/sidebar/sidebar.component';
 import { Router, RouterOutlet } from '@angular/router';
 import { ProfessionalProfile } from './models/professional.model';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -64,10 +65,17 @@ import { ProfessionalProfile } from './models/professional.model';
   `]
 })
 export class AppComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+  
   async onLogout() {
-    console.log('Logout pulsado (autenticación deshabilitada)');
+    console.log('🚪 Cerrando sesión...');
+    await this.authService.signOut();
+    this.router.navigate(['/login']);
   }
+  
   get isAuthRoute(): boolean {
     return this.router.url.startsWith('/login');
   }

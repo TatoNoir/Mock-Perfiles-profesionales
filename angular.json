@@ -27,7 +27,7 @@
           },
           "options": {
             "assets": [
-              "src/environments/env.js"
+              "src/assets"
             ],
             "index": "src/index.html",
             "browser": "src/main.ts",
