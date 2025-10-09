@@ -7,7 +7,12 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <header class="header">
-      <h1 class="title">Portal de Profesionales</h1>
+      <div class="brand">
+        <div class="logo-container">
+          <img src="assets/images/logo.png" alt="Portal de Profesionales" class="logo" />
+        </div>
+        <h1 class="title">Portal de Profesionales</h1>
+      </div>
       <div class="actions">
         <div class="avatar" (click)="toggleDropdown()">MP</div>
         <div class="dropdown" *ngIf="dropdownOpen">
@@ -24,17 +29,87 @@ import { CommonModule } from '@angular/common';
     .header {
       background-color: #1f4c85;
       color: white;
-      padding: 1rem 2rem;
+      padding: 1.25rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      min-height: 80px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      width: auto;
+      padding: 8px;
+      background: white;
+    }
+
+    .logo {
+      height: 65px;
+      width: auto;
+      object-fit: contain;
+      object-position: center;
+      transition: transform 0.2s ease;
+      background: transparent;
+      border: none;
+      outline: none;
+      display: block;
+      filter: none;
+      mix-blend-mode: normal;
+      opacity: 1;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
     }
 
     .title {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .brand {
+        gap: 0.5rem;
+      }
+      
+      .logo-container {
+        height: 60px;
+        padding: 6px;
+      }
+      
+      .logo {
+        height: 55px;
+      }
+      
+      .title {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        display: none;
+      }
+      
+      .logo-container {
+        height: 55px;
+        padding: 5px;
+      }
+      
+      .logo {
+        height: 50px;
+      }
     }
 
     .actions { position: relative; display: flex; align-items: center; }
