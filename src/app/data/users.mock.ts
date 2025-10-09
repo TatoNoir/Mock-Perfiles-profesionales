@@ -1,4 +1,4 @@
-import { ApiUser } from '../services/users.service';
+import { ApiUser } from '../components/features/users/services/users.service';
 
 // Completa manualmente este arreglo con los usuarios mock.
 // Conserva las claves según la interfaz ApiUser del servicio.

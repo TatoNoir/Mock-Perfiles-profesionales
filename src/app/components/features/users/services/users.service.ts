@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { ApiService } from '../../../../services/api.service';
 
 export interface ApiActivityPivot { user_id: number; activity_id: number }
 
@@ -40,13 +41,16 @@ export interface ApiUser {
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private readonly endpoint = 'https://86711653425b.ngrok-free.app/api/users';
-
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   getUsers(): Observable<ApiUser[]> {
-    return this.http.get<{ data: ApiUser[] }>(this.endpoint).pipe(map(r => r.data));
+    return this.apiService.get<{ data: ApiUser[] }>('/api/users').pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching users from API:', error);
+        // Fallback: retornar array vacío en caso de error
+        return of([]);
+      })
+    );
   }
 }
-
-
