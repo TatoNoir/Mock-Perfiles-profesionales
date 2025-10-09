@@ -1,0 +1,14 @@
+.settings { padding: 1rem 2rem; }
+h2 { margin: 0 0 1rem; font-weight: 600; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; max-width: 720px; }
+h3 { margin: 0 0 0.75rem; }
+.field { display: grid; gap: 0.25rem; margin-bottom: 0.75rem; }
+label { color: #374151; font-weight: 500; }
+input { border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem 0.75rem; }
+.actions { margin-top: 0.5rem; }
+button { background: #1f4c85; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.875rem; cursor: pointer; }
+button[disabled] { opacity: 0.5; cursor: not-allowed; }
+.error { color: #b91c1c; margin-top: 0.5rem; }
+.success { color: #065f46; margin-top: 0.5rem; }
+
+

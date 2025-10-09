@@ -1,0 +1,10 @@
+.account { padding: 1rem 2rem; }
+h2 { margin: 0 0 1rem; font-weight: 600; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; max-width: 720px; }
+.row { display: grid; grid-template-columns: 160px 1fr; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+.row:last-child { border-bottom: none; }
+.label { color: #6b7280; }
+.value { color: #111827; font-weight: 500; }
+@media (max-width: 640px) { .row { grid-template-columns: 1fr; } .label { font-size: 0.9rem; } }
+
+

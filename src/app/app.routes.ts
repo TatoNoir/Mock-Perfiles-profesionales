@@ -6,6 +6,8 @@ import { ZonesComponent } from './components/features/zones/zones.component';
 import { ActivitiesComponent } from './components/features/activities/activities.component';
 import { ProfessionalsPageComponent } from './pages/professionals/professionals-page.component';
 import { ProfessionalDetailPageComponent } from './pages/professionals/professional-detail-page.component';
+import { AccountPageComponent } from './pages/account/account-page.component';
+import { SettingsPageComponent } from './pages/settings/settings-page.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -39,6 +41,16 @@ export const routes: Routes = [
   { 
     path: 'actividades', 
     component: ActivitiesComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'mis-datos', 
+    component: AccountPageComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'configuracion', 
+    component: SettingsPageComponent,
     canActivate: [AuthGuard]
   },
   // Ruta wildcard para manejar rutas no encontradas

@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -127,7 +128,15 @@ export class HeaderComponent {
   dropdownOpen = false;
 
   toggleDropdown() { this.dropdownOpen = !this.dropdownOpen; }
-  onMisDatos() { this.dropdownOpen = false; }
-  onConfiguracion() { this.dropdownOpen = false; }
+  onMisDatos() { 
+    this.dropdownOpen = false; 
+    this.router.navigateByUrl('/mis-datos');
+  }
+  onConfiguracion() {
+    this.dropdownOpen = false;
+    this.router.navigateByUrl('/configuracion');
+  }
   onTema() { this.dropdownOpen = false; }
+
+  constructor(private router: Router) {}
 }

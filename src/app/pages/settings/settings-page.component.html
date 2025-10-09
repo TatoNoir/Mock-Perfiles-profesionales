@@ -1,0 +1,29 @@
+<section class="settings">
+  <h2>Configuración</h2>
+
+  <div class="card">
+    <h3>Cambiar contraseña</h3>
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+      <div class="field">
+        <label for="current">Contraseña actual</label>
+        <input id="current" name="current" type="password" [(ngModel)]="current" required />
+      </div>
+      <div class="field">
+        <label for="newPass">Nueva contraseña</label>
+        <input id="newPass" name="newPass" type="password" [(ngModel)]="newPass" required minlength="6" />
+      </div>
+      <div class="field">
+        <label for="confirm">Confirmar nueva contraseña</label>
+        <input id="confirm" name="confirm" type="password" [(ngModel)]="confirm" required />
+      </div>
+
+      <div class="actions">
+        <button type="submit" [disabled]="loading || !form.form.valid || newPass !== confirm">Guardar</button>
+      </div>
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p class="success" *ngIf="success">Contraseña actualizada</p>
+    </form>
+  </div>
+</section>
+
+

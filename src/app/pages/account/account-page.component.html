@@ -1,0 +1,32 @@
+<section class="account">
+  <h2>Mis datos</h2>
+
+  <div *ngIf="user as u; else noUser" class="card">
+    <div class="row">
+      <div class="label">Nombre</div>
+      <div class="value">{{ u.name }}</div>
+    </div>
+    <div class="row">
+      <div class="label">Email</div>
+      <div class="value">{{ u.email }}</div>
+    </div>
+    <div class="row" *ngIf="u.phone">
+      <div class="label">Teléfono</div>
+      <div class="value">{{ u.phone }}</div>
+    </div>
+    <div class="row">
+      <div class="label">Perfil</div>
+      <div class="value">{{ u.profile?.name }}</div>
+    </div>
+    <div class="row">
+      <div class="label">Localidad</div>
+      <div class="value">{{ u.locality?.name }}</div>
+    </div>
+  </div>
+
+  <ng-template #noUser>
+    <p>No hay usuario cargado.</p>
+  </ng-template>
+</section>
+
+
