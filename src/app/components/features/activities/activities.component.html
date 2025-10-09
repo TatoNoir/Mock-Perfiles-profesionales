@@ -153,4 +153,12 @@
     (close)="onCloseAddModal()"
     (activityCreated)="onActivityCreated()"
   ></app-add-activity-modal>
+
+  <!-- Modal para editar actividad -->
+  <app-edit-activity-modal 
+    [isOpen]="showEditModal"
+    [activity]="selectedActivity"
+    (close)="onCloseEditModal()"
+    (activityUpdated)="onActivityUpdated($event)"
+  ></app-edit-activity-modal>
 </section>

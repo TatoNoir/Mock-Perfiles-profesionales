@@ -245,6 +245,20 @@ export class ActivitiesService {
     );
   }
 
+  /**
+   * Actualiza una actividad por ID desde la API
+   */
+  updateActivityFromApi(id: number, request: CreateActivityRequest): Observable<Activity> {
+    return this.apiService.put<Activity>(`/api/activities/${id}`, request).pipe(
+      map(response => this.mapApiActivityToInternal(response)),
+      catchError(error => {
+        console.error('Error updating activity:', error);
+        // Fallback: actualizar localmente
+        return of(this.updateActivityLocally(id, request));
+      })
+    );
+  }
+
   private mapApiActivityToInternal(apiActivity: any): Activity {
     return {
       id: apiActivity.id,
@@ -281,6 +295,25 @@ export class ActivitiesService {
     }
     this.activities.splice(index, 1);
     return true;
+  }
+
+  private updateActivityLocally(id: number, request: CreateActivityRequest): Activity {
+    const index = this.activities.findIndex(a => a.id === id);
+    if (index === -1) {
+      throw new Error('Activity not found');
+    }
+
+    const updatedActivity: Activity = {
+      ...this.activities[index],
+      activity: request.name,
+      description: request.name,
+      status: request.disabled === 0 ? 'Activa' : 'Inactiva',
+      updatedAt: new Date(),
+      tags: request.tags
+    };
+
+    this.activities[index] = updatedActivity;
+    return updatedActivity;
   }
 
   /**

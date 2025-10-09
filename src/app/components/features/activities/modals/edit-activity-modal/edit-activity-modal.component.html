@@ -1,0 +1,97 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Actividad</h2>
+      <button type="button" class="close-btn" (click)="onClose()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-group">
+        <label for="name">Nombre de la actividad *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          placeholder="Ingrese el nombre de la actividad"
+          [class.error]="editForm.get('name')?.invalid && editForm.get('name')?.touched"
+        />
+        <div class="error-message" *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched">
+          <span *ngIf="editForm.get('name')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="editForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="short_code">Código corto *</label>
+        <input
+          type="text"
+          id="short_code"
+          formControlName="short_code"
+          placeholder="Ingrese el código corto"
+          [class.error]="editForm.get('short_code')?.invalid && editForm.get('short_code')?.touched"
+        />
+        <div class="error-message" *ngIf="editForm.get('short_code')?.invalid && editForm.get('short_code')?.touched">
+          <span *ngIf="editForm.get('short_code')?.errors?.['required']">El código corto es requerido</span>
+          <span *ngIf="editForm.get('short_code')?.errors?.['minlength']">El código corto debe tener al menos 2 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="code">Código *</label>
+        <input
+          type="text"
+          id="code"
+          formControlName="code"
+          placeholder="Ingrese el código"
+          [class.error]="editForm.get('code')?.invalid && editForm.get('code')?.touched"
+        />
+        <div class="error-message" *ngIf="editForm.get('code')?.invalid && editForm.get('code')?.touched">
+          <span *ngIf="editForm.get('code')?.errors?.['required']">El código es requerido</span>
+          <span *ngIf="editForm.get('code')?.errors?.['minlength']">El código debe tener al menos 2 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tags">Tags</label>
+        <input
+          type="text"
+          id="tags"
+          formControlName="tags"
+          placeholder="Ingrese los tags separados por comas"
+        />
+        <small class="help-text">Separe los tags con comas (ej: tag1, tag2, tag3)</small>
+      </div>
+
+      <div class="form-group">
+        <label for="disabled">Estado</label>
+        <select id="disabled" formControlName="disabled">
+          <option value="0">Activa</option>
+          <option value="1">Inactiva</option>
+        </select>
+      </div>
+
+      <div class="error-message" *ngIf="error" class="form-error">
+        {{ error }}
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        (click)="onSubmit()" 
+        [disabled]="editForm.invalid || loading"
+      >
+        <span *ngIf="loading" class="loading-spinner"></span>
+        {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { ActivitiesService, Activity, ActivityFilters, ActivityStatus } from './services/activities.service';
-import { AddActivityModalComponent } from './add-activity-modal.component';
+import { AddActivityModalComponent } from './modals/add-activity-modal/add-activity-modal.component';
+import { EditActivityModalComponent } from './modals/edit-activity-modal/edit-activity-modal.component';
 
 @Component({
   selector: 'app-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, AddActivityModalComponent],
+  imports: [CommonModule, FormsModule, AddActivityModalComponent, EditActivityModalComponent],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
@@ -23,6 +24,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   showAddModal = false;
+  showEditModal = false;
+  selectedActivity: Activity | null = null;
   
   // Filters
   filters: ActivityFilters = {
@@ -126,11 +129,30 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Cierra el modal de editar actividad
+   */
+  onCloseEditModal(): void {
+    this.showEditModal = false;
+    this.selectedActivity = null;
+  }
+
+  /**
+   * Maneja la actualización exitosa de una actividad
+   */
+  onActivityUpdated(updatedActivity: Activity): void {
+    // Actualizar la actividad en la lista local
+    const index = this.activities.findIndex(a => a.id === updatedActivity.id);
+    if (index !== -1) {
+      this.activities[index] = updatedActivity;
+    }
+  }
+
+  /**
    * Abre el modal/formulario para editar una actividad
    */
   onEdit(activity: Activity): void {
-    console.log('Editar actividad:', activity);
-    // TODO: Implementar modal/formulario para editar actividad
+    this.selectedActivity = activity;
+    this.showEditModal = true;
   }
 
   /**
