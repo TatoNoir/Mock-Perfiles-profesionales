@@ -3,7 +3,10 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ApiService } from '../../../../services/api.service';
 
-export interface ApiActivityPivot { user_id: number; activity_id: number }
+export interface ApiActivityPivot { 
+  user_id: number; 
+  activity_id: number; 
+}
 
 export interface ApiActivity {
   id: number;
@@ -17,26 +20,62 @@ export interface ApiActivity {
   pivot?: ApiActivityPivot;
 }
 
-export interface ApiUserProfile {
+export interface ApiUserType {
   id: number;
   name: string;
+  description: string;
+  disabled: number;
   created_at?: string | null;
   updated_at?: string | null;
+}
+
+export interface ApiProvince {
+  id: number;
+  name: string;
+  short_code: string;
+  disabled: number;
+  country_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiLocality {
+  id: number;
+  name: string;
+  short_code: string;
+  disabled: number;
+  province_id: number;
+  created_at: string;
+  updated_at: string;
+  province: ApiProvince;
 }
 
 export interface ApiUser {
   id: number;
   name: string;
   email: string;
-  phone: string | null;
+  email_verified_at?: string | null;
+  phone: string;
   profile_picture: string | null;
   description: string | null;
-  profile_user_id: number | null;
-  profile: ApiUserProfile | null;
+  created_at: string;
+  updated_at: string;
+  locality_id: number;
+  user_type_id: number;
+  user_type: ApiUserType;
   activities: ApiActivity[];
-  email_verified_at?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+  locality: ApiLocality;
+}
+
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  description: string;
+  user_type_id: number;
+  locality_id: number;
+  activities: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +89,15 @@ export class UsersService {
         console.error('Error fetching users from API:', error);
         // Fallback: retornar array vacío en caso de error
         return of([]);
+      })
+    );
+  }
+
+  createUser(request: CreateUserRequest): Observable<ApiUser> {
+    return this.apiService.post<ApiUser>('/api/users', request).pipe(
+      catchError(error => {
+        console.error('Error creating user:', error);
+        throw error;
       })
     );
   }

@@ -135,6 +135,69 @@ td {
   color: #92400e; 
 }
 
+.badge-user-type { 
+  background: #dbeafe; 
+  color: #1e40af; 
+}
+
+.locality-info {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+/* Loading, Error and Empty states */
+.loading-cell,
+.error-cell,
+.empty-cell {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-cell span {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.empty-message svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
 .status { 
   text-transform: capitalize; 
 }
