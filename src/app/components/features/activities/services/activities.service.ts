@@ -13,6 +13,15 @@ export interface Activity {
   status: ActivityStatus;
   createdAt: Date;
   updatedAt: Date;
+  tags?: string;
+}
+
+export interface CreateActivityRequest {
+  name: string;
+  short_code: string;
+  tags: string;
+  code: string;
+  disabled: number;
 }
 
 export interface ActivityFilters {
@@ -82,15 +91,23 @@ export class ActivitiesService {
   getActivities(): Observable<Activity[]> {
     return this.apiService.get<Activity[]>('/api/activities').pipe(
       map((response: any) => {
-        // Si la API devuelve un wrapper con data, extraemos las actividades
-        if (response.data) {
-          return response.data;
+        const mapItem = (item: any): Activity => ({
+          id: item.id,
+          category: '',
+          activity: item.name,
+          description: item.name,
+          status: item.disabled === 0 ? 'Activa' : 'Inactiva',
+          createdAt: item.created_at ? new Date(item.created_at) : new Date(),
+          updatedAt: item.updated_at ? new Date(item.updated_at) : new Date(),
+          tags: item.tags
+        });
+
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data.map(mapItem);
         }
-        // Si devuelve directamente el array
         if (Array.isArray(response)) {
-          return response;
+          return response.map(mapItem);
         }
-        // Fallback a datos mock si hay error
         console.warn('Formato de respuesta inesperado, usando datos mock');
         return [...this.activities];
       }),
@@ -105,28 +122,8 @@ export class ActivitiesService {
   /**
    * Obtiene las categorías disponibles desde la API
    */
-  getCategories(): Observable<string[]> {
-    return this.apiService.get<string[]>('/api/activities/categories').pipe(
-      map((response: any) => {
-        // Si la API devuelve un wrapper con data, extraemos las categorías
-        if (response.data) {
-          return response.data;
-        }
-        // Si devuelve directamente el array
-        if (Array.isArray(response)) {
-          return response;
-        }
-        // Fallback a datos mock si hay error
-        console.warn('Formato de respuesta inesperado para categorías, usando datos mock');
-        return [...this.categories];
-      }),
-      catchError((error) => {
-        console.error('Error al obtener categorías desde la API:', error);
-        console.log('Usando categorías mock como fallback');
-        return of([...this.categories]).pipe(delay(100));
-      })
-    );
-  }
+  // Temporalmente deshabilitado: categorías
+  // getCategories(): Observable<string[]> { ... }
 
   /**
    * Filtra las actividades según los criterios usando la API
@@ -147,15 +144,23 @@ export class ActivitiesService {
 
     return this.apiService.get<Activity[]>('/api/activities', params).pipe(
       map((response: any) => {
-        // Si la API devuelve un wrapper con data, extraemos las actividades
-        if (response.data) {
-          return response.data;
+        const mapItem = (item: any): Activity => ({
+          id: item.id,
+          category: '',
+          activity: item.name,
+          description: item.name,
+          status: item.disabled === 0 ? 'Activa' : 'Inactiva',
+          createdAt: item.created_at ? new Date(item.created_at) : new Date(),
+          updatedAt: item.updated_at ? new Date(item.updated_at) : new Date(),
+          tags: item.tags
+        });
+
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data.map(mapItem);
         }
-        // Si devuelve directamente el array
         if (Array.isArray(response)) {
-          return response;
+          return response.map(mapItem);
         }
-        // Fallback a filtrado local si hay error
         console.warn('Formato de respuesta inesperado para filtros, usando filtrado local');
         return this.filterActivitiesLocally(filters);
       }),
@@ -203,16 +208,56 @@ export class ActivitiesService {
   /**
    * Crea una nueva actividad
    */
-  createActivity(activity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>): Observable<Activity> {
+  createActivity(request: CreateActivityRequest): Observable<Activity> {
+    return this.apiService.post<Activity>('/api/activities', request).pipe(
+      map((response: any) => {
+        // Si la API devuelve un wrapper con data, extraemos la actividad
+        if (response.data) {
+          return this.mapApiActivityToInternal(response.data);
+        }
+        // Si devuelve directamente el objeto
+        if (response.id) {
+          return this.mapApiActivityToInternal(response);
+        }
+        // Fallback a creación local si hay error
+        console.warn('Formato de respuesta inesperado para crear actividad, usando creación local');
+        return this.createActivityLocally(request);
+      }),
+      catchError((error) => {
+        console.error('Error al crear actividad desde la API:', error);
+        console.log('Usando creación local como fallback');
+        return of(this.createActivityLocally(request)).pipe(delay(300));
+      })
+    );
+  }
+
+  private mapApiActivityToInternal(apiActivity: any): Activity {
+    return {
+      id: apiActivity.id,
+      category: '',
+      activity: apiActivity.name,
+      description: apiActivity.name,
+      status: apiActivity.disabled === 0 ? 'Activa' : 'Inactiva',
+      createdAt: apiActivity.created_at ? new Date(apiActivity.created_at) : new Date(),
+      updatedAt: apiActivity.updated_at ? new Date(apiActivity.updated_at) : new Date(),
+      tags: apiActivity.tags
+    };
+  }
+
+  private createActivityLocally(request: CreateActivityRequest): Activity {
     const newActivity: Activity = {
-      ...activity,
       id: Math.max(...this.activities.map(a => a.id)) + 1,
+      category: '',
+      activity: request.name,
+      description: request.name,
+      status: request.disabled === 0 ? 'Activa' : 'Inactiva',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      tags: request.tags
     };
 
     this.activities.push(newActivity);
-    return of(newActivity).pipe(delay(300));
+    return newActivity;
   }
 
   /**

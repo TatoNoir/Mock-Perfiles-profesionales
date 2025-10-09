@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { ActivitiesService, Activity, ActivityFilters, ActivityStatus } from './services/activities.service';
+import { AddActivityModalComponent } from './add-activity-modal.component';
 
 @Component({
   selector: 'app-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AddActivityModalComponent],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
@@ -21,6 +22,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   // State
   loading = false;
   error: string | null = null;
+  showAddModal = false;
   
   // Filters
   filters: ActivityFilters = {
@@ -47,18 +49,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    // Cargar categorías
-    this.activitiesService.getCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (categories) => {
-          this.categories = categories;
-        },
-        error: (error) => {
-          console.error('Error al cargar categorías:', error);
-          this.error = 'Error al cargar las categorías';
-        }
-      });
+    // Temporalmente sin carga de categorías
 
     // Cargar actividades
     this.activitiesService.getActivities()
@@ -116,8 +107,22 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
    * Abre el modal/formulario para agregar una nueva actividad
    */
   onAdd(): void {
-    console.log('Agregar nueva actividad');
-    // TODO: Implementar modal/formulario para agregar actividad
+    this.showAddModal = true;
+  }
+
+  /**
+   * Cierra el modal de agregar actividad
+   */
+  onCloseAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  /**
+   * Maneja la creación exitosa de una actividad
+   */
+  onActivityCreated(): void {
+    // Recargar la lista de actividades
+    this.loadInitialData();
   }
 
   /**

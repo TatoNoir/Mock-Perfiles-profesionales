@@ -8,13 +8,8 @@
 
   <div class="filters">
     <div class="field">
-      <label>Categoría</label>
-      <select [(ngModel)]="filters.category">
-        <option value="">Todas</option>
-        <option *ngFor="let category of categories" [ngValue]="category">
-          {{ category }}
-        </option>
-      </select>
+      <label>Tags</label>
+      <input type="text" [(ngModel)]="filters.category" placeholder="construcción, cables, energía" />
     </div>
     <div class="field">
       <label>Actividad</label>
@@ -46,24 +41,48 @@
   </div>
 
   <div class="table-card">
-    <div class="table-header" *ngIf="activities.length > 0">
+    <div class="table-header" *ngIf="activities.length > 0 && !loading">
       <span class="results-count">{{ activities.length }} actividad{{ activities.length !== 1 ? 'es' : '' }} encontrada{{ activities.length !== 1 ? 's' : '' }}</span>
     </div>
     
     <table class="table">
       <thead>
         <tr>
-          <th>Categoría</th>
           <th>Actividad</th>
+          <th>Tags</th>
           <th>Descripción breve</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
-          <td>{{ activity.category }}</td>
+        <!-- Skeleton rows while loading -->
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text wide"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text wide"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text wide"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+
+        <!-- Real rows -->
+        <tr *ngFor="let activity of activities; trackBy: trackByActivityId" [class.hidden]="loading">
           <td>{{ activity.activity }}</td>
+          <td class="muted">{{ activity.tags || '-' }}</td>
           <td class="muted">{{ activity.description }}</td>
           <td>
             <span 
@@ -118,7 +137,7 @@
       <p>Intenta ajustar los filtros de búsqueda o agrega una nueva actividad.</p>
     </div>
 
-    <div class="table-footer">
+    <div class="table-footer" *ngIf="!loading">
       <button class="btn primary" (click)="onAdd()">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path>
@@ -127,4 +146,11 @@
       </button>
     </div>
   </div>
+
+  <!-- Modal para agregar actividad -->
+  <app-add-activity-modal 
+    [isOpen]="showAddModal"
+    (close)="onCloseAddModal()"
+    (activityCreated)="onActivityCreated()"
+  ></app-add-activity-modal>
 </section>

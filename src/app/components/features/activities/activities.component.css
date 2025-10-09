@@ -266,6 +266,20 @@
   color: #6b7280;
 }
 
+/* Skeleton styles */
+.skeleton-row > td { padding: 0.9rem 1rem; }
+.skeleton { position: relative; overflow: hidden; background: #f3f4f6; border-radius: 6px; }
+.skeleton::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shimmer 1.4s infinite; }
+.skeleton-text { height: 14px; width: 120px; }
+.skeleton-text.wide { width: 220px; }
+.skeleton-badge { height: 22px; width: 80px; border-radius: 9999px; }
+.skeleton-actions { height: 16px; width: 140px; }
+.hidden { display: none; }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .filters {
