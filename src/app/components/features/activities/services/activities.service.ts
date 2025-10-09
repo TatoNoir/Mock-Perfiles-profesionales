@@ -231,6 +231,20 @@ export class ActivitiesService {
     );
   }
 
+  /**
+   * Elimina una actividad por ID desde la API
+   */
+  deleteActivityFromApi(id: number): Observable<boolean> {
+    return this.apiService.delete<{ success: boolean }>(`/api/activities/${id}`).pipe(
+      map(response => response.success || true),
+      catchError(error => {
+        console.error('Error deleting activity:', error);
+        // Fallback: eliminar localmente
+        return of(this.deleteActivityLocally(id));
+      })
+    );
+  }
+
   private mapApiActivityToInternal(apiActivity: any): Activity {
     return {
       id: apiActivity.id,
@@ -260,6 +274,15 @@ export class ActivitiesService {
     return newActivity;
   }
 
+  private deleteActivityLocally(id: number): boolean {
+    const index = this.activities.findIndex(a => a.id === id);
+    if (index === -1) {
+      return false;
+    }
+    this.activities.splice(index, 1);
+    return true;
+  }
+
   /**
    * Actualiza una actividad existente
    */
@@ -279,19 +302,6 @@ export class ActivitiesService {
     return of(this.activities[index]).pipe(delay(300));
   }
 
-  /**
-   * Elimina una actividad
-   */
-  deleteActivity(id: number): Observable<boolean> {
-    const index = this.activities.findIndex(a => a.id === id);
-    
-    if (index === -1) {
-      return of(false);
-    }
-
-    this.activities.splice(index, 1);
-    return of(true).pipe(delay(200));
-  }
 
   /**
    * Cambia el estado de una actividad

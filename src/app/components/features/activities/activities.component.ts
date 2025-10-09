@@ -162,17 +162,24 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
    */
   onDelete(activity: Activity): void {
     if (confirm(`¿Estás seguro de que quieres eliminar la actividad "${activity.activity}"?`)) {
-      this.activitiesService.deleteActivity(activity.id)
+      this.loading = true;
+      this.error = null;
+      
+      this.activitiesService.deleteActivityFromApi(activity.id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (success) => {
+            this.loading = false;
             if (success) {
               // Remover la actividad de la lista local
               this.activities = this.activities.filter(a => a.id !== activity.id);
               console.log('Actividad eliminada:', activity.activity);
+            } else {
+              this.error = 'No se pudo eliminar la actividad';
             }
           },
           error: (error) => {
+            this.loading = false;
             console.error('Error al eliminar actividad:', error);
             this.error = 'Error al eliminar la actividad';
           }
