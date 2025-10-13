@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { DashboardComponent } from './components/features/dashboard/dashboard.component';
 import { UsersComponent } from './components/features/users/users.component';
+import { UserProfessionalProfileComponent } from './components/features/users/pages/user-professional-profile/user-professional-profile.component';
 import { ZonesComponent } from './components/features/zones/zones.component';
 import { ActivitiesComponent } from './components/features/activities/activities.component';
 import { ProfessionalsPageComponent } from './pages/professionals/professionals-page.component';
@@ -31,6 +32,11 @@ export const routes: Routes = [
   { 
     path: 'usuarios', 
     component: UsersComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'usuarios/:id/perfil-profesional', 
+    component: UserProfessionalProfileComponent,
     canActivate: [AuthGuard]
   },
   { 

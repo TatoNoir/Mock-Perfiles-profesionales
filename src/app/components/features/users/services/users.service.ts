@@ -101,4 +101,22 @@ export class UsersService {
       })
     );
   }
+
+  updateUser(id: number, request: CreateUserRequest): Observable<ApiUser> {
+    return this.apiService.put<ApiUser>(`/api/users/${id}`, request).pipe(
+      catchError(error => {
+        console.error('Error updating user:', error);
+        throw error;
+      })
+    );
+  }
+
+  deleteUser(id: number): Observable<{ success: boolean }> {
+    return this.apiService.delete<{ success: boolean }>(`/api/users/${id}`).pipe(
+      catchError(error => {
+        console.error('Error deleting user:', error);
+        throw error;
+      })
+    );
+  }
 }

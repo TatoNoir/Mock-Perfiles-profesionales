@@ -1,7 +1,7 @@
 <div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Agregar Nuevo Usuario</h2>
+      <h2>Editar Usuario</h2>
       <button type="button" class="close-btn" (click)="onClose()" [disabled]="loading">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
@@ -9,7 +9,7 @@
       </button>
     </div>
 
-    <form [formGroup]="addForm" (ngSubmit)="onSubmit()" class="modal-body">
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-group">
         <label for="name">Nombre completo *</label>
         <input
@@ -17,11 +17,11 @@
           id="name"
           formControlName="name"
           placeholder="Ingrese el nombre completo"
-          [class.error]="addForm.get('name')?.invalid && addForm.get('name')?.touched"
+          [class.error]="editForm.get('name')?.invalid && editForm.get('name')?.touched"
         />
-        <div class="error-message" *ngIf="addForm.get('name')?.invalid && addForm.get('name')?.touched">
-          <span *ngIf="addForm.get('name')?.errors?.['required']">El nombre es requerido</span>
-          <span *ngIf="addForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
+        <div class="error-message" *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched">
+          <span *ngIf="editForm.get('name')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="editForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
         </div>
       </div>
 
@@ -32,11 +32,11 @@
           id="email"
           formControlName="email"
           placeholder="Ingrese el email"
-          [class.error]="addForm.get('email')?.invalid && addForm.get('email')?.touched"
+          [class.error]="editForm.get('email')?.invalid && editForm.get('email')?.touched"
         />
-        <div class="error-message" *ngIf="addForm.get('email')?.invalid && addForm.get('email')?.touched">
-          <span *ngIf="addForm.get('email')?.errors?.['required']">El email es requerido</span>
-          <span *ngIf="addForm.get('email')?.errors?.['email']">Ingrese un email válido</span>
+        <div class="error-message" *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+          <span *ngIf="editForm.get('email')?.errors?.['required']">El email es requerido</span>
+          <span *ngIf="editForm.get('email')?.errors?.['email']">Ingrese un email válido</span>
         </div>
       </div>
 
@@ -46,12 +46,12 @@
           type="password"
           id="password"
           formControlName="password"
-          placeholder="Ingrese la contraseña"
-          [class.error]="addForm.get('password')?.invalid && addForm.get('password')?.touched"
+          placeholder="Ingrese la nueva contraseña"
+          [class.error]="editForm.get('password')?.invalid && editForm.get('password')?.touched"
         />
-        <div class="error-message" *ngIf="addForm.get('password')?.invalid && addForm.get('password')?.touched">
-          <span *ngIf="addForm.get('password')?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="addForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres</span>
+        <div class="error-message" *ngIf="editForm.get('password')?.invalid && editForm.get('password')?.touched">
+          <span *ngIf="editForm.get('password')?.errors?.['required']">La contraseña es requerida</span>
+          <span *ngIf="editForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres</span>
         </div>
       </div>
 
@@ -62,10 +62,10 @@
           id="phone"
           formControlName="phone"
           placeholder="Ingrese el teléfono"
-          [class.error]="addForm.get('phone')?.invalid && addForm.get('phone')?.touched"
+          [class.error]="editForm.get('phone')?.invalid && editForm.get('phone')?.touched"
         />
-        <div class="error-message" *ngIf="addForm.get('phone')?.invalid && addForm.get('phone')?.touched">
-          <span *ngIf="addForm.get('phone')?.errors?.['required']">El teléfono es requerido</span>
+        <div class="error-message" *ngIf="editForm.get('phone')?.invalid && editForm.get('phone')?.touched">
+          <span *ngIf="editForm.get('phone')?.errors?.['required']">El teléfono es requerido</span>
         </div>
       </div>
 
@@ -96,6 +96,7 @@
       <div class="form-group">
         <label for="activities">Actividades</label>
         <select id="activities" formControlName="activities" multiple>
+          <option value="2">Actividad 2</option>
           <option value="3">Actividad 3</option>
         </select>
       </div>
@@ -113,10 +114,10 @@
         type="submit" 
         class="btn btn-primary" 
         (click)="onSubmit()" 
-        [disabled]="addForm.invalid || loading"
+        [disabled]="editForm.invalid || loading"
       >
         <span *ngIf="loading" class="loading-spinner"></span>
-        {{ loading ? 'Creando...' : 'Crear Usuario' }}
+        {{ loading ? 'Actualizando...' : 'Actualizar Usuario' }}
       </button>
     </div>
   </div>

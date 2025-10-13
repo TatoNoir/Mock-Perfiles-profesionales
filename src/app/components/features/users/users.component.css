@@ -79,6 +79,19 @@ td {
   display: flex; 
   gap: 0.5rem; 
   justify-content: flex-end; 
+  min-width: 200px;
+  white-space: nowrap;
+}
+
+.btn.danger {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.btn.danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }
 
 .btn { 
@@ -87,6 +100,8 @@ td {
   border-radius: 6px; 
   cursor: pointer; 
   font-size: 0.85rem; 
+  min-width: 60px;
+  min-height: 32px;
 }
 
 .btn.primary { 
@@ -209,3 +224,4 @@ td {
 .offline { 
   color: #b91c1c; 
 }
+

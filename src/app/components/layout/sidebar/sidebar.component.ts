@@ -17,6 +17,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           </span>
           <span>Dashboard</span>
         </a>
+        <!-- Temporalmente oculto
         <a class="menu-item" routerLink="/profesionales" routerLinkActive="active">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -25,6 +26,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           </span>
           <span>Profesionales</span>
         </a>
+        -->
         <a class="menu-item" routerLink="/usuarios" routerLinkActive="active">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">

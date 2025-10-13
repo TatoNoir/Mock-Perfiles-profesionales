@@ -56,7 +56,10 @@
             <td class="muted">{{ u.updated_at | date:'short' }}</td>
             <td class="muted">{{ u.updated_at | date:'short' }}</td>
             <td class="actions">
-              <button class="btn primary">Ver</button>
+              <!-- Botones de acción -->
+              <button class="btn secondary" (click)="onEditUser(u)">Editar</button>
+              <button class="btn danger" (click)="onDeleteUser(u)">Eliminar</button>
+              <button class="btn primary" (click)="onViewProfessionalProfile(u)">Ver perfil profesional</button>
             </td>
           </tr>
         </ng-container>
@@ -83,3 +86,12 @@
   (close)="onCloseAddModal()"
   (userCreated)="onUserCreated($event)"
 ></app-add-user-modal>
+
+<!-- Modal para editar usuario -->
+<app-edit-user-modal 
+  [isOpen]="showEditModal"
+  [user]="selectedUser"
+  (close)="onCloseEditModal()"
+  (userUpdated)="onUserUpdated($event)"
+></app-edit-user-modal>
+
