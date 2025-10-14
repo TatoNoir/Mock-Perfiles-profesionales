@@ -8,15 +8,19 @@
 
   <div class="filters">
     <div class="field">
-      <label>Tags</label>
-      <input type="text" [(ngModel)]="filters.category" placeholder="construcción, cables, energía" />
-    </div>
-    <div class="field">
       <label>Actividad</label>
       <input 
         type="text" 
         [(ngModel)]="filters.activity" 
         placeholder="Electricista" 
+      />
+    </div>
+    <div class="field">
+      <label>Tags</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filters.tags" 
+        placeholder="construcción, cables, energía" 
       />
     </div>
     <div class="field">
@@ -28,21 +32,27 @@
       </select>
     </div>
     <div class="actions">
-      <button class="btn primary" (click)="onSearch()" [disabled]="loading">
+      <button class="btn secondary" (click)="onClearFilters()" [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+        <span>Limpiar Filtros</span>
+      </button>
+      <button class="btn primary" (click)="applyFilters()" [disabled]="loading">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" *ngIf="!loading">
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
         </svg>
         <svg class="icon loading" viewBox="0 0 24 24" aria-hidden="true" *ngIf="loading">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
         </svg>
-        <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+        <span>{{ loading ? 'Aplicando...' : 'Aplicar Filtros' }}</span>
       </button>
     </div>
   </div>
 
   <div class="table-card">
-    <div class="table-header" *ngIf="activities.length > 0 && !loading">
-      <span class="results-count">{{ activities.length }} actividad{{ activities.length !== 1 ? 'es' : '' }} encontrada{{ activities.length !== 1 ? 's' : '' }}</span>
+    <div class="table-header" *ngIf="filteredActivities.length > 0 && !loading">
+      <span class="results-count">{{ filteredActivities.length }} actividad{{ filteredActivities.length !== 1 ? 'es' : '' }} encontrada{{ filteredActivities.length !== 1 ? 's' : '' }}</span>
     </div>
     
     <table class="table">
@@ -80,7 +90,7 @@
         </tr>
 
         <!-- Real rows -->
-        <tr *ngFor="let activity of activities; trackBy: trackByActivityId" [class.hidden]="loading">
+        <tr *ngFor="let activity of filteredActivities; trackBy: trackByActivityId" [class.hidden]="loading">
           <td>{{ activity.activity }}</td>
           <td class="muted">{{ activity.tags || '-' }}</td>
           <td class="muted">{{ activity.description }}</td>
@@ -129,7 +139,7 @@
       </tbody>
     </table>
 
-    <div class="empty-state" *ngIf="activities.length === 0 && !loading">
+    <div class="empty-state" *ngIf="filteredActivities.length === 0 && !loading">
       <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path>
       </svg>

@@ -180,6 +180,19 @@
   box-shadow: 0 4px 8px rgba(31, 76, 133, 0.3);
 }
 
+.btn.secondary {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #e5e7eb;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #334155;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .link {
   background: transparent;
   border: none;

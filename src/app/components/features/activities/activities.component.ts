@@ -18,7 +18,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   
   // Data
   activities: Activity[] = [];
-  categories: string[] = [];
+  filteredActivities: Activity[] = [];
   
   // State
   loading = false;
@@ -29,8 +29,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   
   // Filters
   filters: ActivityFilters = {
-    category: '',
     activity: '',
+    tags: '',
     status: undefined
   };
 
@@ -46,13 +46,11 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos iniciales (categorías y actividades)
+   * Carga los datos iniciales
    */
   private loadInitialData(): void {
     this.loading = true;
     this.error = null;
-
-    // Temporalmente sin carga de categorías
 
     // Cargar actividades
     this.activitiesService.getActivities()
@@ -63,6 +61,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (activities) => {
           this.activities = activities;
+          this.filteredActivities = [...activities];
         },
         error: (error) => {
           console.error('Error al cargar actividades:', error);
@@ -72,26 +71,27 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Busca actividades según los filtros aplicados
+   * Aplica los filtros localmente a las actividades
    */
-  onSearch(): void {
-    this.loading = true;
-    this.error = null;
+  applyFilters(): void {
+    this.filteredActivities = this.activities.filter(activity => {
+      // Filtro por actividad
+      if (this.filters.activity && !activity.activity.toLowerCase().includes(this.filters.activity.toLowerCase())) {
+        return false;
+      }
 
-    this.activitiesService.filterActivities(this.filters)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.loading = false)
-      )
-      .subscribe({
-        next: (activities) => {
-          this.activities = activities;
-        },
-        error: (error) => {
-          console.error('Error al filtrar actividades:', error);
-          this.error = 'Error al buscar actividades';
-        }
-      });
+      // Filtro por tags
+      if (this.filters.tags && (!activity.tags || !activity.tags.toLowerCase().includes(this.filters.tags.toLowerCase()))) {
+        return false;
+      }
+
+      // Filtro por estado
+      if (this.filters.status && activity.status !== this.filters.status) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   /**
@@ -99,11 +99,11 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
    */
   onClearFilters(): void {
     this.filters = {
-      category: '',
       activity: '',
+      tags: '',
       status: undefined
     };
-    this.onSearch();
+    this.applyFilters();
   }
 
   /**
@@ -145,6 +145,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       this.activities[index] = updatedActivity;
     }
+    // Aplicar filtros para actualizar la vista
+    this.applyFilters();
   }
 
   /**
@@ -169,7 +171,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
             if (index !== -1) {
               this.activities[index] = updatedActivity;
             }
-            
+            // Aplicar filtros para actualizar la vista
+            this.applyFilters();
           }
         },
         error: (error) => {
@@ -195,7 +198,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
             if (success) {
               // Remover la actividad de la lista local
               this.activities = this.activities.filter(a => a.id !== activity.id);
-               
+              // Aplicar filtros para actualizar la vista
+              this.applyFilters();
             } else {
               this.error = 'No se pudo eliminar la actividad';
             }
@@ -215,13 +219,4 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   trackByActivityId(index: number, activity: Activity): number {
     return activity.id;
   }
-
-  /**
-   * Verifica si hay filtros activos
-   */
-  get hasActiveFilters(): boolean {
-    return !!(this.filters.category || this.filters.activity || this.filters.status);
-  }
 }
-
-

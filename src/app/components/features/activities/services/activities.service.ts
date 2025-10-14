@@ -25,8 +25,8 @@ export interface CreateActivityRequest {
 }
 
 export interface ActivityFilters {
-  category: string;
   activity: string;
+  tags: string;
   status?: ActivityStatus;
 }
 
@@ -43,7 +43,8 @@ export class ActivitiesService {
       description: 'Instalación y reparación eléctrica',
       status: 'Activa',
       createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-01-15')
+      updatedAt: new Date('2024-01-15'),
+      tags: 'construcción, cables, energía'
     },
     {
       id: 2,
@@ -52,7 +53,8 @@ export class ActivitiesService {
       description: 'Reparaciones de caños y grifería',
       status: 'Activa',
       createdAt: new Date('2024-01-16'),
-      updatedAt: new Date('2024-01-16')
+      updatedAt: new Date('2024-01-16'),
+      tags: 'plomería, caños, grifería'
     },
     {
       id: 3,
@@ -61,7 +63,8 @@ export class ActivitiesService {
       description: 'Corte de césped y mantenimiento',
       status: 'Inactiva',
       createdAt: new Date('2024-01-17'),
-      updatedAt: new Date('2024-01-17')
+      updatedAt: new Date('2024-01-17'),
+      tags: 'jardín, césped, plantas'
     },
     {
       id: 4,
@@ -70,7 +73,8 @@ export class ActivitiesService {
       description: 'Instalación y reparación de gas',
       status: 'Activa',
       createdAt: new Date('2024-01-18'),
-      updatedAt: new Date('2024-01-18')
+      updatedAt: new Date('2024-01-18'),
+      tags: 'gas, instalaciones, seguridad'
     },
     {
       id: 5,
@@ -79,7 +83,8 @@ export class ActivitiesService {
       description: 'Pintura de interiores y exteriores',
       status: 'Activa',
       createdAt: new Date('2024-01-19'),
-      updatedAt: new Date('2024-01-19')
+      updatedAt: new Date('2024-01-19'),
+      tags: 'pintura, decoración, mantenimiento'
     }
   ];
 
@@ -123,77 +128,6 @@ export class ActivitiesService {
    */
   // Temporalmente deshabilitado: categorías
   // getCategories(): Observable<string[]> { ... }
-
-  /**
-   * Filtra las actividades según los criterios usando la API
-   */
-  filterActivities(filters: ActivityFilters): Observable<Activity[]> {
-    // Preparar parámetros de consulta
-    const params: any = {};
-    
-    if (filters.category) {
-      params.category = filters.category;
-    }
-    if (filters.activity) {
-      params.activity = filters.activity;
-    }
-    if (filters.status) {
-      params.status = filters.status;
-    }
-
-    return this.apiService.get<Activity[]>('/api/activities', params).pipe(
-      map((response: any) => {
-        const mapItem = (item: any): Activity => ({
-          id: item.id,
-          category: '',
-          activity: item.name,
-          description: item.name,
-          status: item.disabled === 0 ? 'Activa' : 'Inactiva',
-          createdAt: item.created_at ? new Date(item.created_at) : new Date(),
-          updatedAt: item.updated_at ? new Date(item.updated_at) : new Date(),
-          tags: item.tags
-        });
-
-        if (response?.data && Array.isArray(response.data)) {
-          return response.data.map(mapItem);
-        }
-        if (Array.isArray(response)) {
-          return response.map(mapItem);
-        }
-        console.warn('Formato de respuesta inesperado para filtros, usando filtrado local');
-        return this.filterActivitiesLocally(filters);
-      }),
-      catchError((error) => {
-        console.error('Error al filtrar actividades desde la API:', error);
-        return of(this.filterActivitiesLocally(filters)).pipe(delay(200));
-      })
-    );
-  }
-
-  /**
-   * Filtrado local como fallback
-   */
-  private filterActivitiesLocally(filters: ActivityFilters): Activity[] {
-    let filtered = [...this.activities];
-
-    if (filters.category) {
-      filtered = filtered.filter(activity => 
-        activity.category.toLowerCase().includes(filters.category.toLowerCase())
-      );
-    }
-
-    if (filters.activity) {
-      filtered = filtered.filter(activity => 
-        activity.activity.toLowerCase().includes(filters.activity.toLowerCase())
-      );
-    }
-
-    if (filters.status) {
-      filtered = filtered.filter(activity => activity.status === filters.status);
-    }
-
-    return filtered;
-  }
 
   /**
    * Obtiene una actividad por ID
