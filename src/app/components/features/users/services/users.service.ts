@@ -121,7 +121,7 @@ export class UsersService {
   }
 
   getUserTypes(): Observable<ApiUserType[]> {
-    return this.apiService.get<{ data: ApiUserType[] }>('/api/profiles').pipe(
+    return this.apiService.get<{ data: ApiUserType[] }>('/api/user-types').pipe(
       map(response => response.data),
       catchError(error => {
         console.error('Error fetching user types from API:', error);
