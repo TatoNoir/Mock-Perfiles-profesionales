@@ -76,7 +76,6 @@ export class AuthService {
         this.clearStorage();
       }
     } else if (token && !this.tokenService.isTokenValid()) {
-      console.log('Token expirado, limpiando sesión');
       this.clearStorage();
     }
   }
@@ -109,11 +108,9 @@ export class AuthService {
   }
 
   signIn(email: string, password: string): Observable<LoginResponse> {
-    console.log('🔐 Intentando login con:', { email, password: '***' });
     
     return this.apiService.post<LoginResponse>('/api/login', { email, password }).pipe(
       tap((response: LoginResponse) => {
-        console.log('✅ Login exitoso, guardando datos del usuario');
         this.saveUserData(response);
       }),
       catchError(error => {
@@ -124,7 +121,6 @@ export class AuthService {
   }
 
   async signOut() {
-    console.log('🚪 Cerrando sesión');
     this.clearStorage();
     await new Promise(r => setTimeout(r, 150));
   }

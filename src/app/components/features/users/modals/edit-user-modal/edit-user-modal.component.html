@@ -94,11 +94,51 @@
       </div>
 
       <div class="form-group">
-        <label for="activities">Actividades</label>
-        <select id="activities" formControlName="activities" multiple>
-          <option value="2">Actividad 2</option>
-          <option value="3">Actividad 3</option>
-        </select>
+        <label>Actividades</label>
+        
+        <!-- Actividades seleccionadas (tags) -->
+        <div class="selected-activities" *ngIf="selectedActivities.length > 0">
+          <div *ngFor="let activityId of selectedActivities" class="activity-tag">
+            <span>{{ getActivityName(activityId) }}</span>
+            <button type="button" (click)="removeActivity(activityId)" class="remove-tag">×</button>
+          </div>
+        </div>
+
+        <!-- Campo de búsqueda -->
+        <div class="searchable-select">
+          <input 
+            type="text" 
+            placeholder="Buscar actividades..."
+            (input)="filterActivities($event)"
+            (focus)="onSearchFocus()"
+            (blur)="onSearchBlur()"
+            class="search-input"
+            [value]="searchTerm"
+          />
+          
+          <!-- Dropdown con opciones -->
+          <div class="select-dropdown" *ngIf="showDropdown && filteredActivities.length > 0">
+            <div *ngFor="let activity of filteredActivities" 
+                 class="dropdown-option"
+                 (click)="toggleActivity(activity.id)"
+                 [class.selected]="isActivitySelected(activity.id)">
+              <input 
+                type="checkbox" 
+                [checked]="isActivitySelected(activity.id)"
+                readonly
+                class="option-checkbox"
+              />
+              <span class="option-text">{{ activity.name }}</span>
+            </div>
+          </div>
+          
+          <!-- Mensaje cuando no hay resultados -->
+          <div class="no-results" *ngIf="showDropdown && filteredActivities.length === 0">
+            No se encontraron actividades
+          </div>
+        </div>
+        
+        <small class="help-text">Escribe para buscar y selecciona las actividades que correspondan</small>
       </div>
 
       <div class="error-message" *ngIf="error" class="form-error">

@@ -169,7 +169,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
             if (index !== -1) {
               this.activities[index] = updatedActivity;
             }
-            console.log('Estado actualizado:', updatedActivity);
+            
           }
         },
         error: (error) => {
@@ -195,7 +195,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
             if (success) {
               // Remover la actividad de la lista local
               this.activities = this.activities.filter(a => a.id !== activity.id);
-              console.log('Actividad eliminada:', activity.activity);
+               
             } else {
               this.error = 'No se pudo eliminar la actividad';
             }

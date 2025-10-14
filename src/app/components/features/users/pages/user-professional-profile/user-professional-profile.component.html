@@ -10,7 +10,96 @@
   </div>
   
   <div class="content" *ngIf="professionalProfile; else loading">
-    <app-professional-detail [profile]="professionalProfile"></app-professional-detail>
+    <!-- Copia completa del professional-detail component -->
+    <section class="profile">
+      <div class="hero">
+        <div class="avatar-container">
+          <img 
+            class="avatar" 
+            [src]="professionalProfile?.profile_picture || 'https://i.pravatar.cc/120?img=12'" 
+            alt="Foto del profesional" 
+          />
+          <div class="avatar-overlay">
+            <input 
+              type="file" 
+              id="profile-picture" 
+              accept="image/*" 
+              (change)="onImageSelected($event)"
+              class="file-input"
+            />
+            <label for="profile-picture" class="upload-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Cambiar foto
+            </label>
+          </div>
+        </div>
+        <div class="hero-info">
+          <h2 class="name">{{ professionalProfile?.name || 'Profesional' }}</h2>
+          <div class="subtitle">{{ professionalProfile?.specialty || 'Especialidad' }}</div>
+          <p class="summary">{{ professionalProfile?.description || 'Descripción del profesional.' }}</p>
+          <div class="location">{{ professionalProfile?.location || 'Córdoba, Argentina' }}</div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn primary">Ver perfil Profesional</button>
+          <button class="link">Reportar perfil</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Datos Personales</h3>
+          <div class="list">
+            <div class="row"><span>DNI</span><strong>30555892</strong></div>
+            <div class="row"><span>Correo</span><strong>{{ professionalProfile?.email || 'carlos.el@example.com' }}</strong></div>
+            <div class="row"><span>Teléfono</span><strong>{{ professionalProfile?.phone || '+54 9 351 456 8980' }}</strong></div>
+            <div class="row"><span>Registrado el</span><strong>{{ (professionalProfile?.created_at | date:'dd/MM/yyyy') || 'Sin datos para mostrar' }}</strong></div>
+            <div class="row"><span>Estado</span><strong>Activo</strong></div>
+            <div class="row"><span>Disponibilidad</span><strong>Inmediata</strong></div>
+            <div class="row"><span>Experiencia</span><strong>+{{ professionalProfile?.experienceYears || 12 }} años</strong></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Especialidades</h3>
+          <div class="chips">
+            <span class="chip" *ngFor="let skill of professionalProfile?.skills">{{ skill }}</span>
+            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Instalaciones eléctricas</span>
+            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Tableros trifásicos</span>
+            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Domótica</span>
+          </div>
+          <h3>Valoraciones y comentarios</h3>
+          <div class="rating">★★★★★ <strong>4,9</strong> (23)</div>
+          <div class="comment">
+            <img class="mini" src="https://i.pravatar.cc/40?img=5" alt="" />
+            <div>Muy prolijo, explicó todo, lo recomiendo.</div>
+          </div>
+          <div class="comment">
+            <img class="mini" src="https://i.pravatar.cc/40?img=15" alt="" />
+            <div>Detectó un problema que nadie resolvía.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Últimos Trabajos</h3>
+          <div class="work">
+            <img src="https://picsum.photos/seed/e1/320/160" alt="Trabajo" />
+            <div>
+              <div class="work-title">Renovación eléctrica en vivienda antigua</div>
+              <div class="work-meta">Córdoba Capital · Abr. 2024</div>
+            </div>
+          </div>
+          <div class="work">
+            <img src="https://picsum.photos/seed/e2/320/160" alt="Trabajo" />
+            <div>
+              <div class="work-title">Automatización de luminarias</div>
+              <div class="work-meta">Alta Gracia · Feb. 2024</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
   
   <ng-template #loading>

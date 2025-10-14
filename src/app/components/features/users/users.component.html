@@ -8,6 +8,160 @@
     </h2>
     <button class="btn primary" (click)="onAddUser()">Agregar Usuario</button>
   </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <h3>Filtros</h3>
+      <button class="btn secondary" (click)="toggleFilters()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+        </svg>
+        {{ showFilters ? 'Ocultar' : 'Mostrar' }} Filtros
+      </button>
+    </div>
+    
+    <div class="filters-content" *ngIf="showFilters">
+      <div class="filters-grid">
+        <!-- FILA 1: Nombre y Apellido | Email | Rol -->
+        <div class="filters-row">
+          <div class="filters-row-grid filters-row-3cols">
+            <!-- Nombre y Apellido -->
+            <div class="filter-group">
+              <label for="name-filter">Nombre y Apellido</label>
+              <input 
+                type="text" 
+                id="name-filter"
+                [(ngModel)]="filters.name"
+                placeholder="Buscar por nombre..."
+                class="filter-input"
+              />
+            </div>
+
+            <!-- Email -->
+            <div class="filter-group">
+              <label for="email-filter">Email</label>
+              <input 
+                type="email" 
+                id="email-filter"
+                [(ngModel)]="filters.email"
+                placeholder="Buscar por email..."
+                class="filter-input"
+              />
+            </div>
+
+            <!-- Rol/Tipo de Usuario -->
+            <div class="filter-group">
+              <label for="role-filter">Rol</label>
+              <select id="role-filter" [(ngModel)]="filters.role" class="filter-select">
+                <option value="">Todos los roles</option>
+                <option value="1">Administrador</option>
+                <option value="2">Usuario</option>
+                <option value="3">Moderador</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA 2: Provincia | Localidad | Estado -->
+        <div class="filters-row">
+          <div class="filters-row-grid filters-row-3cols">
+            <!-- Provincia -->
+            <div class="filter-group">
+              <label for="province-filter">Provincia</label>
+              <select id="province-filter" [(ngModel)]="filters.province" class="filter-select">
+                <option value="">Todas las provincias</option>
+                <option value="1">Buenos Aires</option>
+                <option value="2">Córdoba</option>
+                <option value="3">Santa Fe</option>
+                <option value="4">Mendoza</option>
+              </select>
+            </div>
+
+            <!-- Localidad -->
+            <div class="filter-group">
+              <label for="locality-filter">Localidad</label>
+              <select id="locality-filter" [(ngModel)]="filters.locality" class="filter-select">
+                <option value="">Todas las localidades</option>
+                <option value="1">La Plata</option>
+                <option value="2">Córdoba</option>
+                <option value="3">Rosario</option>
+                <option value="4">Mendoza</option>
+              </select>
+            </div>
+
+            <!-- Estado -->
+            <div class="filter-group">
+              <label for="status-filter">Estado</label>
+              <select id="status-filter" [(ngModel)]="filters.status" class="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+                <option value="pending">Pendiente</option>
+                <option value="suspended">Suspendido</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA 3: Fecha de creación | Último acceso -->
+        <div class="filters-row">
+          <div class="filters-row-grid filters-row-2cols">
+            <!-- Fecha de creación -->
+            <div class="filter-group">
+              <label for="created-from">Fecha de creación</label>
+              <div class="date-range">
+                <input 
+                  type="date" 
+                  id="created-from"
+                  [(ngModel)]="filters.createdFrom"
+                  class="filter-input"
+                />
+                <span>hasta</span>
+                <input 
+                  type="date" 
+                  id="created-to"
+                  [(ngModel)]="filters.createdTo"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+
+            <!-- Último acceso -->
+            <div class="filter-group">
+              <label for="last-access-filter">Último acceso</label>
+              <select id="last-access-filter" [(ngModel)]="filters.lastAccess" class="filter-select">
+                <option value="">Todos</option>
+                <option value="today">Hoy</option>
+                <option value="week">Esta semana</option>
+                <option value="month">Este mes</option>
+                <option value="3months">Últimos 3 meses</option>
+                <option value="6months">Últimos 6 meses</option>
+                <option value="year">Este año</option>
+                <option value="never">Nunca</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="filters-actions">
+        <button class="btn secondary" (click)="clearFilters()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+          Limpiar Filtros
+        </button>
+        <button class="btn primary" (click)="applyFilters()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+          </svg>
+          Aplicar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="table-wrap">
     <table class="table">
       <thead>
@@ -42,7 +196,7 @@
         
         <!-- Users data -->
         <ng-container *ngIf="!loading && !error">
-          <tr *ngFor="let u of users">
+          <tr *ngFor="let u of filteredUsers">
             <td>{{ u.name }}</td>
             <td class="muted">{{ u.email }}</td>
             <td>

@@ -113,7 +113,6 @@ export class ActivitiesService {
       }),
       catchError((error) => {
         console.error('Error al obtener actividades desde la API:', error);
-        console.log('Usando datos mock como fallback');
         return of([...this.activities]).pipe(delay(300));
       })
     );
@@ -166,7 +165,6 @@ export class ActivitiesService {
       }),
       catchError((error) => {
         console.error('Error al filtrar actividades desde la API:', error);
-        console.log('Usando filtrado local como fallback');
         return of(this.filterActivitiesLocally(filters)).pipe(delay(200));
       })
     );
@@ -225,7 +223,6 @@ export class ActivitiesService {
       }),
       catchError((error) => {
         console.error('Error al crear actividad desde la API:', error);
-        console.log('Usando creación local como fallback');
         return of(this.createActivityLocally(request)).pipe(delay(300));
       })
     );

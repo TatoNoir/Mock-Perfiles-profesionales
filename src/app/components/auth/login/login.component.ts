@@ -40,23 +40,18 @@ export class LoginComponent {
     if (this.isLogin) {
       this.authService.signIn(this.email, this.password).subscribe({
         next: (response) => {
-          console.log('✅ Login exitoso:', response);
-          console.log('📋 Estructura de la respuesta:', JSON.stringify(response, null, 2));
           this.loading = false;
           this.router.navigateByUrl('/dashboard');
         },
         error: (error) => {
           console.error('❌ Error en login:', error);
-          console.log('📋 Estructura del error:', JSON.stringify(error, null, 2));
           this.errorMessage = error.error?.error || error.error || 'Error al iniciar sesión';
           this.loading = false;
         }
       });
     } else {
       try {
-        console.log('🔐 Intentando registro con:', { email: this.email, password: '***' });
         await this.authService.signUp(this.email, this.password);
-        console.log('✅ Registro exitoso');
         this.loading = false;
         // this.router.navigateByUrl('/dashboard'); // Comentado temporalmente
       } catch (error: any) {

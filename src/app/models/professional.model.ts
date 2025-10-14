@@ -15,8 +15,10 @@ export interface ProfessionalProfile {
   description: string;
   location: string;
   avatarUrl?: string;
+  profile_picture?: string | null;
   email?: string;
   phone?: string;
   skills?: string[];
   experienceYears?: number;
+  created_at?: string;
 }

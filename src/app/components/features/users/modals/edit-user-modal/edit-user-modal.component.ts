@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UsersService, CreateUserRequest, ApiUser } from '../../services/users.service';
+import { UsersService, CreateUserRequest, ApiUser, ApiActivity } from '../../services/users.service';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -19,6 +19,11 @@ export class EditUserModalComponent implements OnInit, OnChanges {
   editForm: FormGroup;
   loading = false;
   error: string | null = null;
+  activities: ApiActivity[] = [];
+  filteredActivities: ApiActivity[] = [];
+  selectedActivities: number[] = [];
+  searchTerm: string = '';
+  showDropdown: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -32,11 +37,12 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       description: [''],
       user_type_id: [1], // Hardcodeado
       locality_id: [1], // Hardcodeado
-      activities: [[3, 2]] // Hardcodeado
+      activities: [[]] // Se manejará con checkboxes
     });
   }
 
   ngOnInit(): void {
+    this.loadActivities();
     if (this.user) {
       this.populateForm();
     }
@@ -50,6 +56,10 @@ export class EditUserModalComponent implements OnInit, OnChanges {
 
   private populateForm(): void {
     if (this.user) {
+      // Extraer IDs de actividades del usuario
+      const userActivityIds = this.user.activities.map(activity => activity.id);
+      this.selectedActivities = userActivityIds;
+      
       this.editForm.patchValue({
         name: this.user.name,
         email: this.user.email,
@@ -58,7 +68,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         description: this.user.description || '',
         user_type_id: 1, // Hardcodeado
         locality_id: 1, // Hardcodeado
-        activities: [3, 2] // Hardcodeado
+        activities: userActivityIds
       });
     }
   }
@@ -69,8 +79,12 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       this.editForm.patchValue({
         user_type_id: 1,
         locality_id: 1,
-        activities: [3, 2]
+        activities: []
       });
+      this.selectedActivities = [];
+      this.searchTerm = '';
+      this.filteredActivities = this.activities;
+      this.showDropdown = false;
       this.error = null;
       this.close.emit();
     }
@@ -90,13 +104,12 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         description: formValue.description || '',
         user_type_id: formValue.user_type_id,
         locality_id: formValue.locality_id,
-        activities: formValue.activities
+        activities: this.selectedActivities
       };
 
       this.usersService.updateUser(this.user.id, request).subscribe({
         next: (updatedUser) => {
           this.loading = false;
-          console.log('Usuario actualizado:', updatedUser);
           this.userUpdated.emit(updatedUser);
           this.onClose();
         },
@@ -107,5 +120,68 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         }
       });
     }
+  }
+
+  loadActivities(): void {
+    this.usersService.getActivities().subscribe({
+      next: (activities: ApiActivity[]) => {
+        this.activities = activities;
+        this.filteredActivities = activities;
+      },
+      error: (err: any) => {
+        console.error('Error cargando actividades en modal de edición:', err);
+      }
+    });
+  }
+
+  filterActivities(event: any): void {
+    this.searchTerm = event.target.value.toLowerCase();
+    this.filteredActivities = this.activities.filter(activity => 
+      activity.name.toLowerCase().includes(this.searchTerm)
+    );
+    this.showDropdown = this.searchTerm.length > 0;
+  }
+
+  toggleActivity(activityId: number): void {
+    if (this.selectedActivities.includes(activityId)) {
+      // Remover actividad si está seleccionada
+      this.selectedActivities = this.selectedActivities.filter(id => id !== activityId);
+    } else {
+      // Agregar actividad si no está ya seleccionada
+      this.selectedActivities.push(activityId);
+    }
+    
+    // Actualizar el formulario
+    this.editForm.patchValue({
+      activities: this.selectedActivities
+    });
+    
+  }
+
+  isActivitySelected(activityId: number): boolean {
+    return this.selectedActivities.includes(activityId);
+  }
+
+  getActivityName(activityId: number): string {
+    const activity = this.activities.find(a => a.id === activityId);
+    return activity ? activity.name : '';
+  }
+
+  removeActivity(activityId: number): void {
+    this.selectedActivities = this.selectedActivities.filter(id => id !== activityId);
+    this.editForm.patchValue({
+      activities: this.selectedActivities
+    });
+  }
+
+  onSearchFocus(): void {
+    this.showDropdown = this.searchTerm.length > 0;
+  }
+
+  onSearchBlur(): void {
+    // Delay para permitir que el click en las opciones se ejecute
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 200);
   }
 }

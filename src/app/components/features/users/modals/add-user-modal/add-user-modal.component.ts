@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UsersService, CreateUserRequest, ApiUser } from '../../services/users.service';
+import { UsersService, CreateUserRequest, ApiUser, ApiActivity } from '../../services/users.service';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -10,7 +10,7 @@ import { UsersService, CreateUserRequest, ApiUser } from '../../services/users.s
   templateUrl: './add-user-modal.component.html',
   styleUrls: ['./add-user-modal.component.css']
 })
-export class AddUserModalComponent {
+export class AddUserModalComponent implements OnInit {
   @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
   @Output() userCreated = new EventEmitter<ApiUser>();
@@ -18,6 +18,11 @@ export class AddUserModalComponent {
   addForm: FormGroup;
   loading = false;
   error: string | null = null;
+  activities: ApiActivity[] = [];
+  filteredActivities: ApiActivity[] = [];
+  selectedActivities: number[] = [];
+  searchTerm: string = '';
+  showDropdown: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +36,23 @@ export class AddUserModalComponent {
       description: [''],
       user_type_id: [1], // Hardcodeado
       locality_id: [1], // Hardcodeado
-      activities: [[3]] // Hardcodeado
+      activities: [[]] // Se manejará con checkboxes
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadActivities();
+  }
+
+  loadActivities(): void {
+    this.usersService.getActivities().subscribe({
+      next: (activities: ApiActivity[]) => {
+        this.activities = activities;
+        this.filteredActivities = activities;
+      },
+      error: (err: any) => {
+        console.error('Error cargando actividades en modal:', err);
+      }
     });
   }
 
@@ -41,8 +62,12 @@ export class AddUserModalComponent {
       this.addForm.patchValue({
         user_type_id: 1,
         locality_id: 1,
-        activities: [3]
+        activities: []
       });
+      this.selectedActivities = [];
+      this.searchTerm = '';
+      this.filteredActivities = this.activities;
+      this.showDropdown = false;
       this.error = null;
       this.close.emit();
     }
@@ -62,13 +87,12 @@ export class AddUserModalComponent {
         description: formValue.description || '',
         user_type_id: formValue.user_type_id,
         locality_id: formValue.locality_id,
-        activities: formValue.activities
+        activities: this.selectedActivities
       };
 
       this.usersService.createUser(request).subscribe({
         next: (newUser) => {
           this.loading = false;
-          console.log('Usuario creado:', newUser);
           this.userCreated.emit(newUser);
           this.onClose();
         },
@@ -79,5 +103,56 @@ export class AddUserModalComponent {
         }
       });
     }
+  }
+
+  filterActivities(event: any): void {
+    this.searchTerm = event.target.value.toLowerCase();
+    this.filteredActivities = this.activities.filter(activity => 
+      activity.name.toLowerCase().includes(this.searchTerm)
+    );
+    this.showDropdown = this.searchTerm.length > 0;
+  }
+
+  toggleActivity(activityId: number): void {
+    if (this.selectedActivities.includes(activityId)) {
+      // Remover actividad si está seleccionada
+      this.selectedActivities = this.selectedActivities.filter(id => id !== activityId);
+    } else {
+      // Agregar actividad si no está ya seleccionada
+      this.selectedActivities.push(activityId);
+    }
+    
+    // Actualizar el formulario
+    this.addForm.patchValue({
+      activities: this.selectedActivities
+    });
+    
+  }
+
+  isActivitySelected(activityId: number): boolean {
+    return this.selectedActivities.includes(activityId);
+  }
+
+  getActivityName(activityId: number): string {
+    const activity = this.activities.find(a => a.id === activityId);
+    return activity ? activity.name : '';
+  }
+
+  removeActivity(activityId: number): void {
+    this.selectedActivities = this.selectedActivities.filter(id => id !== activityId);
+    this.addForm.patchValue({
+      activities: this.selectedActivities
+    });
+  }
+
+  onSearchFocus(): void {
+    this.showDropdown = this.searchTerm.length > 0;
+  }
+
+  onSearchBlur(): void {
+    // Delay para permitir que el click en las opciones se ejecute
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 200);
   }
 }

@@ -71,7 +71,6 @@ export class AppComponent {
   ) {}
   
   async onLogout() {
-    console.log('🚪 Cerrando sesión...');
     await this.authService.signOut();
     this.router.navigate(['/login']);
   }

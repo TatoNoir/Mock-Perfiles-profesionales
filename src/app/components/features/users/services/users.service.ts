@@ -119,4 +119,26 @@ export class UsersService {
       })
     );
   }
+
+  getUserTypes(): Observable<ApiUserType[]> {
+    return this.apiService.get<{ data: ApiUserType[] }>('/api/profiles').pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching user types from API:', error);
+        // Fallback: retornar array vacío en caso de error
+        return of([]);
+      })
+    );
+  }
+
+  getActivities(): Observable<ApiActivity[]> {
+    return this.apiService.get<{ data: ApiActivity[] }>('/api/activities').pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching activities from API:', error);
+        // Fallback: retornar array vacío en caso de error
+        return of([]);
+      })
+    );
+  }
 }
