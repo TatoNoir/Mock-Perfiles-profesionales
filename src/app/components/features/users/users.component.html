@@ -200,11 +200,11 @@
             <td>{{ u.name }}</td>
             <td class="muted">{{ u.email }}</td>
             <td>
-              <span class="badge badge-user-type">{{ u.user_type.name }}</span>
+              <span class="badge badge-user-type">{{ u.user_type?.name }}</span>
             </td>
             <td>
               <span class="locality-info">
-                {{ u.locality.name }}, {{ u.locality.province.name }}
+                {{ u.locality?.name }}, {{ u.locality?.province?.name }}
               </span>
             </td>
             <td class="muted">{{ u.updated_at | date:'short' }}</td>

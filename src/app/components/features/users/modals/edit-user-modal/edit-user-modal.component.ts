@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UsersService, CreateUserRequest, ApiUser, ApiActivity } from '../../services/users.service';
+import { UsersService, CreateUserRequest, ApiUser, ApiActivity, ApiDocumentType, ApiUserType } from '../../services/users.service';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -24,6 +24,8 @@ export class EditUserModalComponent implements OnInit, OnChanges {
   selectedActivities: number[] = [];
   searchTerm: string = '';
   showDropdown: boolean = false;
+  documentTypes: ApiDocumentType[] = [];
+  userTypes: ApiUserType[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -34,8 +36,10 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       phone: ['', [Validators.required]],
+      document_type_id: ['', [Validators.required]],
+      document_number: ['', [Validators.required]],
       description: [''],
-      user_type_id: [1], // Hardcodeado
+      user_type_id: ['', [Validators.required]],
       locality_id: [1], // Hardcodeado
       activities: [[]] // Se manejará con checkboxes
     });
@@ -43,6 +47,8 @@ export class EditUserModalComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadActivities();
+    this.loadDocumentTypes();
+    this.loadUserTypes();
     if (this.user) {
       this.populateForm();
     }
@@ -65,8 +71,10 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         email: this.user.email,
         password: '', // No pre-llenamos la contraseña por seguridad
         phone: this.user.phone,
+        document_type_id: '', // TODO: Agregar campo al modelo de usuario
+        document_number: '', // TODO: Agregar campo al modelo de usuario
         description: this.user.description || '',
-        user_type_id: 1, // Hardcodeado
+        user_type_id: this.user.user_type_id,
         locality_id: 1, // Hardcodeado
         activities: userActivityIds
       });
@@ -77,8 +85,10 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     if (!this.loading) {
       this.editForm.reset();
       this.editForm.patchValue({
-        user_type_id: 1,
+        user_type_id: '',
         locality_id: 1,
+        document_type_id: '',
+        document_number: '',
         activities: []
       });
       this.selectedActivities = [];
@@ -130,6 +140,30 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       },
       error: (err: any) => {
         console.error('Error cargando actividades en modal de edición:', err);
+      }
+    });
+  }
+
+  loadDocumentTypes(): void {
+    this.usersService.getDocumentTypes().subscribe({
+      next: (documentTypes: ApiDocumentType[]) => {
+        this.documentTypes = documentTypes;
+        console.log('Tipos de documento cargados en modal de edición:', documentTypes);
+      },
+      error: (err: any) => {
+        console.error('Error cargando tipos de documento en modal de edición:', err);
+      }
+    });
+  }
+
+  loadUserTypes(): void {
+    this.usersService.getUserTypes().subscribe({
+      next: (userTypes: ApiUserType[]) => {
+        this.userTypes = userTypes;
+        console.log('Tipos de usuario cargados en modal de edición:', userTypes);
+      },
+      error: (err: any) => {
+        console.error('Error cargando tipos de usuario en modal de edición:', err);
       }
     });
   }

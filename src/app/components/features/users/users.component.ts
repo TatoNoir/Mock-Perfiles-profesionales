@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UsersService, ApiUser, ApiUserType, ApiActivity } from './services/users.service';
+import { UsersService, ApiUser, ApiUserType, ApiDocumentType } from './services/users.service';
 import { AddUserModalComponent } from './modals/add-user-modal/add-user-modal.component';
 import { EditUserModalComponent } from './modals/edit-user-modal/edit-user-modal.component';
 
@@ -17,6 +17,8 @@ import { EditUserModalComponent } from './modals/edit-user-modal/edit-user-modal
 export class UsersComponent implements OnInit {
   users: ApiUser[] = [];
   filteredUsers: ApiUser[] = [];
+  documentTypes: ApiDocumentType[] = [];
+  userTypes: ApiUserType[] = [];
   loading = false;
   error: string | null = null;
   showAddModal = false;
@@ -44,7 +46,7 @@ export class UsersComponent implements OnInit {
   ngOnInit(): void {
     this.loadUsers();
     this.loadUserTypes();
-    this.loadActivities();
+    this.loadDocumentTypes();
   }
   
   loadUsers() {
@@ -139,7 +141,8 @@ export class UsersComponent implements OnInit {
   loadUserTypes() {
     this.usersService.getUserTypes().subscribe({
       next: (userTypes: ApiUserType[]) => {
-        
+        this.userTypes = userTypes;
+        console.log('Tipos de usuario cargados:', userTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de usuario:', err);
@@ -147,13 +150,14 @@ export class UsersComponent implements OnInit {
     });
   }
 
-      loadActivities() {
-        this.usersService.getActivities().subscribe({
-          next: (activities: ApiActivity[]) => {
-            
+  loadDocumentTypes() {
+        this.usersService.getDocumentTypes().subscribe({
+          next: (documentTypes: ApiDocumentType[]) => {
+            this.documentTypes = documentTypes;
+            console.log('Tipos de documento cargados:', documentTypes);
           },
           error: (err: any) => {
-            console.error('Error cargando actividades:', err);
+            console.error('Error cargando tipos de documento:', err);
           }
         });
       }

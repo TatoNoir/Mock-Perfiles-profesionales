@@ -24,9 +24,6 @@ export interface ApiUserType {
   id: number;
   name: string;
   description: string;
-  disabled: number;
-  created_at?: string | null;
-  updated_at?: string | null;
 }
 
 export interface ApiProvince {
@@ -47,7 +44,7 @@ export interface ApiLocality {
   province_id: number;
   created_at: string;
   updated_at: string;
-  province: ApiProvince;
+  province?: ApiProvince;
 }
 
 export interface ApiUser {
@@ -62,9 +59,15 @@ export interface ApiUser {
   updated_at: string;
   locality_id: number;
   user_type_id: number;
-  user_type: ApiUserType;
+  user_type?: ApiUserType;
   activities: ApiActivity[];
-  locality: ApiLocality;
+  locality?: ApiLocality;
+}
+
+export interface ApiDocumentType {
+  id: number;
+  name: string;
+  description: string;
 }
 
 export interface CreateUserRequest {
@@ -136,6 +139,17 @@ export class UsersService {
       map(response => response.data),
       catchError(error => {
         console.error('Error fetching activities from API:', error);
+        // Fallback: retornar array vacío en caso de error
+        return of([]);
+      })
+    );
+  }
+
+  getDocumentTypes(): Observable<ApiDocumentType[]> {
+    return this.apiService.get<{ data: ApiDocumentType[] }>('/api/document-types').pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching document types from API:', error);
         // Fallback: retornar array vacío en caso de error
         return of([]);
       })

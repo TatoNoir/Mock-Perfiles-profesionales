@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UsersService, CreateUserRequest, ApiUser, ApiActivity } from '../../services/users.service';
+import { UsersService, CreateUserRequest, ApiUser, ApiActivity, ApiDocumentType, ApiUserType } from '../../services/users.service';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -23,6 +23,8 @@ export class AddUserModalComponent implements OnInit {
   selectedActivities: number[] = [];
   searchTerm: string = '';
   showDropdown: boolean = false;
+  documentTypes: ApiDocumentType[] = [];
+  userTypes: ApiUserType[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -33,8 +35,10 @@ export class AddUserModalComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       phone: ['', [Validators.required]],
+      document_type_id: ['', [Validators.required]],
+      document_number: ['', [Validators.required]],
       description: [''],
-      user_type_id: [1], // Hardcodeado
+      user_type_id: ['', [Validators.required]],
       locality_id: [1], // Hardcodeado
       activities: [[]] // Se manejará con checkboxes
     });
@@ -42,6 +46,8 @@ export class AddUserModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadActivities();
+    this.loadDocumentTypes();
+    this.loadUserTypes();
   }
 
   loadActivities(): void {
@@ -56,12 +62,38 @@ export class AddUserModalComponent implements OnInit {
     });
   }
 
+  loadDocumentTypes(): void {
+    this.usersService.getDocumentTypes().subscribe({
+      next: (documentTypes: ApiDocumentType[]) => {
+        this.documentTypes = documentTypes;
+        console.log('Tipos de documento cargados en modal:', documentTypes);
+      },
+      error: (err: any) => {
+        console.error('Error cargando tipos de documento en modal:', err);
+      }
+    });
+  }
+
+  loadUserTypes(): void {
+    this.usersService.getUserTypes().subscribe({
+      next: (userTypes: ApiUserType[]) => {
+        this.userTypes = userTypes;
+        console.log('Tipos de usuario cargados en modal:', userTypes);
+      },
+      error: (err: any) => {
+        console.error('Error cargando tipos de usuario en modal:', err);
+      }
+    });
+  }
+
   onClose(): void {
     if (!this.loading) {
       this.addForm.reset();
       this.addForm.patchValue({
-        user_type_id: 1,
+        user_type_id: '',
         locality_id: 1,
+        document_type_id: '',
+        document_number: '',
         activities: []
       });
       this.selectedActivities = [];

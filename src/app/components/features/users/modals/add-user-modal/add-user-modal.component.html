@@ -70,6 +70,37 @@
       </div>
 
       <div class="form-group">
+        <label for="document_type_id">Tipo de Documento *</label>
+        <select 
+          id="document_type_id" 
+          formControlName="document_type_id"
+          [class.error]="addForm.get('document_type_id')?.invalid && addForm.get('document_type_id')?.touched"
+        >
+          <option value="">Seleccione un tipo de documento</option>
+          <option *ngFor="let docType of documentTypes" [value]="docType.id">
+            {{ docType.name }} - {{ docType.description }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="addForm.get('document_type_id')?.invalid && addForm.get('document_type_id')?.touched">
+          <span *ngIf="addForm.get('document_type_id')?.errors?.['required']">El tipo de documento es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="document_number">Número de Documento *</label>
+        <input
+          type="text"
+          id="document_number"
+          formControlName="document_number"
+          placeholder="Ingrese el número de documento"
+          [class.error]="addForm.get('document_number')?.invalid && addForm.get('document_number')?.touched"
+        />
+        <div class="error-message" *ngIf="addForm.get('document_number')?.invalid && addForm.get('document_number')?.touched">
+          <span *ngIf="addForm.get('document_number')?.errors?.['required']">El número de documento es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="description">Descripción</label>
         <textarea
           id="description"
@@ -80,10 +111,20 @@
       </div>
 
       <div class="form-group">
-        <label for="user_type_id">Tipo de Usuario</label>
-        <select id="user_type_id" formControlName="user_type_id">
-          <option value="1">Tipo 1</option>
+        <label for="user_type_id">Tipo de Usuario *</label>
+        <select 
+          id="user_type_id" 
+          formControlName="user_type_id"
+          [class.error]="addForm.get('user_type_id')?.invalid && addForm.get('user_type_id')?.touched"
+        >
+          <option value="">Seleccione un tipo de usuario</option>
+          <option *ngFor="let userType of userTypes" [value]="userType.id">
+            {{ userType.name }} - {{ userType.description }}
+          </option>
         </select>
+        <div class="error-message" *ngIf="addForm.get('user_type_id')?.invalid && addForm.get('user_type_id')?.touched">
+          <span *ngIf="addForm.get('user_type_id')?.errors?.['required']">El tipo de usuario es requerido</span>
+        </div>
       </div>
 
       <div class="form-group">
