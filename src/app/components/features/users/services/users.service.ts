@@ -26,6 +26,12 @@ export interface ApiUserType {
   description: string;
 }
 
+// Lightweight geo types for typeahead endpoints used in Users forms
+export interface GeoCountry { id: number; name: string; }
+export interface GeoState { id: number; name: string; }
+export interface GeoLocality { id: number; name: string; }
+export interface GeoZipCode { id: number; code: string; locality_id: number; locality?: GeoLocality }
+
 export interface ApiProvince {
   id: number;
   name: string;
@@ -93,6 +99,72 @@ export class UsersService {
         // Fallback: retornar array vacío en caso de error
         return of([]);
       })
+    );
+  }
+
+  // --- Geo helpers (copiados desde ZonesService) ---
+  getCountries(query: string = '') {
+    const qs = query ? `?name=${encodeURIComponent(query)}` : '';
+    return this.apiService.get<{ data: GeoCountry[] } | GeoCountry[]>(`/api/countries${qs}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) return response.data as GeoCountry[];
+        if (Array.isArray(response)) return response as GeoCountry[];
+        return [
+          { id: 13, name: 'Argentina' },
+          { id: 250, name: 'Chile' },
+          { id: 251, name: 'Perú' }
+        ];
+      }),
+      catchError(() => of([
+        { id: 13, name: 'Argentina' },
+        { id: 250, name: 'Chile' }
+      ]))
+    );
+  }
+
+  getProvincesByCountry(countryId: number) {
+    return this.apiService.get<{ data: GeoState[] } | GeoState[]>(`/api/states?country_id=${encodeURIComponent(countryId)}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) return response.data as GeoState[];
+        if (Array.isArray(response)) return response as GeoState[];
+        return [
+          { id: 1, name: 'Buenos Aires' },
+          { id: 2, name: 'Córdoba' }
+        ];
+      }),
+      catchError(() => of([
+        { id: 1, name: 'Buenos Aires' },
+        { id: 2, name: 'Córdoba' }
+      ]))
+    );
+  }
+
+  getLocalitiesByState(stateId: number) {
+    return this.apiService.get<{ data: GeoLocality[] } | GeoLocality[]>(`/api/localities?state_id=${encodeURIComponent(stateId)}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) return response.data as GeoLocality[];
+        if (Array.isArray(response)) return response as GeoLocality[];
+        return [
+          { id: 1, name: 'La Plata' },
+          { id: 2, name: 'Capital Federal' }
+        ];
+      }),
+      catchError(() => of([
+        { id: 1, name: 'La Plata' },
+        { id: 2, name: 'Capital Federal' }
+      ]))
+    );
+  }
+
+  getZipCodesByCode(code: string) {
+    const qs = code ? `?code=${encodeURIComponent(code)}` : '';
+    return this.apiService.get<{ data: GeoZipCode[] } | GeoZipCode[]>(`/api/zip-codes${qs}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) return response.data as GeoZipCode[];
+        if (Array.isArray(response)) return response as GeoZipCode[];
+        return [{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }];
+      }),
+      catchError(() => of([{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }]))
     );
   }
 
