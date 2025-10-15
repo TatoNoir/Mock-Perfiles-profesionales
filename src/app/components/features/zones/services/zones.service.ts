@@ -10,6 +10,23 @@ export interface ApiCountry {
   name: string;
 }
 
+export interface ApiState {
+  id: number;
+  name: string;
+}
+
+export interface ApiLocality {
+  id: number;
+  name: string;
+}
+
+export interface ApiZipCode {
+  id: number;
+  code: string;
+  locality_id: number;
+  locality?: ApiLocality;
+}
+
 export interface ApiZone {
   id: number;
   country: string;
@@ -281,38 +298,118 @@ export class ZonesService {
   }
 
   /**
-   * Obtiene las provincias de un país específico
+   * Obtiene las provincias/estados por país usando el endpoint real
+   * GET /api/states?country_id=<id>
    */
-  getProvincesByCountry(country: string): Observable<string[]> {
-    const provincesByCountry: { [key: string]: string[] } = {
-      'Argentina': ['Buenos Aires', 'Córdoba', 'Santa Fe', 'Mendoza', 'Tucumán', 'Entre Ríos', 'Salta', 'Misiones', 'Chaco', 'Corrientes'],
-      'Perú': ['Lima', 'Arequipa', 'La Libertad', 'Piura', 'Cusco', 'Junín', 'Lambayeque', 'Ancash', 'Puno', 'Tacna'],
-      'Chile': ['Santiago', 'Valparaíso', 'Biobío', 'La Araucanía', 'Los Lagos', 'Antofagasta', 'Coquimbo', 'O\'Higgins', 'Maule', 'Tarapacá'],
-      'Uruguay': ['Montevideo', 'Canelones', 'Maldonado', 'Salto', 'Paysandú', 'Río Negro', 'Tacuarembó', 'Colonia', 'Soriano', 'Florida'],
-      'Paraguay': ['Asunción', 'Central', 'Alto Paraná', 'Itapúa', 'Caaguazú', 'San Pedro', 'Cordillera', 'Guairá', 'Caazapá', 'Misiones'],
-      'Bolivia': ['La Paz', 'Santa Cruz', 'Cochabamba', 'Potosí', 'Oruro', 'Chuquisaca', 'Tarija', 'Beni', 'Pando']
-    };
-
-    const provinces = provincesByCountry[country] || [];
-    return of(provinces).pipe(delay(100));
+  getProvincesByCountry(countryId: number): Observable<ApiState[]> {
+    return this.apiService.get<{ data: ApiState[] } | ApiState[]>(`/api/states?country_id=${encodeURIComponent(countryId)}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data as ApiState[];
+        }
+        if (Array.isArray(response)) {
+          return response as ApiState[];
+        }
+        console.warn('Formato de respuesta inesperado para provincias, usando mock');
+        return [
+          { id: 1, name: 'Buenos Aires' },
+          { id: 2, name: 'Córdoba' },
+          { id: 3, name: 'Santa Fe' }
+        ];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener provincias desde la API:', error);
+        return of([
+          { id: 1, name: 'Buenos Aires' },
+          { id: 2, name: 'Córdoba' }
+        ]).pipe(delay(100));
+      })
+    );
   }
 
   /**
-   * Obtiene las ciudades de una provincia específica
+   * Obtiene localidades por provincia/estado (endpoint real)
+   * GET /api/localities?state_id=<id>
    */
-  getCitiesByProvince(country: string, province: string): Observable<string[]> {
-    // Mock data para ciudades por provincia
-    const citiesByProvince: { [key: string]: string[] } = {
-      'Buenos Aires': ['La Plata', 'Capital Federal', 'Escobar', 'Pilar', 'Tigre', 'San Isidro', 'Vicente López'],
-      'Córdoba': ['Córdoba', 'Villa María', 'Río Cuarto', 'San Francisco', 'Villa Carlos Paz', 'Jesús María'],
-      'Lima': ['Lima', 'Callao', 'Arequipa', 'Trujillo', 'Chiclayo', 'Piura', 'Iquitos'],
-      'Santiago': ['Santiago', 'Valparaíso', 'Viña del Mar', 'Concepción', 'La Serena', 'Antofagasta', 'Temuco']
-    };
-
-    const key = `${country}-${province}`;
-    const cities = citiesByProvince[province] || [];
-    return of(cities).pipe(delay(100));
+  getLocalitiesByState(stateId: number): Observable<ApiLocality[]> {
+    return this.apiService.get<{ data: ApiLocality[] } | ApiLocality[]>(`/api/localities?state_id=${encodeURIComponent(stateId)}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data as ApiLocality[];
+        }
+        if (Array.isArray(response)) {
+          return response as ApiLocality[];
+        }
+        console.warn('Formato inesperado para localidades, usando mock');
+        return [
+          { id: 1, name: 'La Plata' },
+          { id: 2, name: 'Capital Federal' },
+          { id: 3, name: 'Escobar' }
+        ];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener localidades desde la API:', error);
+        return of([
+          { id: 1, name: 'La Plata' },
+          { id: 2, name: 'Capital Federal' }
+        ]).pipe(delay(100));
+      })
+    );
   }
+
+  /**
+   * Obtiene códigos postales por localidad
+   * GET /api/zip-codes?locality_id=<id>
+   */
+  getZipCodesByLocality(localityId: number): Observable<ApiZipCode[]> {
+    return this.apiService.get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes?locality_id=${encodeURIComponent(localityId)}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data as ApiZipCode[];
+        }
+        if (Array.isArray(response)) {
+          return response as ApiZipCode[];
+        }
+        console.warn('Formato inesperado para códigos postales, usando mock');
+        return [
+          { id: 1, code: '1900', locality_id: localityId },
+          { id: 2, code: '1901', locality_id: localityId }
+        ];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener códigos postales desde la API:', error);
+        return of([{ id: 1, code: '0000', locality_id: localityId }]).pipe(delay(100));
+      })
+    );
+  }
+
+  /**
+   * Busca códigos postales por código (modo búsqueda directa por CP)
+   * GET /api/zip-codes?code=<cp>
+   */
+  getZipCodesByCode(code: string): Observable<ApiZipCode[]> {
+    const qs = code ? `?code=${encodeURIComponent(code)}` : '';
+    return this.apiService.get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes${qs}`).pipe(
+      map((response: any) => {
+        if (response?.data && Array.isArray(response.data)) {
+          return response.data as ApiZipCode[];
+        }
+        if (Array.isArray(response)) {
+          return response as ApiZipCode[];
+        }
+        console.warn('Formato inesperado para búsqueda por código postal, usando mock');
+        return [
+          { id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }
+        ];
+      }),
+      catchError((error) => {
+        console.error('Error al buscar por código postal en la API:', error);
+        return of([{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }]).pipe(delay(100));
+      })
+    );
+  }
+
+  // (El método de ciudades mock se eliminó por no utilizarse)
 
   /**
    * Mapea la respuesta de la API al formato interno
