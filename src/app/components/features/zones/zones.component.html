@@ -86,7 +86,7 @@
           <th>CP</th>
           <th>Zona / Barrio</th>
           <th>Tipo</th>
-          <th>Acciones</th>
+          
         </tr>
       </thead>
       <tbody>
@@ -98,7 +98,6 @@
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-badge"></div></td>
-          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
         </tr>
         <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
           <td><div class="skeleton skeleton-text"></div></td>
@@ -107,7 +106,6 @@
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-badge"></div></td>
-          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
         </tr>
         <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
           <td><div class="skeleton skeleton-text"></div></td>
@@ -116,7 +114,6 @@
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-text"></div></td>
           <td><div class="skeleton skeleton-badge"></div></td>
-          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
         </tr>
 
         <!-- Real rows -->
@@ -139,28 +136,6 @@
               {{ zone.type }}
             </span>
           </td>
-          <td class="row-actions">
-            <button 
-              class="link" 
-              (click)="onEdit(zone)"
-              [title]="'Editar zona de ' + zone.neighborhood"
-            >
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04a1 1 0 0 0 0-1.41l-1.51-1.51a1 1 0 0 0-1.41 0l-1.12 1.12 3.75 3.75 1.29-1.29z"></path>
-              </svg>
-              <span>Editar</span>
-            </button>
-            <button 
-              class="link danger" 
-              (click)="onDelete(zone)"
-              [title]="'Eliminar zona de ' + zone.neighborhood"
-            >
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 1h4v2H4V5h4l1-1z"></path>
-              </svg>
-              <span>Eliminar</span>
-            </button>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -173,13 +148,6 @@
       <p>Intenta ajustar los filtros de búsqueda o agrega una nueva zona.</p>
     </div>
 
-    <div class="table-footer" *ngIf="!loading">
-      <button class="btn primary" (click)="onAdd()">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path>
-        </svg>
-        <span>Agregar Zona</span>
-      </button>
-    </div>
+    
   </div>
 </section>

@@ -114,28 +114,9 @@ export class ZonesComponent implements OnInit, OnDestroy {
     this.filteredZones = [...this.zones];
   }
 
-  /**
-   * Abre el modal/formulario para agregar una nueva zona
-   */
-  onAdd(): void {
-    // TODO: Implementar modal de agregar zona
-    console.log('Agregar zona');
-  }
+  
 
-  /**
-   * Abre el modal/formulario para editar una zona
-   */
-  onEdit(zone: ApiZone): void {
-    // TODO: Implementar modal de editar zona
-    console.log('Editar zona:', zone);
-  }
-
-  /**
-   * Elimina una zona
-   */
-  onDelete(_zone: ApiZone): void {
-    // Sin eliminar por ahora
-  }
+  
 
   // Typeahead handlers
   onCountryInput(value: string): void {
