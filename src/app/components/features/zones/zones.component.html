@@ -1,0 +1,185 @@
+<section class="zones">
+  <h2 class="title">
+    <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"></path>
+    </svg>
+    <span>Zonas</span>
+  </h2>
+
+  <div class="filters">
+    <div class="field" style="position: relative;">
+      <label>País</label>
+      <input 
+        type="text" 
+        [ngModel]="filters.country" 
+        (ngModelChange)="onCountryInput($event)" 
+        (focus)="showCountryDropdown = countrySuggestions.length > 0"
+        placeholder="Escribí para buscar países..." />
+      <div 
+        class="typeahead-dropdown" 
+        *ngIf="showCountryDropdown"
+        (mouseleave)="showCountryDropdown = false"
+      >
+        <button 
+          type="button" 
+          class="typeahead-item" 
+          *ngFor="let c of countrySuggestions" 
+          (click)="onSelectCountry(c)"
+        >
+          {{ c.name }}
+        </button>
+        <div class="typeahead-empty" *ngIf="countrySuggestions.length === 0">Sin resultados</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Provincia</label>
+      <select [(ngModel)]="filters.province" (change)="onProvinceChange()" [disabled]="!filters.country">
+        <option value="">Seleccione una provincia</option>
+        <option *ngFor="let p of provinces" [ngValue]="p">{{ p }}</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Localidad</label>
+      <select [(ngModel)]="filters.city" [disabled]="!filters.province">
+        <option value="">Seleccione una localidad</option>
+        <option *ngFor="let c of cities" [ngValue]="c">{{ c }}</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Código Postal</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filters.postal_code" 
+        placeholder="Ingrese código postal" 
+      />
+    </div>
+    <div class="actions">
+      <button class="btn secondary" (click)="onClearFilters()" [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+        <span>Limpiar Filtros</span>
+      </button>
+      <button class="btn primary" (click)="onSearch()" [disabled]="loading">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" *ngIf="!loading">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+        </svg>
+        <svg class="icon loading" viewBox="0 0 24 24" aria-hidden="true" *ngIf="loading">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+        </svg>
+        <span>{{ loading ? 'Buscando...' : 'Buscar' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header" *ngIf="filteredZones.length > 0 && !loading">
+      <span class="results-count">{{ filteredZones.length }} zona{{ filteredZones.length !== 1 ? 's' : '' }} encontrada{{ filteredZones.length !== 1 ? 's' : '' }}</span>
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>País</th>
+          <th>Provincia / Estado</th>
+          <th>Localidad</th>
+          <th>CP</th>
+          <th>Zona / Barrio</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Skeleton rows while loading -->
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+        <tr *ngIf="loading" class="skeleton-row" aria-hidden="true">
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-text"></div></td>
+          <td><div class="skeleton skeleton-badge"></div></td>
+          <td class="row-actions"><div class="skeleton skeleton-actions"></div></td>
+        </tr>
+
+        <!-- Real rows -->
+        <tr *ngFor="let zone of filteredZones; trackBy: trackByZoneId" [class.hidden]="loading">
+          <td>
+            <span class="flag" aria-hidden="true">{{ zone.flag }}</span>
+            {{ zone.country }}
+          </td>
+          <td>{{ zone.province }}</td>
+          <td>{{ zone.city }}</td>
+          <td>{{ zone.postal_code }}</td>
+          <td>{{ zone.neighborhood }}</td>
+          <td>
+            <span 
+              class="badge" 
+              [class.urban]="zone.type === 'Urbana'" 
+              [class.suburban]="zone.type === 'Suburbana'"
+              [class.rural]="zone.type === 'Rural'"
+            >
+              {{ zone.type }}
+            </span>
+          </td>
+          <td class="row-actions">
+            <button 
+              class="link" 
+              (click)="onEdit(zone)"
+              [title]="'Editar zona de ' + zone.neighborhood"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04a1 1 0 0 0 0-1.41l-1.51-1.51a1 1 0 0 0-1.41 0l-1.12 1.12 3.75 3.75 1.29-1.29z"></path>
+              </svg>
+              <span>Editar</span>
+            </button>
+            <button 
+              class="link danger" 
+              (click)="onDelete(zone)"
+              [title]="'Eliminar zona de ' + zone.neighborhood"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 1h4v2H4V5h4l1-1z"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="filteredZones.length === 0 && !loading">
+      <svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"></path>
+      </svg>
+      <h3>No se encontraron zonas</h3>
+      <p>Intenta ajustar los filtros de búsqueda o agrega una nueva zona.</p>
+    </div>
+
+    <div class="table-footer" *ngIf="!loading">
+      <button class="btn primary" (click)="onAdd()">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path>
+        </svg>
+        <span>Agregar Zona</span>
+      </button>
+    </div>
+  </div>
+</section>
