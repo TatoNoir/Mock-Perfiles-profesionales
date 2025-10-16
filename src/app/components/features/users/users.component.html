@@ -83,7 +83,7 @@
                 spellcheck="false"
               />
               <div class="typeahead-dropdown" *ngIf="showProvinceDropdown" (mouseleave)="showProvinceDropdown = false">
-                <button type="button" class="typeahead-item" *ngFor="let p of provinceSuggestions" (click)="onSelectProvince(p)">{{ p }}</button>
+                <button type="button" class="typeahead-item" *ngFor="let p of provinceSuggestions" (click)="onSelectProvince(p)">{{ p.name }}</button>
                 <div class="typeahead-empty" *ngIf="provinceSuggestions.length === 0">Sin resultados</div>
               </div>
             </div>

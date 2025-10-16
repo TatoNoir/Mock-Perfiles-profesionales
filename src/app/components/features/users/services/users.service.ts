@@ -124,8 +124,21 @@ export interface CreateUserRequest {
 export class UsersService {
   constructor(private apiService: ApiService) {}
 
-  getUsers(): Observable<ApiUser[]> {
-    return this.apiService.get<{ data: ApiUser[] }>('/api/users').pipe(
+  getUsers(params?: {
+    name?: string;
+    email?: string;
+    user_type_id?: string | number;
+    province_id?: string | number;
+    created_from?: string;
+    created_to?: string;
+  }): Observable<ApiUser[]> {
+    const qs = params ?
+      '?' + Object.entries(params)
+        .filter(([_, v]) => v !== undefined && v !== null && `${v}` !== '')
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+        .join('&')
+      : '';
+    return this.apiService.get<{ data: ApiUser[] }>(`/api/users${qs}`).pipe(
       map(response => response.data),
       catchError(error => {
         console.error('Error fetching users from API:', error);

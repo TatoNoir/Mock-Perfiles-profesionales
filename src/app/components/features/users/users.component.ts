@@ -28,11 +28,13 @@ export class UsersComponent implements OnInit {
   // Provincia typeahead state
   provinceText = '';
   showProvinceDropdown = false;
-  provinceSuggestions: string[] = [];
+  provinceSuggestions: { id: number; name: string }[] = [];
+  selectedProvinceId: number | null = null;
   // Localidad typeahead state
   localityText = '';
   showLocalityDropdown = false;
-  localitySuggestions: string[] = [];
+  localitySuggestions: { id: number; name: string }[] = [];
+  selectedLocalityId: number | null = null;
   
   filters = {
     email: '',
@@ -58,7 +60,16 @@ export class UsersComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    this.usersService.getUsers().subscribe({
+    const params: any = {
+      name: this.filters.name,
+      email: this.filters.email,
+      user_type_id: this.filters.role,
+      province_id: this.selectedProvinceId ?? undefined,
+      locality_id: this.selectedLocalityId ?? undefined,
+      // created_from: this.filters.createdFrom, // removido del UI actual
+      // created_to: this.filters.createdTo
+    };
+    this.usersService.getUsers(params).subscribe({
       next: (data: ApiUser[]) => { 
         this.users = data;
         this.filteredUsers = data;
@@ -168,41 +179,8 @@ export class UsersComponent implements OnInit {
       }
 
       applyFilters(): void {
-        this.filteredUsers = this.users.filter(user => {
-          // Filtro por email
-          if (this.filters.email && !user.email.toLowerCase().includes(this.filters.email.toLowerCase())) {
-            return false;
-          }
-
-          // Filtro por nombre (usar first_name + last_name o fallback a name)
-          if (this.filters.name) {
-            const full = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || (user.name || '');
-            if (!full.toLowerCase().includes(this.filters.name.toLowerCase())) {
-              return false;
-            }
-          }
-
-          // Filtro por rol/tipo de usuario
-          if (this.filters.role && user.user_type_id.toString() !== this.filters.role) {
-            return false;
-          }
-
-          // Filtro por localidad
-      if (this.localityText && !(user.locality?.name || '').toLowerCase().includes(this.localityText.toLowerCase())) {
-        return false;
-      }
-
-      // Filtro por provincia (texto por nombre de state)
-      if (this.provinceText && !(user.locality?.state?.name || '').toLowerCase().includes(this.provinceText.toLowerCase())) {
-        return false;
-      }
-
-          // Filtro por rango de fechas de creación removido
-
-          // Removido filtro por último acceso
-
-          return true;
-        });
+        // Ahora filtramos desde el backend: recargar con parámetros
+        this.loadUsers();
 
         
       }
@@ -216,13 +194,24 @@ export class UsersComponent implements OnInit {
           locality: '',
           province: ''
         };
-        this.filteredUsers = [...this.users];
+    this.filteredUsers = [...this.users];
     this.provinceText = '';
+    this.selectedProvinceId = null;
     this.showProvinceDropdown = false;
     this.recomputeProvinceSuggestions('');
     this.localityText = '';
+    this.selectedLocalityId = null;
     this.showLocalityDropdown = false;
     this.recomputeLocalitySuggestions('');
+    // reconsultar backend sin filtros
+    // Forzar consulta sin parámetros: vaciar seleccionados antes de llamar
+    this.usersService.getUsers({}).subscribe({
+      next: (data: ApiUser[]) => {
+        this.users = data;
+        this.filteredUsers = data;
+      },
+      error: () => {}
+    });
         
       }
 
@@ -233,24 +222,27 @@ export class UsersComponent implements OnInit {
 
   onProvinceInput(value: string): void {
     this.provinceText = value;
+    if (!value) this.selectedProvinceId = null;
     this.recomputeProvinceSuggestions(value);
     this.showProvinceDropdown = true;
   }
 
-  onSelectProvince(value: string): void {
-    this.provinceText = value;
+  onSelectProvince(value: { id: number; name: string }): void {
+    this.provinceText = value.name;
+    this.selectedProvinceId = value.id;
     this.showProvinceDropdown = false;
   }
 
   private recomputeProvinceSuggestions(query: string): void {
-    const set = new Set<string>();
+    const map = new Map<number, string>();
     for (const u of this.users) {
+      const id = (u.locality?.state?.id as number) || 0;
       const name = (u.locality?.state?.name || '').trim();
-      if (name) set.add(name);
+      if (id && name && !map.has(id)) map.set(id, name);
     }
-    const all = Array.from(set).sort((a, b) => a.localeCompare(b));
+    const all = Array.from(map.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
     const q = (query || '').toLowerCase();
-    this.provinceSuggestions = q ? all.filter(n => n.toLowerCase().includes(q)) : all.slice(0, 10);
+    this.provinceSuggestions = q ? all.filter(n => n.name.toLowerCase().includes(q)) : all.slice(0, 10);
   }
 
   // Localidad typeahead helpers
@@ -260,23 +252,26 @@ export class UsersComponent implements OnInit {
 
   onLocalityInput(value: string): void {
     this.localityText = value;
+    if (!value) this.selectedLocalityId = null;
     this.recomputeLocalitySuggestions(value);
     this.showLocalityDropdown = true;
   }
 
-  onSelectLocality(value: string): void {
-    this.localityText = value;
+  onSelectLocality(value: { id: number; name: string }): void {
+    this.localityText = value.name;
+    this.selectedLocalityId = value.id;
     this.showLocalityDropdown = false;
   }
 
   private recomputeLocalitySuggestions(query: string): void {
-    const set = new Set<string>();
+    const map = new Map<number, string>();
     for (const u of this.users) {
+      const id = (u.locality?.id as number) || 0;
       const name = (u.locality?.name || '').trim();
-      if (name) set.add(name);
+      if (id && name && !map.has(id)) map.set(id, name);
     }
-    const all = Array.from(set).sort((a, b) => a.localeCompare(b));
+    const all = Array.from(map.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
     const q = (query || '').toLowerCase();
-    this.localitySuggestions = q ? all.filter(n => n.toLowerCase().includes(q)) : all.slice(0, 10);
+    this.localitySuggestions = q ? all.filter(n => n.name.toLowerCase().includes(q)) : all.slice(0, 10);
   }
     }
