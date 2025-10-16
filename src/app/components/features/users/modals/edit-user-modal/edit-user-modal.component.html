@@ -41,6 +41,21 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="password">Contraseña *</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Ingrese la contraseña"
+          [class.error]="editForm.get('password')?.invalid && editForm.get('password')?.touched"
+        />
+        <div class="error-message" *ngIf="editForm.get('password')?.invalid && editForm.get('password')?.touched">
+          <span *ngIf="editForm.get('password')?.errors?.['required']">La contraseña es requerida</span>
+          <span *ngIf="editForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</span>
+        </div>
+      </div>
+
       <!-- Teléfono dividido -->
       <div class="form-group">
         <label>Teléfono *</label>

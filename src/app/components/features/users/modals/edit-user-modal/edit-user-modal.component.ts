@@ -62,6 +62,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       country_phone: ['+54', [Validators.required]],
       area_code: ['', [Validators.required]],
       phone_number: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       email: ['', [Validators.required, Validators.email]],
       email_verified_at: [null],
       profile_picture: [null],
@@ -99,12 +100,27 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       const userActivityIds = this.user.activities.map(activity => activity.id);
       this.selectedActivities = userActivityIds;
       
+      const u: any = this.user as any;
       this.editForm.patchValue({
-        username: this.user.email?.split('@')[0] || '',
-        first_name: this.user.name?.split(' ')[0] || '',
-        last_name: this.user.name?.split(' ').slice(1).join(' ') || '',
+        username: u.username || (this.user.email?.split('@')[0] || ''),
+        first_name: u.first_name || '',
+        last_name: u.last_name || '',
+        document_type: u.document_type || 'DNI',
+        document_number: u.document_number || '',
+        birth_date: u.birth_date || '',
+        nationality: u.nationality || 'Argentina',
+        country_phone: u.country_phone || '+54',
+        area_code: u.area_code || '',
+        phone_number: u.phone_number || '',
         email: this.user.email,
-        description: this.user.description || '',
+        email_verified_at: u.email_verified_at ?? null,
+        profile_picture: u.profile_picture ?? null,
+        description: u.description || '',
+        address: u.address || '',
+        street: u.street || '',
+        street_number: u.street_number || '',
+        floor: u.floor || '',
+        apartment: u.apartment || '',
         user_type_id: this.user.user_type_id,
         locality_id: this.user.locality_id || null,
         activities: userActivityIds
@@ -183,7 +199,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         country_phone: formValue.country_phone,
         area_code: formValue.area_code,
         phone_number: formValue.phone_number,
-        password: '', // No se actualiza la contraseña en edición
+        password: formValue.password,
         email: formValue.email,
         email_verified_at: formValue.email_verified_at,
         profile_picture: formValue.profile_picture,
