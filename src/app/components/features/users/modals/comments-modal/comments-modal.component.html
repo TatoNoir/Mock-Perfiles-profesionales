@@ -1,0 +1,42 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Comentarios de {{ userName }}</h2>
+      <button class="close-btn" (click)="onClose()" aria-label="Cerrar modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <ng-container *ngIf="questions && questions.length > 0; else noComments">
+        <div class="comments-list">
+          <div class="comment" *ngFor="let q of questions">
+            <img class="mini" src="https://i.pravatar.cc/40?u={{q.email}}" alt="" />
+            <div class="comment-content">
+              <div class="comment-header">
+                <strong>{{ q.name }}</strong>
+                <span class="muted">{{ q.email }}</span>
+              </div>
+              <div class="comment-date muted">{{ q.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
+              <div class="comment-question">
+                <span class="muted">Pregunta:</span> {{ q.message }}
+              </div>
+              <div class="comment-answer" *ngIf="q.answer">
+                <span class="muted">Respuesta:</span> {{ q.answer }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      
+      <ng-template #noComments>
+        <div class="no-comments">
+          <p class="muted">Aún no hay comentarios para este usuario</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

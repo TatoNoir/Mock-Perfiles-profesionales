@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalProfile } from '../../../../../models/professional.model';
 import { UsersService, ApiUser, ApiQuestion } from '../../services/users.service';
+import { CommentsModalComponent } from '../../modals/comments-modal/comments-modal.component';
 
 @Component({
   selector: 'app-user-professional-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CommentsModalComponent],
   templateUrl: './user-professional-profile.component.html',
   styleUrls: ['./user-professional-profile.component.css']
 })
@@ -17,6 +18,7 @@ export class UserProfessionalProfileComponent implements OnInit {
   userId: number | null = null;
   contactUrl: string | null = null;
   questions: ApiQuestion[] = [];
+  showCommentsModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -152,5 +154,13 @@ export class UserProfessionalProfileComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/usuarios']);
+  }
+
+  openCommentsModal(): void {
+    this.showCommentsModal = true;
+  }
+
+  closeCommentsModal(): void {
+    this.showCommentsModal = false;
   }
 }
