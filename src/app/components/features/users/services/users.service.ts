@@ -171,6 +171,24 @@ export class UsersService {
     );
   }
 
+  updateQuestion(id: number, payload: { answer: string; published: boolean }): Observable<ApiQuestion> {
+    return this.apiService.put<ApiQuestion>(`/api/questions/${id}`, payload).pipe(
+      catchError(error => {
+        console.error('Error updating question:', error);
+        throw error;
+      })
+    );
+  }
+
+  deleteQuestion(id: number): Observable<{ success: boolean } | any> {
+    return this.apiService.delete<{ success: boolean } | any>(`/api/questions/${id}`).pipe(
+      catchError(error => {
+        console.error('Error deleting question:', error);
+        throw error;
+      })
+    );
+  }
+
   // --- Geo helpers (copiados desde ZonesService) ---
   getCountries(query: string = '') {
     const qs = query ? `?name=${encodeURIComponent(query)}` : '';
