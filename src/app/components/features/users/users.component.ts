@@ -85,10 +85,9 @@ export class UsersComponent implements OnInit {
   }
 
       onUserCreated(newUser: ApiUser) {
-        // Agregar el nuevo usuario a la lista
-        this.users.push(newUser);
-        this.filteredUsers.push(newUser);
-        
+        // Refrescar desde el backend para asegurar datos y relaciones
+        this.loadUsers();
+        this.showAddModal = false;
       }
 
   onEditUser(user: ApiUser) {
@@ -102,18 +101,10 @@ export class UsersComponent implements OnInit {
   }
 
       onUserUpdated(updatedUser: ApiUser) {
-        // Actualizar el usuario en la lista
-        const index = this.users.findIndex(u => u.id === updatedUser.id);
-        if (index !== -1) {
-          this.users[index] = updatedUser;
-        }
-        
-        const filteredIndex = this.filteredUsers.findIndex(u => u.id === updatedUser.id);
-        if (filteredIndex !== -1) {
-          this.filteredUsers[filteredIndex] = updatedUser;
-        }
-        
-        
+        // Refrescar lista para reflejar cambios
+        this.loadUsers();
+        this.showEditModal = false;
+        this.selectedUser = null;
       }
 
   onDeleteUser(user: ApiUser) {
