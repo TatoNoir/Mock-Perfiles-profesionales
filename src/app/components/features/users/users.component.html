@@ -143,13 +143,14 @@
           <th>Tipo de Usuario</th>
           <th>Localidad</th>
           <th>Provincia</th>
+          <th class="rating-header">Valoraciones</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <!-- Loading state -->
         <tr *ngIf="loading">
-          <td colspan="6" class="loading-cell">
+          <td colspan="7" class="loading-cell">
             <div class="loading-spinner"></div>
             <span>Cargando usuarios...</span>
           </td>
@@ -157,7 +158,7 @@
         
         <!-- Error state -->
         <tr *ngIf="error && !loading">
-          <td colspan="6" class="error-cell">
+          <td colspan="7" class="error-cell">
             <div class="error-message">
               {{ error }}
               <button class="btn secondary" (click)="loadUsers()">Reintentar</button>
@@ -179,6 +180,14 @@
               </span>
             </td>
             <td class="muted">{{ u.locality?.state?.name }}</td>
+            <td class="rating-cell">
+              <span *ngIf="u.reviews_count && u.reviews_count > 0; else noReviews">
+                {{ u.reviews_avg_value || '0.0' }} ({{ u.reviews_count }})
+              </span>
+              <ng-template #noReviews>
+                <span class="muted">Sin valoraciones</span>
+              </ng-template>
+            </td>
             <td class="actions">
               <!-- Botones de acción (iconos) -->
               <button class="btn secondary" (click)="onEditUser(u)" aria-label="Editar" data-tooltip="Editar">

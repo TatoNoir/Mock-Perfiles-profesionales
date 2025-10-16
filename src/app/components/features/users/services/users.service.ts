@@ -86,6 +86,9 @@ export interface ApiUser {
   user_type?: ApiUserType;
   activities: ApiActivity[];
   locality?: ApiLocality;
+  // Datos de valoraciones
+  reviews_count?: number;
+  reviews_avg_value?: string;
 }
 
 export interface ApiDocumentType {
