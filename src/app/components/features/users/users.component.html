@@ -180,10 +180,22 @@
             </td>
             <td class="muted">{{ u.locality?.state?.name }}</td>
             <td class="actions">
-              <!-- Botones de acción -->
-              <button class="btn secondary" (click)="onEditUser(u)">Editar</button>
-              <button class="btn danger" (click)="onDeleteUser(u)">Eliminar</button>
-              <button class="btn primary" (click)="onViewProfessionalProfile(u)">Ver perfil profesional</button>
+              <!-- Botones de acción (iconos) -->
+              <button class="btn secondary" (click)="onEditUser(u)" aria-label="Editar" data-tooltip="Editar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+                </svg>
+              </button>
+              <button class="btn danger" (click)="onDeleteUser(u)" aria-label="Eliminar" data-tooltip="Eliminar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M6 7h12v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1h4v2H4V4h4l1-1z"/>
+                </svg>
+              </button>
+              <button class="btn primary" (click)="onViewProfessionalProfile(u)" aria-label="Ver perfil" data-tooltip="Ver perfil">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 6a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 10c-5.33 0-8 3-8 3v2h16v-2s-2.67-3-8-3z"/>
+                </svg>
+              </button>
             </td>
           </tr>
         </ng-container>
