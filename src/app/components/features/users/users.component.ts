@@ -25,15 +25,20 @@ export class UsersComponent implements OnInit {
   showEditModal = false;
   selectedUser: ApiUser | null = null;
   showFilters = false;
+  // Provincia typeahead state
+  provinceText = '';
+  showProvinceDropdown = false;
+  provinceSuggestions: string[] = [];
+  // Localidad typeahead state
+  localityText = '';
+  showLocalityDropdown = false;
+  localitySuggestions: string[] = [];
   
   filters = {
     email: '',
     name: '',
     role: '',
     status: '',
-    createdFrom: '',
-    createdTo: '',
-    lastAccess: '',
     locality: '',
     province: ''
   };
@@ -57,6 +62,10 @@ export class UsersComponent implements OnInit {
       next: (data: ApiUser[]) => { 
         this.users = data;
         this.filteredUsers = data;
+        // precalcular sugerencias de provincias desde los datos cargados
+        this.recomputeProvinceSuggestions('');
+        // precalcular sugerencias de localidades
+        this.recomputeLocalitySuggestions('');
         this.loading = false;
       },
       error: (err: any) => { 
@@ -174,9 +183,12 @@ export class UsersComponent implements OnInit {
             return false;
           }
 
-          // Filtro por nombre
-          if (this.filters.name && !user.name.toLowerCase().includes(this.filters.name.toLowerCase())) {
-            return false;
+          // Filtro por nombre (usar first_name + last_name o fallback a name)
+          if (this.filters.name) {
+            const full = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || (user.name || '');
+            if (!full.toLowerCase().includes(this.filters.name.toLowerCase())) {
+              return false;
+            }
           }
 
           // Filtro por rol/tipo de usuario
@@ -185,67 +197,18 @@ export class UsersComponent implements OnInit {
           }
 
           // Filtro por localidad
-          if (this.filters.locality && user.locality_id.toString() !== this.filters.locality) {
-            return false;
-          }
+      if (this.localityText && !(user.locality?.name || '').toLowerCase().includes(this.localityText.toLowerCase())) {
+        return false;
+      }
 
-          // Filtro por provincia (a través de localidad)
-          if (this.filters.province && user.locality?.province_id.toString() !== this.filters.province) {
-            return false;
-          }
+      // Filtro por provincia (texto por nombre de state)
+      if (this.provinceText && !(user.locality?.state?.name || '').toLowerCase().includes(this.provinceText.toLowerCase())) {
+        return false;
+      }
 
-          // Filtro por rango de fechas de creación
-          if (this.filters.createdFrom || this.filters.createdTo) {
-            const userCreatedDate = new Date(user.created_at);
-            
-            if (this.filters.createdFrom) {
-              const fromDate = new Date(this.filters.createdFrom);
-              if (userCreatedDate < fromDate) {
-                return false;
-              }
-            }
-            
-            if (this.filters.createdTo) {
-              const toDate = new Date(this.filters.createdTo);
-              toDate.setHours(23, 59, 59, 999); // Incluir todo el día
-              if (userCreatedDate > toDate) {
-                return false;
-              }
-            }
-          }
+          // Filtro por rango de fechas de creación removido
 
-          // Filtro por último acceso (simulado - no tenemos esta data real)
-          if (this.filters.lastAccess) {
-            // Por ahora solo simulamos, en un caso real tendrías que tener esta información
-            const now = new Date();
-            const userUpdatedDate = new Date(user.updated_at);
-            const daysDiff = Math.floor((now.getTime() - userUpdatedDate.getTime()) / (1000 * 60 * 60 * 24));
-            
-            switch (this.filters.lastAccess) {
-              case 'today':
-                if (daysDiff > 0) return false;
-                break;
-              case 'week':
-                if (daysDiff > 7) return false;
-                break;
-              case 'month':
-                if (daysDiff > 30) return false;
-                break;
-              case '3months':
-                if (daysDiff > 90) return false;
-                break;
-              case '6months':
-                if (daysDiff > 180) return false;
-                break;
-              case 'year':
-                if (daysDiff > 365) return false;
-                break;
-              case 'never':
-                // Simulamos que nunca accedió si no se actualizó en los últimos 30 días
-                if (daysDiff < 30) return false;
-                break;
-            }
-          }
+          // Removido filtro por último acceso
 
           return true;
         });
@@ -258,14 +221,71 @@ export class UsersComponent implements OnInit {
           email: '',
           name: '',
           role: '',
-          status: '',
-          createdFrom: '',
-          createdTo: '',
-          lastAccess: '',
+      status: '',
           locality: '',
           province: ''
         };
         this.filteredUsers = [...this.users];
+    this.provinceText = '';
+    this.showProvinceDropdown = false;
+    this.recomputeProvinceSuggestions('');
+    this.localityText = '';
+    this.showLocalityDropdown = false;
+    this.recomputeLocalitySuggestions('');
         
       }
+
+  // Provincia typeahead helpers
+  onProvinceFocus(): void {
+    this.showProvinceDropdown = this.provinceSuggestions.length > 0;
+  }
+
+  onProvinceInput(value: string): void {
+    this.provinceText = value;
+    this.recomputeProvinceSuggestions(value);
+    this.showProvinceDropdown = true;
+  }
+
+  onSelectProvince(value: string): void {
+    this.provinceText = value;
+    this.showProvinceDropdown = false;
+  }
+
+  private recomputeProvinceSuggestions(query: string): void {
+    const set = new Set<string>();
+    for (const u of this.users) {
+      const name = (u.locality?.state?.name || '').trim();
+      if (name) set.add(name);
+    }
+    const all = Array.from(set).sort((a, b) => a.localeCompare(b));
+    const q = (query || '').toLowerCase();
+    this.provinceSuggestions = q ? all.filter(n => n.toLowerCase().includes(q)) : all.slice(0, 10);
+  }
+
+  // Localidad typeahead helpers
+  onLocalityFocus(): void {
+    this.showLocalityDropdown = this.localitySuggestions.length > 0;
+  }
+
+  onLocalityInput(value: string): void {
+    this.localityText = value;
+    this.recomputeLocalitySuggestions(value);
+    this.showLocalityDropdown = true;
+  }
+
+  onSelectLocality(value: string): void {
+    this.localityText = value;
+    this.showLocalityDropdown = false;
+  }
+
+  private recomputeLocalitySuggestions(query: string): void {
+    const set = new Set<string>();
+    for (const u of this.users) {
+      const name = (u.locality?.name || '').trim();
+      if (name) set.add(name);
+    }
+    const all = Array.from(set).sort((a, b) => a.localeCompare(b));
+    const q = (query || '').toLowerCase();
+    this.localitySuggestions = q ? all.filter(n => n.toLowerCase().includes(q)) : all.slice(0, 10);
+  }
     }

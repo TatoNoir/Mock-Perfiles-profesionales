@@ -42,23 +42,41 @@ export interface ApiProvince {
   updated_at: string;
 }
 
+export interface ApiStateRef {
+  id: number;
+  country_id: number;
+  name: string;
+  codigo3166_2?: string;
+  deleted_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
 export interface ApiLocality {
   id: number;
   name: string;
   short_code: string;
-  disabled: number;
-  province_id: number;
+  disabled?: number;
+  // Compatibilidad antigua (provincias)
+  province_id?: number;
+  province?: ApiProvince;
+  // Estructura actual (estados)
+  state_id?: number;
+  state?: ApiStateRef;
   created_at: string;
   updated_at: string;
-  province?: ApiProvince;
 }
 
 export interface ApiUser {
   id: number;
-  name: string;
+  // Algunos listados aún usan name
+  name?: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
   email_verified_at?: string | null;
-  phone: string;
+  // Compatibilidad con vistas antiguas
+  phone?: string;
   profile_picture: string | null;
   description: string | null;
   created_at: string;
@@ -77,11 +95,26 @@ export interface ApiDocumentType {
 }
 
 export interface CreateUserRequest {
-  name: string;
-  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  document_type: string;
+  document_number: string;
+  birth_date: string; // YYYY-MM-DD
+  nationality: string;
+  country_phone: string;
+  area_code: string;
+  phone_number: string;
   password: string;
-  phone: string;
+  email: string;
+  email_verified_at: string | null;
+  profile_picture: string | null;
   description: string;
+  address: string;
+  street: string;
+  street_number: string;
+  floor: string;
+  apartment: string;
   user_type_id: number;
   locality_id: number;
   activities: number[];

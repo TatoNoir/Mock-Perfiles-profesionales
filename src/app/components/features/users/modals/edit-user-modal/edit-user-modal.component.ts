@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UsersService, CreateUserRequest, ApiUser, ApiActivity, ApiDocumentType, ApiUserType } from '../../services/users.service';
+import { UsersService, CreateUserRequest, ApiUser, ApiActivity, ApiDocumentType, ApiUserType, GeoCountry, GeoState, GeoLocality } from '../../services/users.service';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -27,21 +28,52 @@ export class EditUserModalComponent implements OnInit, OnChanges {
   documentTypes: ApiDocumentType[] = [];
   userTypes: ApiUserType[] = [];
 
+  // Geo typeahead state (igual que crear)
+  private destroy$ = new Subject<void>();
+  private countryInput$ = new Subject<string>();
+  private stateInput$ = new Subject<string>();
+  private localityInput$ = new Subject<string>();
+
+  countryText = '';
+  provinceText = '';
+  localityText = '';
+
+  countrySuggestions: GeoCountry[] = [];
+  stateSuggestions: GeoState[] = [];
+  localitySuggestions: GeoLocality[] = [];
+  showCountryDropdown = false;
+  showStateDropdown = false;
+  showLocalityDropdown = false;
+  selectedCountryId: number | null = null;
+  selectedStateId: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private usersService: UsersService
   ) {
     this.editForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      phone: ['', [Validators.required]],
-      document_type_id: ['', [Validators.required]],
+      username: ['', [Validators.required]],
+      first_name: ['', [Validators.required]],
+      last_name: ['', [Validators.required]],
+      document_type: ['DNI', [Validators.required]],
       document_number: ['', [Validators.required]],
+      birth_date: ['', [Validators.required]],
+      nationality: ['Argentina', [Validators.required]],
+      country_phone: ['+54', [Validators.required]],
+      area_code: ['', [Validators.required]],
+      phone_number: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      email_verified_at: [null],
+      profile_picture: [null],
       description: [''],
+      address: [''],
+      street: [''],
+      street_number: [''],
+      floor: [''],
+      apartment: [''],
       user_type_id: ['', [Validators.required]],
-      locality_id: [1], // Hardcodeado
-      activities: [[]] // Se manejará con checkboxes
+      locality_id: [null, [Validators.required]],
+      activities: [[]]
     });
   }
 
@@ -49,6 +81,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     this.loadActivities();
     this.loadDocumentTypes();
     this.loadUserTypes();
+    this.setupTypeaheads();
     if (this.user) {
       this.populateForm();
     }
@@ -67,17 +100,47 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       this.selectedActivities = userActivityIds;
       
       this.editForm.patchValue({
-        name: this.user.name,
+        username: this.user.email?.split('@')[0] || '',
+        first_name: this.user.name?.split(' ')[0] || '',
+        last_name: this.user.name?.split(' ').slice(1).join(' ') || '',
         email: this.user.email,
-        password: '', // No pre-llenamos la contraseña por seguridad
-        phone: this.user.phone,
-        document_type_id: '', // TODO: Agregar campo al modelo de usuario
-        document_number: '', // TODO: Agregar campo al modelo de usuario
         description: this.user.description || '',
         user_type_id: this.user.user_type_id,
-        locality_id: 1, // Hardcodeado
+        locality_id: this.user.locality_id || null,
         activities: userActivityIds
       });
+
+      // Patch geo texts desde locality/state si vienen
+      const state = (this.user as any).locality?.state;
+      const locality = (this.user as any).locality;
+      if (state) {
+        this.selectedStateId = state.id || null;
+        this.selectedCountryId = state.country_id || null;
+        this.provinceText = state.name || '';
+      }
+      if (locality) {
+        this.localityText = locality.name || '';
+      }
+      // Resolve country name by id si es posible
+      if (this.selectedCountryId != null) {
+        this.usersService.getCountries('')
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(cs => {
+            const c = (cs || []).find(x => x.id === this.selectedCountryId!);
+            if (c) this.countryText = c.name;
+          });
+      }
+      // Precargar sugerencias de estado/localidad para edición
+      if (this.selectedCountryId != null) {
+        this.usersService.getProvincesByCountry(this.selectedCountryId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(states => { this.stateSuggestions = states || []; });
+      }
+      if (this.selectedStateId != null) {
+        this.usersService.getLocalitiesByState(this.selectedStateId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(localities => { this.localitySuggestions = localities || []; });
+      }
     }
   }
 
@@ -85,10 +148,13 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     if (!this.loading) {
       this.editForm.reset();
       this.editForm.patchValue({
+        document_type: 'DNI',
+        nationality: 'Argentina',
+        country_phone: '+54',
+        email_verified_at: null,
+        profile_picture: null,
         user_type_id: '',
-        locality_id: 1,
-        document_type_id: '',
-        document_number: '',
+        locality_id: null,
         activities: []
       });
       this.selectedActivities = [];
@@ -107,11 +173,26 @@ export class EditUserModalComponent implements OnInit, OnChanges {
 
       const formValue = this.editForm.value;
       const request: CreateUserRequest = {
-        name: formValue.name,
+        username: formValue.username,
+        first_name: formValue.first_name,
+        last_name: formValue.last_name,
+        document_type: formValue.document_type,
+        document_number: formValue.document_number,
+        birth_date: formValue.birth_date,
+        nationality: formValue.nationality,
+        country_phone: formValue.country_phone,
+        area_code: formValue.area_code,
+        phone_number: formValue.phone_number,
+        password: '', // No se actualiza la contraseña en edición
         email: formValue.email,
-        password: formValue.password,
-        phone: formValue.phone,
+        email_verified_at: formValue.email_verified_at,
+        profile_picture: formValue.profile_picture,
         description: formValue.description || '',
+        address: formValue.address || '',
+        street: formValue.street || '',
+        street_number: formValue.street_number || '',
+        floor: formValue.floor || '',
+        apartment: formValue.apartment || '',
         user_type_id: formValue.user_type_id,
         locality_id: formValue.locality_id,
         activities: this.selectedActivities
@@ -130,6 +211,75 @@ export class EditUserModalComponent implements OnInit, OnChanges {
         }
       });
     }
+  }
+
+  // --- Geo Typeahead setup & handlers ---
+  private setupTypeaheads(): void {
+    this.countryInput$
+      .pipe(takeUntil(this.destroy$), debounceTime(300), distinctUntilChanged())
+      .subscribe(query => {
+        this.usersService.getCountries(query).subscribe(countries => {
+          this.countrySuggestions = countries || [];
+          this.showCountryDropdown = this.countrySuggestions.length > 0;
+        });
+      });
+
+    this.stateInput$
+      .pipe(takeUntil(this.destroy$), debounceTime(300), distinctUntilChanged())
+      .subscribe(query => {
+        if (!this.selectedCountryId) { this.stateSuggestions = []; this.showStateDropdown = false; return; }
+        this.usersService.getProvincesByCountry(this.selectedCountryId).subscribe(states => {
+          const list = states || [];
+          const q = (query || '').toLowerCase().trim();
+          this.stateSuggestions = q ? list.filter(s => s.name.toLowerCase().includes(q)).slice(0, 20) : list.slice(0, 10);
+          this.showStateDropdown = this.stateSuggestions.length > 0;
+        });
+      });
+
+    this.localityInput$
+      .pipe(takeUntil(this.destroy$), debounceTime(300), distinctUntilChanged())
+      .subscribe(query => {
+        if (!this.selectedStateId) { this.localitySuggestions = []; this.showLocalityDropdown = false; return; }
+        this.usersService.getLocalitiesByState(this.selectedStateId).subscribe(localities => {
+          const list = localities || [];
+          const q = (query || '').toLowerCase().trim();
+          this.localitySuggestions = q ? list.filter(l => l.name.toLowerCase().includes(q)).slice(0, 20) : list.slice(0, 10);
+          this.showLocalityDropdown = this.localitySuggestions.length > 0;
+        });
+      });
+  }
+
+  onCountryInput(value: string): void { this.countryText = value; this.countryInput$.next(value); }
+  onCountryFocus(): void {
+    if (this.countrySuggestions.length === 0) {
+      this.usersService.getCountries('').subscribe(c => { this.countrySuggestions = c || []; this.showCountryDropdown = this.countrySuggestions.length > 0; });
+    } else { this.showCountryDropdown = this.countrySuggestions.length > 0; }
+  }
+  onSelectCountry(country: GeoCountry): void {
+    this.countryText = country.name; this.selectedCountryId = country.id; this.showCountryDropdown = false;
+    this.provinceText = ''; this.localityText = ''; this.selectedStateId = null; this.editForm.patchValue({ locality_id: null });
+  }
+
+  onStateInput(value: string): void { this.provinceText = value; this.stateInput$.next(value); }
+  onStateFocus(): void {
+    if (!this.selectedCountryId) return;
+    this.usersService.getProvincesByCountry(this.selectedCountryId).subscribe(s => { this.stateSuggestions = s || []; this.showStateDropdown = this.stateSuggestions.length > 0; });
+  }
+  onSelectState(state: GeoState): void {
+    this.provinceText = state.name; this.selectedStateId = state.id; this.showStateDropdown = false; this.localityText = ''; this.editForm.patchValue({ locality_id: null });
+  }
+
+  onLocalityInput(value: string): void { this.localityText = value; this.localityInput$.next(value); }
+  onLocalityFocus(): void {
+    if (!this.selectedStateId) return;
+    this.usersService.getLocalitiesByState(this.selectedStateId).subscribe(l => { this.localitySuggestions = l || []; this.showLocalityDropdown = this.localitySuggestions.length > 0; });
+  }
+  onSelectLocality(locality: GeoLocality): void {
+    this.localityText = locality.name; this.showLocalityDropdown = false; this.editForm.patchValue({ locality_id: locality.id });
+  }
+
+  preventNativeAutofill(ev: FocusEvent): void {
+    const el = ev.target as HTMLInputElement; if (!el) return; const prev = el.readOnly; el.readOnly = true; setTimeout(() => (el.readOnly = prev), 120);
   }
 
   loadActivities(): void {

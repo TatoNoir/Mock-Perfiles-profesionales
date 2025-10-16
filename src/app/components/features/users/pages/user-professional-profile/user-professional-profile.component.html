@@ -16,7 +16,7 @@
         <div class="avatar-container">
           <img 
             class="avatar" 
-            [src]="professionalProfile?.profile_picture || 'https://i.pravatar.cc/120?img=12'" 
+            [src]="professionalProfile.profile_picture || 'https://i.pravatar.cc/120?img=12'" 
             alt="Foto del profesional" 
           />
           <div class="avatar-overlay">
@@ -36,10 +36,10 @@
           </div>
         </div>
         <div class="hero-info">
-          <h2 class="name">{{ professionalProfile?.name || 'Profesional' }}</h2>
-          <div class="subtitle">{{ professionalProfile?.specialty || 'Especialidad' }}</div>
-          <p class="summary">{{ professionalProfile?.description || 'Descripción del profesional.' }}</p>
-          <div class="location">{{ professionalProfile?.location || 'Córdoba, Argentina' }}</div>
+          <h2 class="name">{{ professionalProfile.name || 'Profesional' }}</h2>
+          <div class="subtitle">{{ professionalProfile.specialty || 'Especialidad' }}</div>
+          <p class="summary">{{ professionalProfile.description || 'Descripción del profesional.' }}</p>
+          <div class="location">{{ professionalProfile.location || 'Córdoba, Argentina' }}</div>
         </div>
         <div class="hero-actions">
           <button class="btn primary">Ver perfil Profesional</button>
@@ -52,22 +52,22 @@
           <h3>Datos Personales</h3>
           <div class="list">
             <div class="row"><span>DNI</span><strong>30555892</strong></div>
-            <div class="row"><span>Correo</span><strong>{{ professionalProfile?.email || 'carlos.el@example.com' }}</strong></div>
-            <div class="row"><span>Teléfono</span><strong>{{ professionalProfile?.phone || '+54 9 351 456 8980' }}</strong></div>
-            <div class="row"><span>Registrado el</span><strong>{{ (professionalProfile?.created_at | date:'dd/MM/yyyy') || 'Sin datos para mostrar' }}</strong></div>
+            <div class="row"><span>Correo</span><strong>{{ professionalProfile.email || 'carlos.el@example.com' }}</strong></div>
+            <div class="row"><span>Teléfono</span><strong>{{ professionalProfile.phone || '+54 9 351 456 8980' }}</strong></div>
+            <div class="row"><span>Registrado el</span><strong>{{ (professionalProfile.created_at | date:'dd/MM/yyyy') || 'Sin datos para mostrar' }}</strong></div>
             <div class="row"><span>Estado</span><strong>Activo</strong></div>
             <div class="row"><span>Disponibilidad</span><strong>Inmediata</strong></div>
-            <div class="row"><span>Experiencia</span><strong>+{{ professionalProfile?.experienceYears || 12 }} años</strong></div>
+            <div class="row"><span>Experiencia</span><strong>+{{ professionalProfile.experienceYears || 12 }} años</strong></div>
           </div>
         </div>
 
         <div class="card">
           <h3>Especialidades</h3>
           <div class="chips">
-            <span class="chip" *ngFor="let skill of professionalProfile?.skills">{{ skill }}</span>
-            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Instalaciones eléctricas</span>
-            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Tableros trifásicos</span>
-            <span class="chip" *ngIf="!professionalProfile?.skills || professionalProfile?.skills?.length === 0">Domótica</span>
+            <span class="chip" *ngFor="let skill of professionalProfile.skills">{{ skill }}</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Instalaciones eléctricas</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Tableros trifásicos</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Domótica</span>
           </div>
           <h3>Valoraciones y comentarios</h3>
           <div class="rating">★★★★★ <strong>4,9</strong> (23)</div>

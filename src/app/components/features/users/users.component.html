@@ -50,9 +50,9 @@
               />
             </div>
 
-            <!-- Rol/Tipo de Usuario -->
+            <!-- Tipo de Usuario -->
             <div class="filter-group">
-              <label for="role-filter">Rol</label>
+              <label for="role-filter">Tipo de Usuario</label>
               <select id="role-filter" [(ngModel)]="filters.role" class="filter-select">
                 <option value="">Todos los roles</option>
                 <option value="1">Administrador</option>
@@ -66,83 +66,55 @@
         <!-- FILA 2: Provincia | Localidad | Estado -->
         <div class="filters-row">
           <div class="filters-row-grid filters-row-3cols">
-            <!-- Provincia -->
-            <div class="filter-group">
+            <!-- Provincia (typeahead) -->
+            <div class="filter-group" style="position: relative;">
               <label for="province-filter">Provincia</label>
-              <select id="province-filter" [(ngModel)]="filters.province" class="filter-select">
-                <option value="">Todas las provincias</option>
-                <option value="1">Buenos Aires</option>
-                <option value="2">Córdoba</option>
-                <option value="3">Santa Fe</option>
-                <option value="4">Mendoza</option>
-              </select>
-            </div>
-
-            <!-- Localidad -->
-            <div class="filter-group">
-              <label for="locality-filter">Localidad</label>
-              <select id="locality-filter" [(ngModel)]="filters.locality" class="filter-select">
-                <option value="">Todas las localidades</option>
-                <option value="1">La Plata</option>
-                <option value="2">Córdoba</option>
-                <option value="3">Rosario</option>
-                <option value="4">Mendoza</option>
-              </select>
-            </div>
-
-            <!-- Estado -->
-            <div class="filter-group">
-              <label for="status-filter">Estado</label>
-              <select id="status-filter" [(ngModel)]="filters.status" class="filter-select">
-                <option value="">Todos los estados</option>
-                <option value="active">Activo</option>
-                <option value="inactive">Inactivo</option>
-                <option value="pending">Pendiente</option>
-                <option value="suspended">Suspendido</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- FILA 3: Fecha de creación | Último acceso -->
-        <div class="filters-row">
-          <div class="filters-row-grid filters-row-2cols">
-            <!-- Fecha de creación -->
-            <div class="filter-group">
-              <label for="created-from">Fecha de creación</label>
-              <div class="date-range">
-                <input 
-                  type="date" 
-                  id="created-from"
-                  [(ngModel)]="filters.createdFrom"
-                  class="filter-input"
-                />
-                <span>hasta</span>
-                <input 
-                  type="date" 
-                  id="created-to"
-                  [(ngModel)]="filters.createdTo"
-                  class="filter-input"
-                />
+              <input 
+                id="province-filter"
+                type="search"
+                [value]="provinceText"
+                (input)="onProvinceInput($any($event.target).value)"
+                (focus)="onProvinceFocus()"
+                placeholder="Escribí para buscar provincias..."
+                class="filter-input"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+              />
+              <div class="typeahead-dropdown" *ngIf="showProvinceDropdown" (mouseleave)="showProvinceDropdown = false">
+                <button type="button" class="typeahead-item" *ngFor="let p of provinceSuggestions" (click)="onSelectProvince(p)">{{ p }}</button>
+                <div class="typeahead-empty" *ngIf="provinceSuggestions.length === 0">Sin resultados</div>
               </div>
             </div>
 
-            <!-- Último acceso -->
-            <div class="filter-group">
-              <label for="last-access-filter">Último acceso</label>
-              <select id="last-access-filter" [(ngModel)]="filters.lastAccess" class="filter-select">
-                <option value="">Todos</option>
-                <option value="today">Hoy</option>
-                <option value="week">Esta semana</option>
-                <option value="month">Este mes</option>
-                <option value="3months">Últimos 3 meses</option>
-                <option value="6months">Últimos 6 meses</option>
-                <option value="year">Este año</option>
-                <option value="never">Nunca</option>
-              </select>
+            <!-- Localidad (typeahead) -->
+            <div class="filter-group" style="position: relative;">
+              <label for="locality-filter">Localidad</label>
+              <input 
+                id="locality-filter"
+                type="search"
+                [value]="localityText"
+                (input)="onLocalityInput($any($event.target).value)"
+                (focus)="onLocalityFocus()"
+                placeholder="Escribí para buscar localidades..."
+                class="filter-input"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+              />
+              <div class="typeahead-dropdown" *ngIf="showLocalityDropdown" (mouseleave)="showLocalityDropdown = false">
+                <button type="button" class="typeahead-item" *ngFor="let l of localitySuggestions" (click)="onSelectLocality(l)">{{ l }}</button>
+                <div class="typeahead-empty" *ngIf="localitySuggestions.length === 0">Sin resultados</div>
+              </div>
             </div>
+
+            
           </div>
         </div>
+
+        
       </div>
 
       <!-- Botones de acción -->
@@ -170,15 +142,14 @@
           <th>Email</th>
           <th>Tipo de Usuario</th>
           <th>Localidad</th>
-          <th>Último Acceso</th>
-          <th>Modificado</th>
+          <th>Provincia</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <!-- Loading state -->
         <tr *ngIf="loading">
-          <td colspan="7" class="loading-cell">
+          <td colspan="6" class="loading-cell">
             <div class="loading-spinner"></div>
             <span>Cargando usuarios...</span>
           </td>
@@ -186,7 +157,7 @@
         
         <!-- Error state -->
         <tr *ngIf="error && !loading">
-          <td colspan="7" class="error-cell">
+          <td colspan="6" class="error-cell">
             <div class="error-message">
               {{ error }}
               <button class="btn secondary" (click)="loadUsers()">Reintentar</button>
@@ -197,18 +168,17 @@
         <!-- Users data -->
         <ng-container *ngIf="!loading && !error">
           <tr *ngFor="let u of filteredUsers">
-            <td>{{ u.name }}</td>
+            <td>{{ (u.first_name || '') + ' ' + (u.last_name || '') }}</td>
             <td class="muted">{{ u.email }}</td>
             <td>
               <span class="badge badge-user-type">{{ u.user_type?.name }}</span>
             </td>
             <td>
               <span class="locality-info">
-                {{ u.locality?.name }}, {{ u.locality?.province?.name }}
+                {{ u.locality?.name }}
               </span>
             </td>
-            <td class="muted">{{ u.updated_at | date:'short' }}</td>
-            <td class="muted">{{ u.updated_at | date:'short' }}</td>
+            <td class="muted">{{ u.locality?.state?.name }}</td>
             <td class="actions">
               <!-- Botones de acción -->
               <button class="btn secondary" (click)="onEditUser(u)">Editar</button>
@@ -220,7 +190,7 @@
         
         <!-- Empty state -->
         <tr *ngIf="!loading && !error && users.length === 0">
-          <td colspan="7" class="empty-cell">
+          <td colspan="6" class="empty-cell">
             <div class="empty-message">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>

@@ -51,16 +51,29 @@ export class AddUserModalComponent implements OnInit {
     private usersService: UsersService
   ) {
     this.addForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      phone: ['', [Validators.required]],
-      document_type_id: ['', [Validators.required]],
+      username: ['', [Validators.required]],
+      first_name: ['', [Validators.required]],
+      last_name: ['', [Validators.required]],
+      document_type: ['DNI', [Validators.required]],
       document_number: ['', [Validators.required]],
+      birth_date: ['', [Validators.required]],
+      nationality: ['Argentina', [Validators.required]],
+      country_phone: ['+54', [Validators.required]],
+      area_code: ['', [Validators.required]],
+      phone_number: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [Validators.required, Validators.email]],
+      email_verified_at: [null],
+      profile_picture: [null],
       description: [''],
+      address: [''],
+      street: [''],
+      street_number: [''],
+      floor: [''],
+      apartment: [''],
       user_type_id: ['', [Validators.required]],
-      locality_id: [null],
-      activities: [[]] // Se manejará con checkboxes
+      locality_id: [null, [Validators.required]],
+      activities: [[]]
     });
   }
 
@@ -111,10 +124,13 @@ export class AddUserModalComponent implements OnInit {
     if (!this.loading) {
       this.addForm.reset();
       this.addForm.patchValue({
+        document_type: 'DNI',
+        nationality: 'Argentina',
+        country_phone: '+54',
+        email_verified_at: null,
+        profile_picture: null,
         user_type_id: '',
         locality_id: null,
-        document_type_id: '',
-        document_number: '',
         activities: []
       });
       this.countryText = '';
@@ -144,11 +160,26 @@ export class AddUserModalComponent implements OnInit {
 
       const formValue = this.addForm.value;
       const request: CreateUserRequest = {
-        name: formValue.name,
-        email: formValue.email,
+        username: formValue.username,
+        first_name: formValue.first_name,
+        last_name: formValue.last_name,
+        document_type: formValue.document_type,
+        document_number: formValue.document_number,
+        birth_date: formValue.birth_date,
+        nationality: formValue.nationality,
+        country_phone: formValue.country_phone,
+        area_code: formValue.area_code,
+        phone_number: formValue.phone_number,
         password: formValue.password,
-        phone: formValue.phone,
+        email: formValue.email,
+        email_verified_at: formValue.email_verified_at,
+        profile_picture: formValue.profile_picture,
         description: formValue.description || '',
+        address: formValue.address || '',
+        street: formValue.street || '',
+        street_number: formValue.street_number || '',
+        floor: formValue.floor || '',
+        apartment: formValue.apartment || '',
         user_type_id: formValue.user_type_id,
         locality_id: formValue.locality_id,
         activities: this.selectedActivities

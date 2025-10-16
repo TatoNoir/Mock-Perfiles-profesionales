@@ -11,19 +11,20 @@
 
     <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-group">
-        <label for="name">Nombre completo *</label>
-        <input
-          type="text"
-          id="name"
-          formControlName="name"
-          placeholder="Ingrese el nombre completo"
-          [class.error]="editForm.get('name')?.invalid && editForm.get('name')?.touched"
-        />
-        <div class="error-message" *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched">
-          <span *ngIf="editForm.get('name')?.errors?.['required']">El nombre es requerido</span>
-          <span *ngIf="editForm.get('name')?.errors?.['minlength']">El nombre debe tener al menos 3 caracteres</span>
-        </div>
+        <label for="username">Nombre de usuario *</label>
+        <input type="text" id="username" formControlName="username" placeholder="Usuario" />
       </div>
+
+      <div class="form-group">
+        <label for="first_name">Nombre *</label>
+        <input type="text" id="first_name" formControlName="first_name" placeholder="Nombre" />
+      </div>
+
+      <div class="form-group">
+        <label for="last_name">Apellido *</label>
+        <input type="text" id="last_name" formControlName="last_name" placeholder="Apellido" />
+      </div>
+
 
       <div class="form-group">
         <label for="email">Email *</label>
@@ -40,50 +41,24 @@
         </div>
       </div>
 
+      <!-- Teléfono dividido -->
       <div class="form-group">
-        <label for="password">Contraseña *</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          placeholder="Ingrese la nueva contraseña"
-          [class.error]="editForm.get('password')?.invalid && editForm.get('password')?.touched"
-        />
-        <div class="error-message" *ngIf="editForm.get('password')?.invalid && editForm.get('password')?.touched">
-          <span *ngIf="editForm.get('password')?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="editForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres</span>
+        <label>Teléfono *</label>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <input type="text" style="width:90px" placeholder="+54" formControlName="country_phone" />
+          <input type="text" style="width:100px" placeholder="Área" formControlName="area_code" />
+          <input type="text" placeholder="Número" formControlName="phone_number" style="flex:1" />
         </div>
       </div>
 
       <div class="form-group">
-        <label for="phone">Teléfono *</label>
-        <input
-          type="tel"
-          id="phone"
-          formControlName="phone"
-          placeholder="Ingrese el teléfono"
-          [class.error]="editForm.get('phone')?.invalid && editForm.get('phone')?.touched"
-        />
-        <div class="error-message" *ngIf="editForm.get('phone')?.invalid && editForm.get('phone')?.touched">
-          <span *ngIf="editForm.get('phone')?.errors?.['required']">El teléfono es requerido</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="document_type_id">Tipo de Documento *</label>
-        <select 
-          id="document_type_id" 
-          formControlName="document_type_id"
-          [class.error]="editForm.get('document_type_id')?.invalid && editForm.get('document_type_id')?.touched"
-        >
+        <label for="document_type">Tipo de Documento *</label>
+        <select id="document_type" formControlName="document_type">
           <option value="">Seleccione un tipo de documento</option>
-          <option *ngFor="let docType of documentTypes" [value]="docType.id">
+          <option *ngFor="let docType of documentTypes" [value]="docType.name">
             {{ docType.name }} - {{ docType.description }}
           </option>
         </select>
-        <div class="error-message" *ngIf="editForm.get('document_type_id')?.invalid && editForm.get('document_type_id')?.touched">
-          <span *ngIf="editForm.get('document_type_id')?.errors?.['required']">El tipo de documento es requerido</span>
-        </div>
       </div>
 
       <div class="form-group">
@@ -101,13 +76,39 @@
       </div>
 
       <div class="form-group">
+        <label for="birth_date">Fecha de nacimiento *</label>
+        <input type="date" id="birth_date" formControlName="birth_date" />
+      </div>
+
+      <div class="form-group">
+        <label for="nationality">Nacionalidad *</label>
+        <input type="text" id="nationality" formControlName="nationality" placeholder="Argentina" />
+      </div>
+
+      <div class="form-group">
         <label for="description">Descripción</label>
-        <textarea
-          id="description"
-          formControlName="description"
-          placeholder="Ingrese una descripción del usuario"
-          rows="3"
-        ></textarea>
+        <textarea id="description" formControlName="description" rows="3" placeholder="Descripción"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Domicilio</label>
+        <input type="text" id="address" formControlName="address" placeholder="Domicilio" />
+      </div>
+
+      <div class="form-group">
+        <label for="street">Calle y número</label>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <input type="text" id="street" formControlName="street" placeholder="Calle" style="flex:1" />
+          <input type="text" id="street_number" formControlName="street_number" placeholder="N°" style="width:120px" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="floor">Piso y Depto.</label>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <input type="text" id="floor" formControlName="floor" placeholder="Piso" style="width:120px" />
+          <input type="text" id="apartment" formControlName="apartment" placeholder="Depto" style="width:120px" />
+        </div>
       </div>
 
       <div class="form-group">
@@ -128,10 +129,36 @@
       </div>
 
       <div class="form-group">
-        <label for="locality_id">Localidad</label>
-        <select id="locality_id" formControlName="locality_id">
-          <option value="1">Localidad 1</option>
-        </select>
+        <label>País</label>
+        <div style="position: relative;">
+          <input type="search" [value]="countryText" (input)="onCountryInput($any($event.target).value)" (focus)="preventNativeAutofill($event); onCountryFocus()" name="ignore-country" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="search" placeholder="Escribí para buscar países..." />
+          <div class="typeahead-dropdown" *ngIf="showCountryDropdown" (mouseleave)="showCountryDropdown = false">
+            <button type="button" class="typeahead-item" *ngFor="let c of countrySuggestions" (click)="onSelectCountry(c)">{{ c.name }}</button>
+            <div class="typeahead-empty" *ngIf="countrySuggestions.length === 0">Sin resultados</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Provincia</label>
+        <div style="position: relative;">
+          <input type="search" [disabled]="!selectedCountryId" [value]="provinceText" (input)="onStateInput($any($event.target).value)" (focus)="preventNativeAutofill($event); onStateFocus()" name="ignore-province" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="search" [placeholder]="(!selectedCountryId ? 'Seleccioná un país primero' : 'Escribí para buscar provincias...')" />
+          <div class="typeahead-dropdown" *ngIf="showStateDropdown" (mouseleave)="showStateDropdown = false">
+            <button type="button" class="typeahead-item" *ngFor="let s of stateSuggestions" (click)="onSelectState(s)">{{ s.name }}</button>
+            <div class="typeahead-empty" *ngIf="stateSuggestions.length === 0">Sin resultados</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Localidad</label>
+        <div style="position: relative;">
+          <input type="search" [disabled]="!selectedStateId" [value]="localityText" (input)="onLocalityInput($any($event.target).value)" (focus)="preventNativeAutofill($event); onLocalityFocus()" name="ignore-locality" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="search" [placeholder]="(!selectedStateId ? 'Seleccioná una provincia primero' : 'Escribí para buscar localidades...')" />
+          <div class="typeahead-dropdown" *ngIf="showLocalityDropdown" (mouseleave)="showLocalityDropdown = false">
+            <button type="button" class="typeahead-item" *ngFor="let l of localitySuggestions" (click)="onSelectLocality(l)">{{ l.name }}</button>
+            <div class="typeahead-empty" *ngIf="localitySuggestions.length === 0">Sin resultados</div>
+          </div>
+        </div>
       </div>
 
       <div class="form-group">

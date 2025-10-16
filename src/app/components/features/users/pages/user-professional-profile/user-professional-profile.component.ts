@@ -53,14 +53,14 @@ export class UserProfessionalProfileComponent implements OnInit {
   }
 
   convertUserToProfessionalProfile(user: ApiUser): ProfessionalProfile {
-    const professionalProfile = {
+    const professionalProfile: ProfessionalProfile = {
       id: user.id,
-      name: user.name,
+      name: (user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.name || 'Usuario')),
       specialty: user.activities && user.activities.length > 0 ? user.activities[0].name : 'Sin especialidad',
       description: user.description || 'Profesional registrado en el sistema',
       location: user.locality?.name || 'Ubicación no especificada',
       email: user.email,
-      phone: user.phone,
+      phone: user.phone || '',
       skills: user.activities?.map(activity => activity.name) || [],
       experienceYears: 0, // No tenemos esta información en ApiUser
       created_at: user.created_at, // Agregar la fecha de creación

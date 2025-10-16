@@ -68,6 +68,7 @@
 
 .form-group {
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .form-group label {
@@ -351,6 +352,42 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Typeahead (igual que Zonas) */
+.typeahead-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-top: 0.25rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.typeahead-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+.typeahead-item:hover {
+  background: #f8fafc;
+}
+
+.typeahead-empty {
+  padding: 0.75rem;
+  color: #64748b;
+  font-size: 0.85rem;
 }
 
 /* Responsive */
