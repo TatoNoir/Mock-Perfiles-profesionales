@@ -314,7 +314,6 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     this.usersService.getDocumentTypes().subscribe({
       next: (documentTypes: ApiDocumentType[]) => {
         this.documentTypes = documentTypes;
-        console.log('Tipos de documento cargados en modal de edición:', documentTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de documento en modal de edición:', err);
@@ -326,7 +325,6 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     this.usersService.getUserTypes().subscribe({
       next: (userTypes: ApiUserType[]) => {
         this.userTypes = userTypes;
-        console.log('Tipos de usuario cargados en modal de edición:', userTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de usuario en modal de edición:', err);

@@ -153,7 +153,6 @@ export class UsersComponent implements OnInit {
     this.usersService.getUserTypes().subscribe({
       next: (userTypes: ApiUserType[]) => {
         this.userTypes = userTypes;
-        console.log('Tipos de usuario cargados:', userTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de usuario:', err);
@@ -165,7 +164,6 @@ export class UsersComponent implements OnInit {
         this.usersService.getDocumentTypes().subscribe({
           next: (documentTypes: ApiDocumentType[]) => {
             this.documentTypes = documentTypes;
-            console.log('Tipos de documento cargados:', documentTypes);
           },
           error: (err: any) => {
             console.error('Error cargando tipos de documento:', err);

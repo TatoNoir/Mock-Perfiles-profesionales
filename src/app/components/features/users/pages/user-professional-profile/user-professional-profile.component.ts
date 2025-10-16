@@ -15,6 +15,7 @@ export class UserProfessionalProfileComponent implements OnInit {
   professionalProfile: ProfessionalProfile | undefined = undefined;
   error: string | null = null;
   userId: number | null = null;
+  contactUrl: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -41,6 +42,7 @@ export class UserProfessionalProfileComponent implements OnInit {
         const user = users.find(u => u.id === userId);
         if (user) {
           this.professionalProfile = this.convertUserToProfessionalProfile(user);
+          this.contactUrl = this.buildWhatsAppUrl(user);
         } else {
           this.error = 'Usuario no encontrado';
         }
@@ -58,16 +60,58 @@ export class UserProfessionalProfileComponent implements OnInit {
       name: (user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.name || 'Usuario')),
       specialty: user.activities && user.activities.length > 0 ? user.activities[0].name : 'Sin especialidad',
       description: user.description || 'Profesional registrado en el sistema',
-      location: user.locality?.name || 'Ubicación no especificada',
+      location: this.buildLocation(user),
       email: user.email,
-      phone: user.phone || '',
+      phone: this.buildPhone(user) || '',
       skills: user.activities?.map(activity => activity.name) || [],
       experienceYears: 0, // No tenemos esta información en ApiUser
       created_at: user.created_at, // Agregar la fecha de creación
       profile_picture: user.profile_picture // Agregar la foto de perfil
     };
+    // Adjuntar algunos campos adicionales para el template (sin cambiar la interfaz)
+    (professionalProfile as any).document_number = (user as any).document_number || '';
+    (professionalProfile as any).address_display = this.buildAddress(user);
+    (professionalProfile as any).nationality = (user as any).nationality || '';
+    (professionalProfile as any).birth_date = (user as any).birth_date || '';
     
     return professionalProfile;
+  }
+
+  private buildWhatsAppUrl(user: ApiUser): string | null {
+    const country = (user as any).country_phone || '';
+    const area = (user as any).area_code || '';
+    const number = (user as any).phone_number || '';
+    const digits = `${country}${area}${number}`.replace(/[^0-9]/g, '');
+    if (!digits) return null;
+    const text = encodeURIComponent('Hola, te contacto desde Perfiles Profesionales');
+    return `https://wa.me/${digits}?text=${text}`;
+  }
+
+  private buildPhone(user: ApiUser): string {
+    const country = (user as any).country_phone || '';
+    const area = (user as any).area_code || '';
+    const number = (user as any).phone_number || '';
+    const compact = `${country} ${area} ${number}`.trim().replace(/\s+/g, ' ');
+    return compact;
+  }
+
+  private buildLocation(user: ApiUser): string {
+    const loc = user.locality?.name || '';
+    const state = (user as any).locality?.state?.name || '';
+    const stateUpper = state ? state.toUpperCase() : '';
+    return [loc, stateUpper].filter(Boolean).join(' · ');
+  }
+
+  private buildAddress(user: ApiUser): string {
+    const street = (user as any).street || '';
+    const streetNumber = (user as any).street_number || '';
+    const floor = (user as any).floor || '';
+    const apartment = (user as any).apartment || '';
+    const address = (user as any).address || '';
+    const main = [street, streetNumber].filter(Boolean).join(' ');
+    const extra = [floor, apartment].filter(Boolean).join(' ');
+    const parts = [address, main, extra].filter(Boolean);
+    return parts.join(' · ');
   }
 
   onImageSelected(event: any): void {

@@ -100,7 +100,6 @@ export class AddUserModalComponent implements OnInit {
     this.usersService.getDocumentTypes().subscribe({
       next: (documentTypes: ApiDocumentType[]) => {
         this.documentTypes = documentTypes;
-        console.log('Tipos de documento cargados en modal:', documentTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de documento en modal:', err);
@@ -112,7 +111,6 @@ export class AddUserModalComponent implements OnInit {
     this.usersService.getUserTypes().subscribe({
       next: (userTypes: ApiUserType[]) => {
         this.userTypes = userTypes;
-        console.log('Tipos de usuario cargados en modal:', userTypes);
       },
       error: (err: any) => {
         console.error('Error cargando tipos de usuario en modal:', err);

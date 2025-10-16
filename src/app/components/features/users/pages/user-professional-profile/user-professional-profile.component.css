@@ -201,9 +201,10 @@
 }
 
 .hero-actions { 
-  display: grid; 
+  display: flex; 
   gap: 0.5rem; 
-  justify-items: end; 
+  justify-content: flex-end; 
+  align-items: center;
 }
 
 .btn.primary { 
@@ -213,8 +214,11 @@
   border-radius: 10px; 
   cursor: pointer; 
   font-weight: 600; 
-  background: #1f4c85; 
+  background: #25D366; /* WhatsApp green */ 
   color: #fff; 
+  text-decoration: none; 
+  display: inline-flex;
+  align-items: center;
 }
 
 .link { 
