@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalProfile } from '../../../../../models/professional.model';
-import { UsersService, ApiUser, ApiQuestion } from '../../services/users.service';
+import { UsersService, ApiUser, ApiQuestion, ApiReview } from '../../services/users.service';
 import { CommentsModalComponent } from '../../modals/comments-modal/comments-modal.component';
+import { ReviewsModalComponent } from '../../modals/reviews-modal/reviews-modal.component';
 
 @Component({
   selector: 'app-user-professional-profile',
   standalone: true,
-  imports: [CommonModule, CommentsModalComponent],
+  imports: [CommonModule, CommentsModalComponent, ReviewsModalComponent],
   templateUrl: './user-professional-profile.component.html',
   styleUrls: ['./user-professional-profile.component.css']
 })
@@ -18,7 +19,9 @@ export class UserProfessionalProfileComponent implements OnInit {
   userId: number | null = null;
   contactUrl: string | null = null;
   questions: ApiQuestion[] = [];
+  reviews: ApiReview[] = [];
   showCommentsModal = false;
+  showReviewsModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -50,6 +53,12 @@ export class UserProfessionalProfileComponent implements OnInit {
           this.usersService.getQuestions(user.id).subscribe({
             next: (qs) => { this.questions = qs || []; },
             error: () => { this.questions = []; }
+          });
+          
+          // Cargar valoraciones de este usuario
+          this.usersService.getReviews(user.id).subscribe({
+            next: (rs) => { this.reviews = rs || []; },
+            error: () => { this.reviews = []; }
           });
         } else {
           this.error = 'Usuario no encontrado';
@@ -179,5 +188,38 @@ export class UserProfessionalProfileComponent implements OnInit {
         }
       });
     }
+  }
+
+  openReviewsModal(): void {
+    this.showReviewsModal = true;
+  }
+
+  closeReviewsModal(): void {
+    this.showReviewsModal = false;
+  }
+
+  onReviewsUpdated(updatedReviews: ApiReview[]): void {
+    this.reviews = updatedReviews;
+  }
+
+  reloadReviews(): void {
+    if (this.userId) {
+      this.usersService.getReviews(this.userId).subscribe({
+        next: (rs) => { 
+          this.reviews = rs || []; 
+        },
+        error: () => { 
+          this.reviews = []; 
+        }
+      });
+    }
+  }
+
+  getStars(value: number): string[] {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= value ? '★' : '☆');
+    }
+    return stars;
   }
 }

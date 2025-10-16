@@ -106,6 +106,19 @@ export interface ApiQuestion {
   updated_at: string;
 }
 
+export interface ApiReview {
+  id: number;
+  email: string;
+  name: string;
+  published: boolean;
+  message: string;
+  answer: string | null;
+  value: number; // Puntuación de 1 a 5
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateUserRequest {
   username: string;
   first_name: string;
@@ -166,6 +179,17 @@ export class UsersService {
       map((response) => response?.data ?? []),
       catchError((error) => {
         console.error('Error fetching questions:', error);
+        return of([]);
+      })
+    );
+  }
+
+  getReviews(userId: number) {
+    const qs = `?user_id=${encodeURIComponent(String(userId))}`;
+    return this.apiService.get<{ data: ApiReview[] }>(`/api/reviews${qs}`).pipe(
+      map((response) => response?.data ?? []),
+      catchError((error) => {
+        console.error('Error fetching reviews:', error);
         return of([]);
       })
     );

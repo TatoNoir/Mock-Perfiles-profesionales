@@ -129,7 +129,28 @@
 
         <div class="card">
           <h3>Valoraciones</h3>
-          <div class="rating">★★★★★ <strong>4,9</strong> (23)</div>
+          <ng-container *ngIf="reviews && reviews.length > 0; else noReviews">
+            <div class="review" *ngFor="let r of reviews | slice:0:2">
+              <img class="mini" src="https://i.pravatar.cc/40?u={{r.email}}" alt="" />
+              <div>
+                <div><strong>{{ r.name }}</strong> · <span class="muted">{{ r.email }}</span></div>
+                <div class="muted" style="font-size:12px;">{{ r.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
+                <!-- Estrellas de valoración -->
+                <div class="rating-stars">
+                  <span class="stars">{{ getStars(r.value).join('') }}</span>
+                  <span class="rating-value">({{ r.value }}/5)</span>
+                </div>
+                <div style="margin-top:4px;"><span class="muted">Valoración:</span> {{ r.message }}</div>
+                <div *ngIf="r.answer" style="margin-top:4px;"><span class="muted">Respuesta:</span> {{ r.answer }}</div>
+              </div>
+            </div>
+            <div *ngIf="reviews.length > 2" style="margin-top:0.5rem;">
+              <button class="link" (click)="openReviewsModal()">Ver más valoraciones</button>
+            </div>
+          </ng-container>
+          <ng-template #noReviews>
+            <div class="muted">Aún no hay valoraciones</div>
+          </ng-template>
         </div>
         </div>
       </div>
@@ -159,3 +180,14 @@
   (questionsUpdated)="onQuestionsUpdated($event)"
   (reloadRequested)="reloadQuestions()">
 </app-comments-modal>
+
+<!-- Modal de valoraciones -->
+<app-reviews-modal 
+  [isOpen]="showReviewsModal"
+  [reviews]="reviews"
+  [userName]="professionalProfile?.name || 'Usuario'"
+  [userId]="userId"
+  (close)="closeReviewsModal()"
+  (reviewsUpdated)="onReviewsUpdated($event)"
+  (reloadRequested)="reloadReviews()">
+</app-reviews-modal>

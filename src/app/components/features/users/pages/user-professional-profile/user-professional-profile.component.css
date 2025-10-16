@@ -295,7 +295,8 @@
   margin-bottom: 0.5rem; 
 }
 
-.comment { 
+.comment,
+.review { 
   display: grid; 
   grid-template-columns: 40px 1fr; 
   gap: 0.5rem; 
@@ -307,6 +308,25 @@
   width: 40px; 
   height: 40px; 
   border-radius: 9999px; 
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.stars {
+  color: #fbbf24;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.rating-value {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .work { 
