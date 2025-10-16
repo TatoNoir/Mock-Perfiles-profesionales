@@ -94,6 +94,18 @@ export interface ApiDocumentType {
   description: string;
 }
 
+export interface ApiQuestion {
+  id: number;
+  email: string;
+  name: string;
+  published: boolean;
+  message: string;
+  answer: string | null;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateUserRequest {
   username: string;
   first_name: string;
@@ -143,6 +155,17 @@ export class UsersService {
       catchError(error => {
         console.error('Error fetching users from API:', error);
         // Fallback: retornar array vacío en caso de error
+        return of([]);
+      })
+    );
+  }
+
+  getQuestions(userId: number) {
+    const qs = `?user_id=${encodeURIComponent(String(userId))}`;
+    return this.apiService.get<{ data: ApiQuestion[] }>(`/api/questions${qs}`).pipe(
+      map((response) => response?.data ?? []),
+      catchError((error) => {
+        console.error('Error fetching questions:', error);
         return of([]);
       })
     );

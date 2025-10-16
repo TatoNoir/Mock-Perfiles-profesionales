@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalProfile } from '../../../../../models/professional.model';
-import { UsersService, ApiUser } from '../../services/users.service';
+import { UsersService, ApiUser, ApiQuestion } from '../../services/users.service';
 
 @Component({
   selector: 'app-user-professional-profile',
@@ -16,6 +16,7 @@ export class UserProfessionalProfileComponent implements OnInit {
   error: string | null = null;
   userId: number | null = null;
   contactUrl: string | null = null;
+  questions: ApiQuestion[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -43,6 +44,11 @@ export class UserProfessionalProfileComponent implements OnInit {
         if (user) {
           this.professionalProfile = this.convertUserToProfessionalProfile(user);
           this.contactUrl = this.buildWhatsAppUrl(user);
+          // Cargar comentarios/preguntas de este usuario
+          this.usersService.getQuestions(user.id).subscribe({
+            next: (qs) => { this.questions = qs || []; },
+            error: () => { this.questions = []; }
+          });
         } else {
           this.error = 'Usuario no encontrado';
         }

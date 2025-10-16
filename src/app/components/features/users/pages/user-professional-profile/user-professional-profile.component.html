@@ -56,6 +56,8 @@
       </div>
 
       <div class="grid">
+        <!-- Columna izquierda: Datos personales (arriba) y Últimos trabajos (abajo) -->
+        <div class="col">
         <div class="card">
           <h3>Datos Personales</h3>
           <div class="list">
@@ -69,26 +71,6 @@
             <div class="row"><span>Estado</span><strong>Activo</strong></div>
             <div class="row"><span>Disponibilidad</span><strong>Inmediata</strong></div>
             <div class="row"><span>Experiencia</span><strong>+{{ professionalProfile.experienceYears || 12 }} años</strong></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Especialidades</h3>
-          <div class="chips">
-            <span class="chip" *ngFor="let skill of professionalProfile.skills">{{ skill }}</span>
-            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Instalaciones eléctricas</span>
-            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Tableros trifásicos</span>
-            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Domótica</span>
-          </div>
-          <h3>Valoraciones y comentarios</h3>
-          <div class="rating">★★★★★ <strong>4,9</strong> (23)</div>
-          <div class="comment">
-            <img class="mini" src="https://i.pravatar.cc/40?img=5" alt="" />
-            <div>Muy prolijo, explicó todo, lo recomiendo.</div>
-          </div>
-          <div class="comment">
-            <img class="mini" src="https://i.pravatar.cc/40?img=15" alt="" />
-            <div>Detectó un problema que nadie resolvía.</div>
           </div>
         </div>
 
@@ -108,6 +90,47 @@
               <div class="work-meta">Alta Gracia · Feb. 2024</div>
             </div>
           </div>
+        </div>
+
+        </div>
+
+        <!-- Columna derecha: Especialidades (arriba), Comentarios (medio), Valoraciones (abajo) -->
+        <div class="col">
+        <div class="card specialties">
+          <h3>Especialidades</h3>
+          <div class="chips">
+            <span class="chip" *ngFor="let skill of professionalProfile.skills">{{ skill }}</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Instalaciones eléctricas</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Tableros trifásicos</span>
+            <span class="chip" *ngIf="!professionalProfile.skills || professionalProfile.skills.length === 0">Domótica</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Comentarios</h3>
+          <ng-container *ngIf="questions && questions.length > 0; else noComments">
+            <div class="comment" *ngFor="let q of questions | slice:0:2">
+              <img class="mini" src="https://i.pravatar.cc/40?u={{q.email}}" alt="" />
+              <div>
+                <div><strong>{{ q.name }}</strong> · <span class="muted">{{ q.email }}</span></div>
+                <div class="muted" style="font-size:12px;">{{ q.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
+                <div style="margin-top:4px;"><span class="muted">Pregunta:</span> {{ q.message }}</div>
+                <div *ngIf="q.answer" style="margin-top:4px;"><span class="muted">Respuesta:</span> {{ q.answer }}</div>
+              </div>
+            </div>
+            <div *ngIf="questions.length > 2" style="margin-top:0.5rem;">
+              <button class="link">Ver más comentarios</button>
+            </div>
+          </ng-container>
+          <ng-template #noComments>
+            <div class="muted">Aún no hay comentarios</div>
+          </ng-template>
+        </div>
+
+        <div class="card">
+          <h3>Valoraciones</h3>
+          <div class="rating">★★★★★ <strong>4,9</strong> (23)</div>
+        </div>
         </div>
       </div>
     </section>
