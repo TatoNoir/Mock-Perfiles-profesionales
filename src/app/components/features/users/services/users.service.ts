@@ -111,7 +111,7 @@ export interface ApiReview {
   email: string;
   name: string;
   published: boolean;
-  message: string;
+  comment: string; // En reviews se llama 'comment' en lugar de 'message'
   answer: string | null;
   value: number; // Puntuación de 1 a 5
   user_id: number;
@@ -208,6 +208,24 @@ export class UsersService {
     return this.apiService.delete<{ success: boolean } | any>(`/api/questions/${id}`).pipe(
       catchError(error => {
         console.error('Error deleting question:', error);
+        throw error;
+      })
+    );
+  }
+
+  updateReview(id: number, payload: { answer: string; published: boolean }): Observable<ApiReview> {
+    return this.apiService.put<ApiReview>(`/api/reviews/${id}`, payload).pipe(
+      catchError(error => {
+        console.error('Error updating review:', error);
+        throw error;
+      })
+    );
+  }
+
+  deleteReview(id: number): Observable<{ success: boolean } | any> {
+    return this.apiService.delete<{ success: boolean } | any>(`/api/reviews/${id}`).pipe(
+      catchError(error => {
+        console.error('Error deleting review:', error);
         throw error;
       })
     );

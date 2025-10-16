@@ -52,7 +52,7 @@ export class ReviewsModalComponent implements OnInit {
     this.isSaving = true;
     this.successMessage = '';
     
-    this.usersService.updateQuestion(r.id, { answer, published }).subscribe({
+    this.usersService.updateReview(r.id, { answer, published }).subscribe({
       next: (response: any) => {
         this.isSaving = false;
         
@@ -95,7 +95,7 @@ export class ReviewsModalComponent implements OnInit {
     const ok = confirm('¿Eliminar esta valoración? Esta acción no se puede deshacer.');
     if (!ok) return;
     
-    this.usersService.deleteQuestion(r.id).subscribe({
+    this.usersService.deleteReview(r.id).subscribe({
       next: (response: any) => {
         // Mostrar mensaje de éxito si viene del backend
         if (response?.message) {

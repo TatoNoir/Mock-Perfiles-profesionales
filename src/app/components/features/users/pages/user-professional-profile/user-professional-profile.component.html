@@ -140,7 +140,7 @@
                   <span class="stars">{{ getStars(r.value).join('') }}</span>
                   <span class="rating-value">({{ r.value }}/5)</span>
                 </div>
-                <div style="margin-top:4px;"><span class="muted">Valoración:</span> {{ r.message }}</div>
+                <div style="margin-top:4px;"><span class="muted">Valoración:</span> {{ r.comment }}</div>
                 <div *ngIf="r.answer" style="margin-top:4px;"><span class="muted">Respuesta:</span> {{ r.answer }}</div>
               </div>
             </div>

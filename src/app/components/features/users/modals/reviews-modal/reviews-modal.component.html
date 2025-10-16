@@ -34,7 +34,7 @@
               </div>
               
               <div class="review-message">
-                <span class="muted">Valoración:</span> {{ r.message }}
+                <span class="muted">Valoración:</span> {{ r.comment }}
               </div>
               <div class="review-answer" *ngIf="r.answer && editingReviewId !== r.id">
                 <span class="muted">Respuesta:</span> {{ r.answer }}
