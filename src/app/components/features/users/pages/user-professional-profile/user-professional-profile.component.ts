@@ -163,4 +163,21 @@ export class UserProfessionalProfileComponent implements OnInit {
   closeCommentsModal(): void {
     this.showCommentsModal = false;
   }
+
+  onQuestionsUpdated(updatedQuestions: ApiQuestion[]): void {
+    this.questions = updatedQuestions;
+  }
+
+  reloadQuestions(): void {
+    if (this.userId) {
+      this.usersService.getQuestions(this.userId).subscribe({
+        next: (qs) => { 
+          this.questions = qs || []; 
+        },
+        error: () => { 
+          this.questions = []; 
+        }
+      });
+    }
+  }
 }

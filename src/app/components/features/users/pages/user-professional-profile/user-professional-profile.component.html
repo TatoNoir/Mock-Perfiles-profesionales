@@ -154,5 +154,8 @@
   [isOpen]="showCommentsModal"
   [questions]="questions"
   [userName]="professionalProfile?.name || 'Usuario'"
-  (close)="closeCommentsModal()">
+  [userId]="userId"
+  (close)="closeCommentsModal()"
+  (questionsUpdated)="onQuestionsUpdated($event)"
+  (reloadRequested)="reloadQuestions()">
 </app-comments-modal>

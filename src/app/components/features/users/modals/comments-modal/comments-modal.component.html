@@ -11,6 +11,11 @@
     </div>
     
     <div class="modal-body">
+      <!-- Mensaje de éxito -->
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+      
       <ng-container *ngIf="questions && questions.length > 0; else noComments">
         <div class="comments-list">
           <div class="comment" *ngFor="let q of questions">
@@ -24,8 +29,32 @@
               <div class="comment-question">
                 <span class="muted">Pregunta:</span> {{ q.message }}
               </div>
-              <div class="comment-answer" *ngIf="q.answer">
+              <div class="comment-answer" *ngIf="q.answer && editingQuestionId !== q.id">
                 <span class="muted">Respuesta:</span> {{ q.answer }}
+              </div>
+              <div class="comment-edit" *ngIf="editingQuestionId === q.id">
+                <span class="muted">Respuesta:</span>
+                <textarea 
+                  [(ngModel)]="editAnswerText" 
+                  class="edit-textarea"
+                  placeholder="Escribir respuesta..."
+                  rows="3">
+                </textarea>
+                <div class="edit-actions">
+                  <button class="btn-save" (click)="onSaveEdit(q)" [disabled]="isSaving">
+                    <span *ngIf="!isSaving">Guardar</span>
+                    <span *ngIf="isSaving" class="loading-text">
+                      <svg class="spinner" width="16" height="16" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                          <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                          <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                      </svg>
+                      Guardando...
+                    </span>
+                  </button>
+                  <button class="btn-cancel" (click)="onCancelEdit()" [disabled]="isSaving">Cancelar</button>
+                </div>
               </div>
             </div>
             <div class="comment-actions">
