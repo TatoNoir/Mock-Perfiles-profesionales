@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -18,8 +18,6 @@ import { CommonModule } from '@angular/common';
         <div class="avatar" (click)="toggleDropdown()">MP</div>
         <div class="dropdown" *ngIf="dropdownOpen">
           <button class="dropdown-item" (click)="onMisDatos()">Mis Datos</button>
-          <button class="dropdown-item" (click)="onConfiguracion()">Configuración</button>
-          <button class="dropdown-item" (click)="onTema()">Tema</button>
           <div class="divider"></div>
           <button class="dropdown-item danger" (click)="logout.emit()">Cerrar Sesión</button>
         </div>
@@ -132,11 +130,14 @@ export class HeaderComponent {
     this.dropdownOpen = false; 
     this.router.navigateByUrl('/mis-datos');
   }
-  onConfiguracion() {
-    this.dropdownOpen = false;
-    this.router.navigateByUrl('/configuracion');
-  }
-  onTema() { this.dropdownOpen = false; }
+  constructor(private router: Router, private elRef: ElementRef) {}
 
-  constructor(private router: Router) {}
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.dropdownOpen) return;
+    const clickedInside = this.elRef.nativeElement.contains(event.target as Node);
+    if (!clickedInside) {
+      this.dropdownOpen = false;
+    }
+  }
 }

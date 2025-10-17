@@ -5,27 +5,36 @@ import { TokenService } from './token.service';
 
 export interface AuthUser {
   id: number;
-  name: string;
+  name: string; // first_name + last_name
   email: string;
-  phone: string;
-  profile_picture?: string;
-  description?: string;
+  phone: string; // country_phone + area_code + phone_number
+  profile_picture?: string | null;
+  description?: string | null;
   locality_id: number;
+  // Perfil (user_type del backend)
   profile: {
     id: number;
     name: string;
-    created_at: string;
-    updated_at: string;
+    created_at?: string | null;
+    updated_at?: string | null;
   };
+  // Localidad (del backend)
   locality: {
     id: number;
     name: string;
-    short_code: string;
-    disabled: number;
-    province_id: number;
-    created_at: string;
-    updated_at: string;
+    short_code?: string;
+    state_id?: number;
+    province_id?: number; // compat
+    disabled?: number;
+    created_at?: string | null;
+    updated_at?: string | null;
   };
+  // Dirección adicional
+  address?: string | null;
+  street?: string | null;
+  street_number?: string | null;
+  floor?: string | null;
+  apartment?: string | null;
 }
 
 export interface LoginResponse {
@@ -82,8 +91,45 @@ export class AuthService {
 
   private saveUserData(response: LoginResponse): void {
     this.tokenService.setToken(response.access_token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
-    this.currentUserSubject.next(response.user);
+    const u: any = response.user as any;
+    const fullName = [u.first_name, u.last_name].filter(Boolean).join(' ').trim() || u.username || '';
+    const phone = [u.country_phone, u.area_code, u.phone_number]
+      .filter(Boolean)
+      .map((s: string) => (s || '').toString().trim())
+      .join(' ')
+      .trim();
+
+    const normalized: AuthUser = {
+      id: u.id,
+      name: fullName,
+      email: u.email,
+      phone,
+      profile_picture: u.profile_picture ?? null,
+      description: u.description ?? null,
+      locality_id: u.locality_id,
+      profile: {
+        id: u.user_type?.id ?? 0,
+        name: u.user_type?.name ?? 'Usuario',
+        created_at: u.user_type?.created_at ?? null,
+        updated_at: u.user_type?.updated_at ?? null
+      },
+      locality: {
+        id: u.locality?.id ?? 0,
+        name: u.locality?.name ?? '',
+        short_code: u.locality?.short_code,
+        state_id: u.locality?.state_id,
+        created_at: u.locality?.created_at ?? null,
+        updated_at: u.locality?.updated_at ?? null
+      },
+      address: u.address ?? null,
+      street: u.street ?? null,
+      street_number: u.street_number ?? null,
+      floor: u.floor ?? null,
+      apartment: u.apartment ?? null
+    };
+
+    localStorage.setItem(this.USER_KEY, JSON.stringify(normalized));
+    this.currentUserSubject.next(normalized);
   }
 
   private clearStorage(): void {
@@ -101,7 +147,14 @@ export class AuthService {
       phone: '',
       locality_id: 1,
       profile: { id: 1, name: 'Usuario', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      locality: { id: 1, name: 'La Plata', short_code: 'LAP', disabled: 0, province_id: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+      locality: { id: 1, name: 'La Plata', short_code: 'LAP', state_id: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      address: null,
+      street: null,
+      street_number: null,
+      floor: null,
+      apartment: null,
+      profile_picture: null,
+      description: null
     };
     this.currentUserSubject.next(user);
     return { user } as any;

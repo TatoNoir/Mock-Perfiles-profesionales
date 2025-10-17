@@ -14,13 +14,28 @@
       <div class="label">Teléfono</div>
       <div class="value">{{ u.phone }}</div>
     </div>
-    <div class="row">
+    <div class="row" *ngIf="u.profile">
       <div class="label">Perfil</div>
-      <div class="value">{{ u.profile.name }}</div>
+      <div class="value">{{ u.profile?.name }}</div>
     </div>
-    <div class="row">
+    <div class="row" *ngIf="u.locality">
       <div class="label">Localidad</div>
-      <div class="value">{{ u.locality.name }}</div>
+      <div class="value">{{ u.locality?.name }}</div>
+    </div>
+    <div class="row" *ngIf="u.address || u.street || u.street_number">
+      <div class="label">Dirección</div>
+      <div class="value">
+        <ng-container *ngIf="u.address; else streetBlock">{{ u.address }}</ng-container>
+        <ng-template #streetBlock>
+          {{ u.street || '' }} <ng-container *ngIf="u.street && u.street_number">{{ u.street_number }}</ng-container>
+          <ng-container *ngIf="u.floor">, Piso {{ u.floor }}</ng-container>
+          <ng-container *ngIf="u.apartment">, Dpto {{ u.apartment }}</ng-container>
+        </ng-template>
+      </div>
+    </div>
+    <div class="row" *ngIf="u.description">
+      <div class="label">Descripción</div>
+      <div class="value">{{ u.description }}</div>
     </div>
   </div>
 

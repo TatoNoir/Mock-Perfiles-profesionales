@@ -62,7 +62,7 @@ export class EditUserModalComponent implements OnInit, OnChanges {
       country_phone: ['+54', [Validators.required]],
       area_code: ['', [Validators.required]],
       phone_number: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: [''],
       email: ['', [Validators.required, Validators.email]],
       email_verified_at: [null],
       profile_picture: [null],
