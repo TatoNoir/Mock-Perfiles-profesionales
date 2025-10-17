@@ -180,19 +180,28 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
    * Cambia el estado de una actividad (Activa/Inactiva)
    */
   onToggleStatus(activity: Activity): void {
-    this.activitiesService.toggleActivityStatus(activity.id)
-      .pipe(takeUntil(this.destroy$))
+    this.loading = true;
+    this.error = null;
+    this.activitiesService.toggleActivityStatusViaApi(activity)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      )
       .subscribe({
-        next: (updatedActivity) => {
-          if (updatedActivity) {
-            // Actualizar la actividad en la lista local
-            const index = this.activities.findIndex(a => a.id === activity.id);
-            if (index !== -1) {
-              this.activities[index] = updatedActivity;
-            }
-            // Aplicar filtros para actualizar la vista
-            this.applyFilters();
-          }
+        next: () => {
+          // Refrescar el listado para reflejar el cambio
+          this.activitiesService.getActivities()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (activities) => {
+                this.activities = activities;
+                this.applyFilters();
+              },
+              error: (err) => {
+                console.error('Error recargando actividades:', err);
+                this.applyFilters();
+              }
+            });
         },
         error: (error) => {
           console.error('Error al cambiar estado:', error);

@@ -288,4 +288,19 @@ export class ActivitiesService {
 
     return of(activity).pipe(delay(200));
   }
+
+  /**
+   * Cambia el estado de una actividad llamando al endpoint de edición
+   * Envia el payload completo requerido por la API (name, short_code, code, tags, disabled)
+   */
+  toggleActivityStatusViaApi(activity: Activity): Observable<Activity> {
+    const request: CreateActivityRequest = {
+      name: activity.activity,
+      short_code: activity.short_code || activity.activity,
+      code: activity.code || activity.activity,
+      tags: activity.tags || '',
+      disabled: activity.status === 'Activa' ? 1 : 0
+    };
+    return this.updateActivityFromApi(activity.id, request);
+  }
 }
