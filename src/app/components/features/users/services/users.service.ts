@@ -91,6 +91,16 @@ export interface ApiUser {
   reviews_avg_value?: string;
 }
 
+export interface UsersResponse {
+  data: ApiUser[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
 export interface ApiDocumentType {
   id: number;
   name: string;
@@ -157,21 +167,32 @@ export class UsersService {
     email?: string;
     user_type_id?: string | number;
     province_id?: string | number;
+    locality_id?: string | number;
     created_from?: string;
     created_to?: string;
-  }): Observable<ApiUser[]> {
+    page?: number;
+    limit?: number;
+  }): Observable<UsersResponse> {
     const qs = params ?
       '?' + Object.entries(params)
         .filter(([_, v]) => v !== undefined && v !== null && `${v}` !== '')
         .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
         .join('&')
       : '';
-    return this.apiService.get<{ data: ApiUser[] }>(`/api/users${qs}`).pipe(
-      map(response => response.data),
+    return this.apiService.get<UsersResponse>(`/api/users${qs}`).pipe(
+      map(response => response),
       catchError(error => {
         console.error('Error fetching users from API:', error);
-        // Fallback: retornar array vacío en caso de error
-        return of([]);
+        // Fallback: retornar respuesta vacía en caso de error
+        return of({
+          data: [],
+          pagination: {
+            current_page: 1,
+            per_page: 10,
+            total: 0,
+            last_page: 1
+          }
+        });
       })
     );
   }

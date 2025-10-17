@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessionalProfile } from '../../../../../models/professional.model';
-import { UsersService, ApiUser, ApiQuestion, ApiReview } from '../../services/users.service';
+import { UsersService, ApiUser, ApiQuestion, ApiReview, UsersResponse } from '../../services/users.service';
 import { CommentsModalComponent } from '../../modals/comments-modal/comments-modal.component';
 import { ReviewsModalComponent } from '../../modals/reviews-modal/reviews-modal.component';
 
@@ -44,8 +44,8 @@ export class UserProfessionalProfileComponent implements OnInit {
   loadUserProfile(userId: number): void {
     
     this.usersService.getUsers().subscribe({
-      next: (users: ApiUser[]) => {
-        const user = users.find(u => u.id === userId);
+      next: (response: UsersResponse) => {
+        const user = response.data.find(u => u.id === userId);
         if (user) {
           this.professionalProfile = this.convertUserToProfessionalProfile(user);
           this.contactUrl = this.buildWhatsAppUrl(user);

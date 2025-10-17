@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UsersService, ApiUser, ApiUserType, ApiDocumentType } from './services/users.service';
+import { UsersService, ApiUser, ApiUserType, ApiDocumentType, UsersResponse } from './services/users.service';
 import { AddUserModalComponent } from './modals/add-user-modal/add-user-modal.component';
 import { EditUserModalComponent } from './modals/edit-user-modal/edit-user-modal.component';
 
@@ -25,6 +25,17 @@ export class UsersComponent implements OnInit {
   showEditModal = false;
   selectedUser: ApiUser | null = null;
   showFilters = false;
+  
+  // Paginación
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+  
+  // Método para calcular el mínimo en el template
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
   // Provincia typeahead state
   provinceText = '';
   showProvinceDropdown = false;
@@ -66,13 +77,19 @@ export class UsersComponent implements OnInit {
       user_type_id: this.filters.role,
       province_id: this.selectedProvinceId ?? undefined,
       locality_id: this.selectedLocalityId ?? undefined,
+      page: this.currentPage,
+      limit: this.itemsPerPage
       // created_from: this.filters.createdFrom, // removido del UI actual
       // created_to: this.filters.createdTo
     };
     this.usersService.getUsers(params).subscribe({
-      next: (data: ApiUser[]) => { 
-        this.users = data;
-        this.filteredUsers = data;
+      next: (response: UsersResponse) => { 
+        this.users = response.data;
+        this.filteredUsers = response.data;
+        this.totalItems = response.pagination.total;
+        this.totalPages = response.pagination.last_page;
+        this.currentPage = response.pagination.current_page;
+        this.itemsPerPage = response.pagination.per_page;
         // precalcular sugerencias de provincias desde los datos cargados
         this.recomputeProvinceSuggestions('');
         // precalcular sugerencias de localidades
@@ -177,10 +194,9 @@ export class UsersComponent implements OnInit {
       }
 
       applyFilters(): void {
-        // Ahora filtramos desde el backend: recargar con parámetros
+        // Resetear a página 1 al aplicar filtros
+        this.currentPage = 1;
         this.loadUsers();
-
-        
       }
 
       clearFilters(): void {
@@ -201,12 +217,16 @@ export class UsersComponent implements OnInit {
     this.selectedLocalityId = null;
     this.showLocalityDropdown = false;
     this.recomputeLocalitySuggestions('');
-    // reconsultar backend sin filtros
-    // Forzar consulta sin parámetros: vaciar seleccionados antes de llamar
-    this.usersService.getUsers({}).subscribe({
-      next: (data: ApiUser[]) => {
-        this.users = data;
-        this.filteredUsers = data;
+    // Resetear paginación y reconsultar backend sin filtros
+    this.currentPage = 1;
+    this.usersService.getUsers({ page: this.currentPage, limit: this.itemsPerPage }).subscribe({
+      next: (response: UsersResponse) => {
+        this.users = response.data;
+        this.filteredUsers = response.data;
+        this.totalItems = response.pagination.total;
+        this.totalPages = response.pagination.last_page;
+        this.currentPage = response.pagination.current_page;
+        this.itemsPerPage = response.pagination.per_page;
       },
       error: () => {}
     });
@@ -271,5 +291,33 @@ export class UsersComponent implements OnInit {
     const all = Array.from(map.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
     const q = (query || '').toLowerCase();
     this.localitySuggestions = q ? all.filter(n => n.name.toLowerCase().includes(q)) : all.slice(0, 10);
+  }
+
+  // Métodos de paginación
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadUsers();
+  }
+
+  onItemsPerPageChange(itemsPerPage: number): void {
+    this.itemsPerPage = itemsPerPage;
+    this.currentPage = 1; // Resetear a página 1
+    this.loadUsers();
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
     }
