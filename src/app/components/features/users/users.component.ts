@@ -16,7 +16,6 @@ import { EditUserModalComponent } from './modals/edit-user-modal/edit-user-modal
 })
 export class UsersComponent implements OnInit {
   users: ApiUser[] = [];
-  filteredUsers: ApiUser[] = [];
   documentTypes: ApiDocumentType[] = [];
   userTypes: ApiUserType[] = [];
   loading = false;
@@ -79,13 +78,10 @@ export class UsersComponent implements OnInit {
       locality_id: this.selectedLocalityId ?? undefined,
       page: this.currentPage,
       limit: this.itemsPerPage
-      // created_from: this.filters.createdFrom, // removido del UI actual
-      // created_to: this.filters.createdTo
     };
     this.usersService.getUsers(params).subscribe({
       next: (response: UsersResponse) => { 
         this.users = response.data;
-        this.filteredUsers = response.data;
         this.totalItems = response.pagination.total;
         this.totalPages = response.pagination.last_page;
         this.currentPage = response.pagination.current_page;
@@ -146,7 +142,6 @@ export class UsersComponent implements OnInit {
               if (response && response.success) {
                 // Remover el usuario de la lista local
                 this.users = this.users.filter(u => u.id !== user.id);
-                this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
                 
               } else {
             this.error = 'No se pudo eliminar el usuario';
@@ -208,7 +203,6 @@ export class UsersComponent implements OnInit {
           locality: '',
           province: ''
         };
-    this.filteredUsers = [...this.users];
     this.provinceText = '';
     this.selectedProvinceId = null;
     this.showProvinceDropdown = false;
@@ -222,7 +216,6 @@ export class UsersComponent implements OnInit {
     this.usersService.getUsers({ page: this.currentPage, limit: this.itemsPerPage }).subscribe({
       next: (response: UsersResponse) => {
         this.users = response.data;
-        this.filteredUsers = response.data;
         this.totalItems = response.pagination.total;
         this.totalPages = response.pagination.last_page;
         this.currentPage = response.pagination.current_page;

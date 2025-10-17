@@ -54,10 +54,10 @@
             <div class="filter-group">
               <label for="role-filter">Tipo de Usuario</label>
               <select id="role-filter" [(ngModel)]="filters.role" class="filter-select">
-                <option value="">Todos los roles</option>
-                <option value="1">Administrador</option>
-                <option value="2">Usuario</option>
-                <option value="3">Moderador</option>
+                <option value="">Todos los tipos</option>
+                <option *ngFor="let userType of userTypes" [value]="userType.id">
+                  {{ userType.name }}
+                </option>
               </select>
             </div>
           </div>
@@ -168,7 +168,7 @@
         
         <!-- Users data -->
         <ng-container *ngIf="!loading && !error">
-          <tr *ngFor="let u of filteredUsers">
+          <tr *ngFor="let u of users">
             <td>{{ (u.first_name || '') + ' ' + (u.last_name || '') }}</td>
             <td class="muted">{{ u.email }}</td>
             <td>
