@@ -14,6 +14,8 @@ export interface Activity {
   createdAt: Date;
   updatedAt: Date;
   tags?: string;
+  short_code?: string;
+  code?: string;
 }
 
 export interface CreateActivityRequest {
@@ -104,7 +106,9 @@ export class ActivitiesService {
           status: item.disabled === 0 ? 'Activa' : 'Inactiva',
           createdAt: item.created_at ? new Date(item.created_at) : new Date(),
           updatedAt: item.updated_at ? new Date(item.updated_at) : new Date(),
-          tags: item.tags
+          tags: item.tags,
+          short_code: item.short_code,
+          code: item.code
         });
 
         if (response?.data && Array.isArray(response.data)) {
@@ -199,7 +203,9 @@ export class ActivitiesService {
       status: apiActivity.disabled === 0 ? 'Activa' : 'Inactiva',
       createdAt: apiActivity.created_at ? new Date(apiActivity.created_at) : new Date(),
       updatedAt: apiActivity.updated_at ? new Date(apiActivity.updated_at) : new Date(),
-      tags: apiActivity.tags
+      tags: apiActivity.tags,
+      short_code: apiActivity.short_code,
+      code: apiActivity.code
     };
   }
 

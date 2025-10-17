@@ -53,8 +53,8 @@ export class EditActivityModalComponent implements OnInit, OnChanges {
     if (this.activity) {
       this.editForm.patchValue({
         name: this.activity.activity,
-        short_code: this.activity.activity, // Mapeamos desde activity ya que no tenemos short_code en el modelo
-        code: this.activity.activity, // Mapeamos desde activity ya que no tenemos code en el modelo
+        short_code: (this.activity as any).short_code || '',
+        code: (this.activity as any).code || '',
         tags: this.activity.tags || '',
         disabled: this.activity.status === 'Activa' ? 0 : 1
       });

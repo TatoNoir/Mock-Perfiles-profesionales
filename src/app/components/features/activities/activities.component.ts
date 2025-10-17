@@ -140,13 +140,32 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
    * Maneja la actualización exitosa de una actividad
    */
   onActivityUpdated(updatedActivity: Activity): void {
-    // Actualizar la actividad en la lista local
-    const index = this.activities.findIndex(a => a.id === updatedActivity.id);
-    if (index !== -1) {
-      this.activities[index] = updatedActivity;
-    }
-    // Aplicar filtros para actualizar la vista
-    this.applyFilters();
+    // Refrescar desde el servicio para mantener consistencia con backend/mock
+    this.loading = true;
+    this.activitiesService.getActivities()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      )
+      .subscribe({
+        next: (activities) => {
+          this.activities = activities;
+          this.applyFilters();
+          this.showEditModal = false;
+          this.selectedActivity = null;
+        },
+        error: (error) => {
+          console.error('Error recargando actividades:', error);
+          // Si falla la recarga, al menos actualizamos localmente
+          const index = this.activities.findIndex(a => a.id === updatedActivity.id);
+          if (index !== -1) {
+            this.activities[index] = updatedActivity;
+          }
+          this.applyFilters();
+          this.showEditModal = false;
+          this.selectedActivity = null;
+        }
+      });
   }
 
   /**
