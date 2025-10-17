@@ -126,7 +126,7 @@ export class UsersComponent implements OnInit {
       this.usersService.deleteUser(user.id).subscribe({
         next: (response) => {
           this.loading = false;
-              if (response.success) {
+              if (response && response.success) {
                 // Remover el usuario de la lista local
                 this.users = this.users.filter(u => u.id !== user.id);
                 this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);

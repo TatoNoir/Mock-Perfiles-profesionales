@@ -319,7 +319,8 @@ export class UsersService {
   }
 
   deleteUser(id: number): Observable<{ success: boolean }> {
-    return this.apiService.delete<{ success: boolean }>(`/api/users/${id}`).pipe(
+    return this.apiService.delete<{ success?: boolean } | null>(`/api/users/${id}`).pipe(
+      map((response) => ({ success: response?.success ?? true })),
       catchError(error => {
         console.error('Error deleting user:', error);
         throw error;
