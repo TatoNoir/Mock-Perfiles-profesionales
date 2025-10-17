@@ -190,7 +190,7 @@ export class ZonesComponent implements OnInit, OnDestroy {
         });
       return;
     }
-    // Modo 2: país + provincia + localidad
+    // Modo 2a: país + provincia + localidad
     if (this.selectedLocality?.id != null) {
       this.loading = true;
       this.zonesService.getZipCodesByLocality(this.selectedLocality.id)
@@ -200,9 +200,22 @@ export class ZonesComponent implements OnInit, OnDestroy {
           error: () => { this.zipResults = []; },
           complete: () => { this.loading = false; }
         });
-    } else {
-      this.zipResults = [];
+      return;
     }
+    // Modo 2b: país + provincia (sin localidad) => buscar por provincia
+    if (this.selectedStateId != null) {
+      this.loading = true;
+      this.zonesService.getZipCodesByState(this.selectedStateId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (rows) => { this.zipResults = rows || []; },
+          error: () => { this.zipResults = []; },
+          complete: () => { this.loading = false; }
+        });
+      return;
+    }
+    // Sin filtros válidos
+    this.zipResults = [];
   }
 
   /**

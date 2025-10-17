@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, catchError, delay } from 'rxjs/operators';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, catchError, delay, switchMap } from 'rxjs/operators';
 import { ApiService } from '../../../../services/api.service';
 
 export type ZoneType = 'Urbana' | 'Suburbana' | 'Rural';
@@ -381,6 +381,50 @@ export class ZonesService {
         return of([{ id: 1, code: '0000', locality_id: localityId }]).pipe(delay(100));
       })
     );
+  }
+
+  /**
+   * Obtiene códigos postales por provincia/estado
+   * Preferentemente desde la API: GET /api/zip-codes?state_id=<id>
+   * Fallback: agrega los CP consultando por cada localidad de la provincia
+   */
+  getZipCodesByState(stateId: number): Observable<ApiZipCode[]> {
+    // Intento directo a la API si está disponible
+    return this.apiService
+      .get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes?state_id=${encodeURIComponent(stateId)}`)
+      .pipe(
+        map((response: any) => {
+          if (response?.data && Array.isArray(response.data)) {
+            return response.data as ApiZipCode[];
+          }
+          if (Array.isArray(response)) {
+            return response as ApiZipCode[];
+          }
+          // Si la forma no es la esperada, construimos a partir de localidades
+          return [] as ApiZipCode[];
+        }),
+        catchError(() => of([] as ApiZipCode[])),
+        // Si vino vacío por formato desconocido, usamos fallback local
+        map((zipsFromApi) => zipsFromApi && zipsFromApi.length > 0 ? zipsFromApi : null),
+        // Si null, hacemos fallback a consultar por localidad
+        switchMap((maybeZips) => {
+          if (maybeZips) {
+            return of(maybeZips);
+          }
+          return this.getLocalitiesByState(stateId).pipe(
+            switchMap((localities) => {
+              if (!localities || localities.length === 0) {
+                return of([] as ApiZipCode[]);
+              }
+              const requests = localities.map((l) => this.getZipCodesByLocality(l.id));
+              return forkJoin(requests).pipe(
+                map((results) => results.flat())
+              );
+            }),
+            catchError(() => of([] as ApiZipCode[]))
+          );
+        })
+      );
   }
 
   /**
