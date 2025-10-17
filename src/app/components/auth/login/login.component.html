@@ -30,11 +30,6 @@
         </button>
       </div>
 
-      <label class="remember">
-        <input type="checkbox" [(ngModel)]="remember" name="remember">
-        Recordarme
-      </label>
-
       <div *ngIf="errorMessage" class="error">
         {{ errorMessage }}
       </div>
@@ -44,7 +39,5 @@
         Ingresar
       </button>
     </form>
-
-    <button class="link" type="button">Olvidé mi contraseña</button>
   </div>
 </div>

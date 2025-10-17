@@ -78,15 +78,6 @@
   cursor: pointer;
 }
 
-.remember {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0 0.25rem;
-  color: #334155;
-  font-size: 0.95rem;
-}
-
 .error {
   margin-top: 0.5rem;
   background: #fef2f2;
@@ -131,14 +122,4 @@
   to { 
     transform: rotate(360deg); 
   } 
-}
-
-.link {
-  margin-top: 1rem;
-  background: none;
-  border: none;
-  color: #1d4ed8;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
 }

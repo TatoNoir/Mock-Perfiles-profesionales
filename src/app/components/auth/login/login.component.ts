@@ -18,7 +18,6 @@ export class LoginComponent {
   errorMessage = '';
   isLogin = true;
   showPassword = false;
-  remember = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
