@@ -5,6 +5,7 @@ import { UsersComponent } from './components/features/users/users.component';
 import { UserProfessionalProfileComponent } from './components/features/users/pages/user-professional-profile/user-professional-profile.component';
 import { ZonesComponent } from './components/features/zones/zones.component';
 import { ActivitiesComponent } from './components/features/activities/activities.component';
+import { CommentsComponent } from './components/features/comments/comments.component';
 import { ProfessionalsPageComponent } from './pages/professionals/professionals-page.component';
 import { ProfessionalDetailPageComponent } from './pages/professionals/professional-detail-page.component';
 import { AccountPageComponent } from './pages/account/account-page.component';
@@ -46,6 +47,11 @@ export const routes: Routes = [
   { 
     path: 'actividades', 
     component: ActivitiesComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'comentarios', 
+    component: CommentsComponent,
     canActivate: [AuthGuard]
   },
   { 

@@ -22,6 +22,9 @@ export class UserProfessionalProfileComponent implements OnInit {
   reviews: ApiReview[] = [];
   showCommentsModal = false;
   showReviewsModal = false;
+  loading = false;
+  userData: any;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -47,7 +50,7 @@ export class UserProfessionalProfileComponent implements OnInit {
       next: (response: UsersResponse) => {
         const user = response.data.find(u => u.id === userId);
         if (user) {
-          this.professionalProfile = this.convertUserToProfessionalProfile(user);
+          this.loadUserData(userId);
           this.contactUrl = this.buildWhatsAppUrl(user);
           // Cargar comentarios/preguntas de este usuario
           this.usersService.getQuestions(user.id).subscribe({
@@ -71,7 +74,27 @@ export class UserProfessionalProfileComponent implements OnInit {
     });
   }
 
+  loadUserData(id: number){
+    this.loading = true;
+    this.error = null;
+    
+    this.usersService.getUserData(id).subscribe({
+      next: (response: any) => { 
+        console.log('Usuario cargado:', response);
+        this.userData = response;
+        this.professionalProfile = this.convertUserToProfessionalProfile(this.userData);
+        this.loading = false;
+      },
+      error: (err: any) => { 
+        console.error('Error cargando usuarios', err);
+        this.loading = false;
+        this.error = 'Error al cargar los usuarios';
+      }
+    });
+  }
+
   convertUserToProfessionalProfile(user: ApiUser): ProfessionalProfile {
+
     const professionalProfile: ProfessionalProfile = {
       id: user.id,
       name: (user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.name || 'Usuario')),
@@ -81,9 +104,9 @@ export class UserProfessionalProfileComponent implements OnInit {
       email: user.email,
       phone: this.buildPhone(user) || '',
       skills: user.activities?.map(activity => activity.name) || [],
-      experienceYears: 0, // No tenemos esta información en ApiUser
-      created_at: user.created_at, // Agregar la fecha de creación
-      profile_picture: user.profile_picture // Agregar la foto de perfil
+      experienceYears: 0,
+      created_at: user.created_at,
+      profile_picture: user.profile_picture
     };
     // Adjuntar algunos campos adicionales para el template (sin cambiar la interfaz)
     (professionalProfile as any).document_number = (user as any).document_number || '';

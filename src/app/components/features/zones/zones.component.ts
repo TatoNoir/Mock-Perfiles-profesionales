@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
-import { ZonesService, ZoneFilters, ApiCountry, ApiState, ApiLocality } from './services/zones.service';
+import { ZonesService, ZoneFilters, ApiCountry, ApiState, ApiLocality, ZipCodesResponse } from './services/zones.service';
 
 @Component({
   selector: 'app-zones',
@@ -18,8 +18,14 @@ export class ZonesComponent implements OnInit, OnDestroy {
   private localityInput$ = new Subject<string>();
   
   // Data
-  // Resultados de localidades/zip-codes
+  // Resultados de códigos postales
   zipResults: { id: number; code: string; locality_id: number; locality?: { id: number; name: string } }[] = [];
+  
+  // Paginación
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
   countries: string[] = [];
   countrySuggestions: ApiCountry[] = [];
   showCountryDropdown = false;
@@ -177,15 +183,31 @@ export class ZonesComponent implements OnInit, OnDestroy {
    * Aplica los filtros localmente a las zonas
    */
   onSearch(): void {
+    this.currentPage = 1; // Reset a la primera página
+    this.loadZipCodes();
+  }
+
+  /**
+   * Carga los códigos postales con paginación
+   */
+  private loadZipCodes(): void {
     // Modo 1: búsqueda por código postal directo
     const cp = (this.filters.postal_code || '').trim();
     if (cp) {
       this.loading = true;
-      this.zonesService.getZipCodesByCode(cp)
+      this.zonesService.getZipCodesByCode(cp, this.currentPage, this.itemsPerPage)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (rows) => { this.zipResults = rows || []; },
-          error: () => { this.zipResults = []; },
+          next: (response: ZipCodesResponse) => { 
+            this.zipResults = response.data || []; 
+            this.totalItems = response.pagination.total;
+            this.totalPages = response.pagination.last_page;
+          },
+          error: () => { 
+            this.zipResults = []; 
+            this.totalItems = 0;
+            this.totalPages = 0;
+          },
           complete: () => { this.loading = false; }
         });
       return;
@@ -193,11 +215,19 @@ export class ZonesComponent implements OnInit, OnDestroy {
     // Modo 2a: país + provincia + localidad
     if (this.selectedLocality?.id != null) {
       this.loading = true;
-      this.zonesService.getZipCodesByLocality(this.selectedLocality.id)
+      this.zonesService.getZipCodesByLocality(this.selectedLocality.id, this.currentPage, this.itemsPerPage)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (rows) => { this.zipResults = rows || []; },
-          error: () => { this.zipResults = []; },
+          next: (response: ZipCodesResponse) => { 
+            this.zipResults = response.data || []; 
+            this.totalItems = response.pagination.total;
+            this.totalPages = response.pagination.last_page;
+          },
+          error: () => { 
+            this.zipResults = []; 
+            this.totalItems = 0;
+            this.totalPages = 0;
+          },
           complete: () => { this.loading = false; }
         });
       return;
@@ -205,17 +235,27 @@ export class ZonesComponent implements OnInit, OnDestroy {
     // Modo 2b: país + provincia (sin localidad) => buscar por provincia
     if (this.selectedStateId != null) {
       this.loading = true;
-      this.zonesService.getZipCodesByState(this.selectedStateId)
+      this.zonesService.getZipCodesByState(this.selectedStateId, this.currentPage, this.itemsPerPage)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (rows) => { this.zipResults = rows || []; },
-          error: () => { this.zipResults = []; },
+          next: (response: ZipCodesResponse) => { 
+            this.zipResults = response.data || []; 
+            this.totalItems = response.pagination.total;
+            this.totalPages = response.pagination.last_page;
+          },
+          error: () => { 
+            this.zipResults = []; 
+            this.totalItems = 0;
+            this.totalPages = 0;
+          },
           complete: () => { this.loading = false; }
         });
       return;
     }
     // Sin filtros válidos
     this.zipResults = [];
+    this.totalItems = 0;
+    this.totalPages = 0;
   }
 
   /**
@@ -230,6 +270,62 @@ export class ZonesComponent implements OnInit, OnDestroy {
     };
     this.cities = [];
     this.zipResults = [];
+    this.currentPage = 1;
+    this.totalItems = 0;
+    this.totalPages = 0;
+  }
+
+  /**
+   * Maneja el cambio de página
+   */
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadZipCodes();
+  }
+
+  /**
+   * Maneja el cambio de elementos por página
+   */
+  onItemsPerPageChange(itemsPerPage: number): void {
+    this.itemsPerPage = itemsPerPage;
+    this.currentPage = 1; // Reset a la primera página
+    this.loadZipCodes();
+  }
+
+  /**
+   * Maneja el cambio del select de elementos por página
+   */
+  onItemsPerPageSelectChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const value = parseInt(target.value, 10);
+    this.onItemsPerPageChange(value);
+  }
+
+  /**
+   * Genera los números de página visibles
+   */
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  /**
+   * Método helper para Math.min en el template
+   */
+  min(a: number, b: number): number {
+    return Math.min(a, b);
   }
 
   
@@ -323,13 +419,13 @@ export class ZonesComponent implements OnInit, OnDestroy {
             this.selectedLocality = (localities || []).find(l => l.name === name) || null;
             const localityId = this.selectedLocality?.id;
             if (localityId != null) {
-              this.zonesService.getZipCodesByLocality(localityId)
+              this.zonesService.getZipCodesByLocality(localityId, 1, 1)
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
-                  next: (zips) => {
-                    const first = zips && zips.length ? zips[0] : null;
-                    if (first?.code) {
-                      this.filters.postal_code = first.code;
+                  next: (response: ZipCodesResponse) => {
+                    const firstZipCode = response.data && response.data.length ? response.data[0] : null;
+                    if (firstZipCode?.code) {
+                      this.filters.postal_code = firstZipCode.code;
                     }
                   },
                   error: () => {}
@@ -373,13 +469,13 @@ export class ZonesComponent implements OnInit, OnDestroy {
     this.showLocalityDropdown = false;
     this.localitySuggestions = [];
     // Cargar CP por localidad seleccionada
-    this.zonesService.getZipCodesByLocality(locality.id)
+    this.zonesService.getZipCodesByLocality(locality.id, 1, 1)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (zips) => {
-          const first = zips && zips.length ? zips[0] : null;
-          if (first?.code) {
-            this.filters.postal_code = first.code;
+        next: (response: ZipCodesResponse) => {
+          const firstZipCode = response.data && response.data.length ? response.data[0] : null;
+          if (firstZipCode?.code) {
+            this.filters.postal_code = firstZipCode.code;
           }
         },
         error: () => {}
@@ -410,6 +506,7 @@ export class ZonesComponent implements OnInit, OnDestroy {
       element.readOnly = previousReadonly;
     }, 120);
   }
+
 }
 
 

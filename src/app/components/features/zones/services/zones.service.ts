@@ -27,6 +27,16 @@ export interface ApiZipCode {
   locality?: ApiLocality;
 }
 
+export interface ZipCodesResponse {
+  data: ApiZipCode[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
 export interface ApiZone {
   id: number;
   country: string;
@@ -358,97 +368,174 @@ export class ZonesService {
   }
 
   /**
-   * Obtiene códigos postales por localidad
-   * GET /api/zip-codes?locality_id=<id>
+   * Obtiene códigos postales por localidad con paginación
+   * GET /api/zip-codes?locality_id=<id>&page=<page>&limit=<limit>
    */
-  getZipCodesByLocality(localityId: number): Observable<ApiZipCode[]> {
-    return this.apiService.get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes?locality_id=${encodeURIComponent(localityId)}`).pipe(
+  getZipCodesByLocality(localityId: number, page: number = 1, limit: number = 10): Observable<ZipCodesResponse> {
+    const params = new URLSearchParams({
+      locality_id: localityId.toString(),
+      page: page.toString(),
+      limit: limit.toString()
+    });
+    
+    return this.apiService.get<ZipCodesResponse>(`/api/zip-codes?${params}`).pipe(
       map((response: any) => {
-        if (response?.data && Array.isArray(response.data)) {
-          return response.data as ApiZipCode[];
+        if (response?.data && response?.pagination) {
+          return response as ZipCodesResponse;
         }
         if (Array.isArray(response)) {
-          return response as ApiZipCode[];
+          // Si viene como array simple, lo convertimos al formato paginado
+          return {
+            data: response as ApiZipCode[],
+            pagination: {
+              current_page: 1,
+              per_page: response.length,
+              total: response.length,
+              last_page: 1
+            }
+          };
         }
         console.warn('Formato inesperado para códigos postales, usando mock');
-        return [
-          { id: 1, code: '1900', locality_id: localityId },
-          { id: 2, code: '1901', locality_id: localityId }
-        ];
+        return {
+          data: [
+            { id: 1, code: '1900', locality_id: localityId },
+            { id: 2, code: '1901', locality_id: localityId }
+          ],
+          pagination: {
+            current_page: 1,
+            per_page: 2,
+            total: 2,
+            last_page: 1
+          }
+        };
       }),
       catchError((error) => {
         console.error('Error al obtener códigos postales desde la API:', error);
-        return of([{ id: 1, code: '0000', locality_id: localityId }]).pipe(delay(100));
+        return of({
+          data: [{ id: 1, code: '0000', locality_id: localityId }],
+          pagination: {
+            current_page: 1,
+            per_page: 1,
+            total: 1,
+            last_page: 1
+          }
+        }).pipe(delay(100));
       })
     );
   }
 
   /**
-   * Obtiene códigos postales por provincia/estado
-   * Preferentemente desde la API: GET /api/zip-codes?state_id=<id>
-   * Fallback: agrega los CP consultando por cada localidad de la provincia
+   * Obtiene códigos postales por provincia/estado con paginación
+   * GET /api/zip-codes?state_id=<id>&page=<page>&limit=<limit>
    */
-  getZipCodesByState(stateId: number): Observable<ApiZipCode[]> {
-    // Intento directo a la API si está disponible
-    return this.apiService
-      .get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes?state_id=${encodeURIComponent(stateId)}`)
-      .pipe(
-        map((response: any) => {
-          if (response?.data && Array.isArray(response.data)) {
-            return response.data as ApiZipCode[];
+  getZipCodesByState(stateId: number, page: number = 1, limit: number = 10): Observable<ZipCodesResponse> {
+    const params = new URLSearchParams({
+      state_id: stateId.toString(),
+      page: page.toString(),
+      limit: limit.toString()
+    });
+    
+    return this.apiService.get<ZipCodesResponse>(`/api/zip-codes?${params}`).pipe(
+      map((response: any) => {
+        if (response?.data && response?.pagination) {
+          return response as ZipCodesResponse;
+        }
+        if (Array.isArray(response)) {
+          // Si viene como array simple, lo convertimos al formato paginado
+          return {
+            data: response as ApiZipCode[],
+            pagination: {
+              current_page: 1,
+              per_page: response.length,
+              total: response.length,
+              last_page: 1
+            }
+          };
+        }
+        console.warn('Formato inesperado para códigos postales por estado, usando mock');
+        return {
+          data: [
+            { id: 1, code: '1900', locality_id: 1 },
+            { id: 2, code: '1901', locality_id: 1 }
+          ],
+          pagination: {
+            current_page: 1,
+            per_page: 2,
+            total: 2,
+            last_page: 1
           }
-          if (Array.isArray(response)) {
-            return response as ApiZipCode[];
+        };
+      }),
+      catchError((error) => {
+        console.error('Error al obtener códigos postales por estado desde la API:', error);
+        return of({
+          data: [{ id: 1, code: '0000', locality_id: 1 }],
+          pagination: {
+            current_page: 1,
+            per_page: 1,
+            total: 1,
+            last_page: 1
           }
-          // Si la forma no es la esperada, construimos a partir de localidades
-          return [] as ApiZipCode[];
-        }),
-        catchError(() => of([] as ApiZipCode[])),
-        // Si vino vacío por formato desconocido, usamos fallback local
-        map((zipsFromApi) => zipsFromApi && zipsFromApi.length > 0 ? zipsFromApi : null),
-        // Si null, hacemos fallback a consultar por localidad
-        switchMap((maybeZips) => {
-          if (maybeZips) {
-            return of(maybeZips);
-          }
-          return this.getLocalitiesByState(stateId).pipe(
-            switchMap((localities) => {
-              if (!localities || localities.length === 0) {
-                return of([] as ApiZipCode[]);
-              }
-              const requests = localities.map((l) => this.getZipCodesByLocality(l.id));
-              return forkJoin(requests).pipe(
-                map((results) => results.flat())
-              );
-            }),
-            catchError(() => of([] as ApiZipCode[]))
-          );
-        })
-      );
+        }).pipe(delay(100));
+      })
+    );
   }
 
   /**
-   * Busca códigos postales por código (modo búsqueda directa por CP)
-   * GET /api/zip-codes?code=<cp>
+   * Busca códigos postales por código con paginación (modo búsqueda directa por CP)
+   * GET /api/zip-codes?code=<cp>&page=<page>&limit=<limit>
    */
-  getZipCodesByCode(code: string): Observable<ApiZipCode[]> {
-    const qs = code ? `?code=${encodeURIComponent(code)}` : '';
-    return this.apiService.get<{ data: ApiZipCode[] } | ApiZipCode[]>(`/api/zip-codes${qs}`).pipe(
+  getZipCodesByCode(code: string, page: number = 1, limit: number = 10): Observable<ZipCodesResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+    
+    if (code) {
+      params.append('code', code);
+    }
+    
+    return this.apiService.get<ZipCodesResponse>(`/api/zip-codes?${params}`).pipe(
       map((response: any) => {
-        if (response?.data && Array.isArray(response.data)) {
-          return response.data as ApiZipCode[];
+        if (response?.data && response?.pagination) {
+          return response as ZipCodesResponse;
         }
         if (Array.isArray(response)) {
-          return response as ApiZipCode[];
+          // Si viene como array simple, lo convertimos al formato paginado
+          return {
+            data: response as ApiZipCode[],
+            pagination: {
+              current_page: 1,
+              per_page: response.length,
+              total: response.length,
+              last_page: 1
+            }
+          };
         }
         console.warn('Formato inesperado para búsqueda por código postal, usando mock');
-        return [
-          { id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }
-        ];
+        return {
+          data: [
+            { id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }
+          ],
+          pagination: {
+            current_page: 1,
+            per_page: 1,
+            total: 1,
+            last_page: 1
+          }
+        };
       }),
       catchError((error) => {
         console.error('Error al buscar por código postal en la API:', error);
-        return of([{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }]).pipe(delay(100));
+        return of({
+          data: [{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }],
+          pagination: {
+            current_page: 1,
+            per_page: 1,
+            total: 1,
+            last_page: 1
+          }
+        }).pipe(delay(100));
       })
     );
   }

@@ -82,6 +82,7 @@ export class UsersComponent implements OnInit {
     this.usersService.getUsers(params).subscribe({
       next: (response: UsersResponse) => { 
         this.users = response.data;
+        console.log('Usuarios cargados sin filtros:', this.users);
         this.totalItems = response.pagination.total;
         this.totalPages = response.pagination.last_page;
         this.currentPage = response.pagination.current_page;
@@ -100,6 +101,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
+
   onAddUser() {
     this.showAddModal = true;
   }
@@ -108,11 +110,11 @@ export class UsersComponent implements OnInit {
     this.showAddModal = false;
   }
 
-      onUserCreated(newUser: ApiUser) {
-        // Refrescar desde el backend para asegurar datos y relaciones
-        this.loadUsers();
-        this.showAddModal = false;
-      }
+  onUserCreated(newUser: ApiUser) {
+    // Refrescar desde el backend para asegurar datos y relaciones
+    this.loadUsers();
+    this.showAddModal = false;
+  }
 
   onEditUser(user: ApiUser) {
     this.selectedUser = user;
@@ -124,12 +126,12 @@ export class UsersComponent implements OnInit {
     this.selectedUser = null;
   }
 
-      onUserUpdated(updatedUser: ApiUser) {
-        // Refrescar lista para reflejar cambios
-        this.loadUsers();
-        this.showEditModal = false;
-        this.selectedUser = null;
-      }
+  onUserUpdated(updatedUser: ApiUser) {
+    // Refrescar lista para reflejar cambios
+    this.loadUsers();
+    this.showEditModal = false;
+    this.selectedUser = null;
+  }
 
   onDeleteUser(user: ApiUser) {
     if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${user.name}"?`)) {

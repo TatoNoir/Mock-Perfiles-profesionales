@@ -197,6 +197,16 @@ export class UsersService {
     );
   }
 
+  getUserData(userId: number) {
+    return this.apiService.get<{ data: any }>(`/api/users/${userId}`).pipe(
+      map((response) => response?.data ?? []),
+      catchError((error) => {
+        console.error('Error fetching reviews:', error);
+        return of([]);
+      })
+    );
+  }
+
   getQuestions(userId: number) {
     const qs = `?user_id=${encodeURIComponent(String(userId))}`;
     return this.apiService.get<{ data: ApiQuestion[] }>(`/api/questions${qs}`).pipe(

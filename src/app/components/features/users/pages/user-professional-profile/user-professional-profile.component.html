@@ -101,12 +101,15 @@
                 <div *ngIf="q.answer" style="margin-top:4px;"><span class="muted">Respuesta:</span> {{ q.answer }}</div>
               </div>
             </div>
-            <div *ngIf="questions.length > 2" style="margin-top:0.5rem;">
-              <button class="link" (click)="openCommentsModal()">Ver más comentarios</button>
+            <div style="margin-top:0.5rem;">
+              <button class="link" (click)="openCommentsModal()">Ver comentarios</button>
             </div>
           </ng-container>
           <ng-template #noComments>
             <div class="muted">Aún no hay comentarios</div>
+            <div style="margin-top:0.5rem;">
+              <button class="link" (click)="openCommentsModal()">Ver comentarios</button>
+            </div>
           </ng-template>
         </div>
 
@@ -127,12 +130,15 @@
                 <div *ngIf="r.answer" style="margin-top:4px;"><span class="muted">Respuesta:</span> {{ r.answer }}</div>
               </div>
             </div>
-            <div *ngIf="reviews.length > 2" style="margin-top:0.5rem;">
-              <button class="link" (click)="openReviewsModal()">Ver más valoraciones</button>
+            <div style="margin-top:0.5rem;">
+              <button class="link" (click)="openReviewsModal()">Ver valoraciones</button>
             </div>
           </ng-container>
           <ng-template #noReviews>
             <div class="muted">Aún no hay valoraciones</div>
+            <div style="margin-top:0.5rem;">
+              <button class="link" (click)="openReviewsModal()">Ver valoraciones</button>
+            </div>
           </ng-template>
         </div>
         </div>
