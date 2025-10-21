@@ -3,10 +3,7 @@
   <div class="header">
     <div class="header-content">
       <h1 class="title">Comentarios</h1>
-      <button class="btn btn-primary" (click)="addComment()">
-        <i class="icon">+</i>
-        Agregar Comentario
-      </button>
+      <button class="btn primary" (click)="addComment()">Agregar Comentario</button>
     </div>
   </div>
 
@@ -117,10 +114,17 @@
 
     <div class="no-data" *ngIf="!loading && !error && filteredComments.length === 0">
       <p>No se encontraron comentarios</p>
-      <button class="btn btn-primary" (click)="addComment()">Agregar Primer Comentario</button>
+      <button class="btn primary" (click)="addComment()">Agregar Primer Comentario</button>
     </div>
   </div>
 </div>
+
+<!-- Modal para agregar comentario -->
+<app-add-comment-modal 
+  [isOpen]="showAddModal"
+  (close)="onCloseAddModal()"
+  (commentCreated)="onCommentCreated($event)"
+></app-add-comment-modal>
 
 <!-- Modal para editar comentario -->
 <app-edit-comment-modal 

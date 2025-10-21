@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommentsService, Comment, CommentFilters } from './services/comments.service';
 import { EditCommentModalComponent } from './modals/edit-comment-modal/edit-comment-modal.component';
+import { AddCommentModalComponent } from './modals/add-comment-modal/add-comment-modal.component';
 
 @Component({
   selector: 'app-comments',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, EditCommentModalComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, EditCommentModalComponent, AddCommentModalComponent],
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css']
 })
@@ -21,6 +22,7 @@ export class CommentsComponent implements OnInit {
   
   // Modal state
   showEditModal = false;
+  showAddModal = false;
   selectedComment: Comment | null = null;
 
   constructor(private commentsService: CommentsService) { }
@@ -80,8 +82,23 @@ export class CommentsComponent implements OnInit {
   }
 
   addComment(): void {
-    // TODO: Implementar modal para agregar comentario
-    console.log('Agregar comentario');
+    this.showAddModal = true;
+  }
+
+  onCloseAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  onCommentCreated(newComment: Comment): void {
+    // Agregar el nuevo comentario a la lista
+    this.comments.unshift(newComment);
+    
+    // Actualizar también la lista filtrada si no hay filtros activos
+    if (!this.hasActiveFilters()) {
+      this.filteredComments.unshift(newComment);
+    }
+    
+    this.showAddModal = false;
   }
 
   editComment(comment: Comment): void {
