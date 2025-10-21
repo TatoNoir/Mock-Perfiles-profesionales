@@ -1,0 +1,87 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Comentario</h2>
+      <button type="button" class="close-btn" (click)="onClose()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Información del comentario original (solo lectura) -->
+      <div class="comment-info">
+        <h3>Información del Comentario</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Usuario:</label>
+            <span>{{ comment?.name }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ comment?.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Usuario:</label>
+            <span>{{ comment?.user_id }}</span>
+          </div>
+          <div class="info-item">
+            <label>Fecha:</label>
+            <span>{{ formatDate(comment?.created_at) }}</span>
+          </div>
+        </div>
+        
+        <div class="original-message">
+          <label>Mensaje Original:</label>
+          <div class="message-content">{{ comment?.message }}</div>
+        </div>
+      </div>
+
+      <!-- Campos editables -->
+      <div class="form-group">
+        <label for="answer">Respuesta</label>
+        <textarea 
+          id="answer" 
+          formControlName="answer" 
+          rows="4" 
+          placeholder="Escriba la respuesta al comentario..."
+          class="answer-textarea"
+        ></textarea>
+        <small class="help-text">Esta respuesta será visible para el usuario que hizo el comentario</small>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            formControlName="published"
+            class="checkbox-input"
+          />
+          <span class="checkbox-custom"></span>
+          <span class="checkbox-text">Publicar comentario</span>
+        </label>
+        <small class="help-text">Los comentarios no publicados no serán visibles para otros usuarios</small>
+      </div>
+
+      <div class="error-message" *ngIf="error" class="form-error">
+        {{ error }}
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="onSubmit()" 
+        [disabled]="editForm.invalid || loading"
+      >
+        <span *ngIf="loading" class="loading-spinner"></span>
+        {{ loading ? 'Actualizando...' : 'Actualizar Comentario' }}
+      </button>
+    </div>
+  </div>
+</div>

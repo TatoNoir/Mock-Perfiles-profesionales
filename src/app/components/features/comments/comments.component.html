@@ -121,3 +121,11 @@
     </div>
   </div>
 </div>
+
+<!-- Modal para editar comentario -->
+<app-edit-comment-modal 
+  [isOpen]="showEditModal"
+  [comment]="selectedComment"
+  (close)="onCloseEditModal()"
+  (commentUpdated)="onCommentUpdated($event)"
+></app-edit-comment-modal>

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommentsService, Comment, CommentFilters } from './services/comments.service';
+import { EditCommentModalComponent } from './modals/edit-comment-modal/edit-comment-modal.component';
 
 @Component({
   selector: 'app-comments',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, EditCommentModalComponent],
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css']
 })
@@ -17,6 +18,10 @@ export class CommentsComponent implements OnInit {
   filters: CommentFilters = {};
   loading = false;
   error: string | null = null;
+  
+  // Modal state
+  showEditModal = false;
+  selectedComment: Comment | null = null;
 
   constructor(private commentsService: CommentsService) { }
 
@@ -80,8 +85,30 @@ export class CommentsComponent implements OnInit {
   }
 
   editComment(comment: Comment): void {
-    // TODO: Implementar modal para editar comentario
-    console.log('Editar comentario:', comment);
+    this.selectedComment = comment;
+    this.showEditModal = true;
+  }
+
+  onCloseEditModal(): void {
+    this.showEditModal = false;
+    this.selectedComment = null;
+  }
+
+  onCommentUpdated(updatedComment: Comment): void {
+    // Actualizar el comentario en la lista
+    const index = this.comments.findIndex(c => c.id === updatedComment.id);
+    if (index !== -1) {
+      this.comments[index] = updatedComment;
+    }
+    
+    // Actualizar también en la lista filtrada
+    const filteredIndex = this.filteredComments.findIndex(c => c.id === updatedComment.id);
+    if (filteredIndex !== -1) {
+      this.filteredComments[filteredIndex] = updatedComment;
+    }
+    
+    this.showEditModal = false;
+    this.selectedComment = null;
   }
 
   deleteComment(comment: Comment): void {
