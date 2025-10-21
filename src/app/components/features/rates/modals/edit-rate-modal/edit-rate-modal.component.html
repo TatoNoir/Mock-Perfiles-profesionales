@@ -1,0 +1,95 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Valoración</h2>
+      <button type="button" class="close-btn" (click)="onClose()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Información de la valoración original (solo lectura) -->
+      <div class="rate-info">
+        <h3>Información de la Valoración</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Usuario:</label>
+            <span>{{ rate?.name }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ rate?.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>ID Usuario:</label>
+            <span>{{ rate?.user_id }}</span>
+          </div>
+          <div class="info-item">
+            <label>Fecha:</label>
+            <span>{{ formatDate(rate?.created_at) }}</span>
+          </div>
+        </div>
+        
+        <div class="rating-display">
+          <label>Valoración:</label>
+          <div class="rating-content">
+            <span class="stars">{{ getStars(rate?.value || 0) }}</span>
+            <span class="value-text">({{ rate?.value }}/5)</span>
+          </div>
+        </div>
+        
+        <div class="original-comment">
+          <label>Comentario Original:</label>
+          <div class="comment-content">{{ rate?.comment }}</div>
+        </div>
+      </div>
+
+      <!-- Campos editables -->
+      <div class="form-group">
+        <label for="answer">Respuesta</label>
+        <textarea 
+          id="answer" 
+          formControlName="answer" 
+          rows="4" 
+          placeholder="Escriba la respuesta a la valoración..."
+          class="answer-textarea"
+        ></textarea>
+        <small class="help-text">Esta respuesta será visible para el usuario que hizo la valoración</small>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            formControlName="published"
+            class="checkbox-input"
+          />
+          <span class="checkbox-custom"></span>
+          <span class="checkbox-text">Publicar valoración</span>
+        </label>
+        <small class="help-text">Las valoraciones no publicadas no serán visibles para otros usuarios</small>
+      </div>
+
+      <div class="error-message" *ngIf="error" class="form-error">
+        {{ error }}
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="onSubmit()" 
+        [disabled]="editForm.invalid || loading"
+      >
+        <span *ngIf="loading" class="loading-spinner"></span>
+        {{ loading ? 'Actualizando...' : 'Actualizar Valoración' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RatesService, Rate, RateFilters } from './services/rates.service';
+import { EditRateModalComponent } from './modals/edit-rate-modal/edit-rate-modal.component';
+import { AddRateModalComponent } from './modals/add-rate-modal/add-rate-modal.component';
 
 @Component({
   selector: 'app-rates',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, EditRateModalComponent, AddRateModalComponent],
   templateUrl: './rates.component.html',
   styleUrls: ['./rates.component.css']
 })
@@ -17,6 +19,11 @@ export class RatesComponent implements OnInit {
   filters: RateFilters = {};
   loading = false;
   error: string | null = null;
+  
+  // Modal state
+  showEditModal = false;
+  showAddModal = false;
+  selectedRate: Rate | null = null;
 
   constructor(private ratesService: RatesService) { }
 
@@ -75,13 +82,50 @@ export class RatesComponent implements OnInit {
   }
 
   addRate(): void {
-    // TODO: Implementar modal para agregar valoración
-    console.log('Agregar valoración');
+    this.showAddModal = true;
+  }
+
+  onCloseAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  onRateCreated(newRate: Rate): void {
+    // Agregar la nueva valoración a la lista
+    this.rates.unshift(newRate);
+    
+    // Actualizar también la lista filtrada si no hay filtros activos
+    if (!this.hasActiveFilters()) {
+      this.filteredRates.unshift(newRate);
+    }
+    
+    this.showAddModal = false;
   }
 
   editRate(rate: Rate): void {
-    // TODO: Implementar modal para editar valoración
-    console.log('Editar valoración:', rate);
+    this.selectedRate = rate;
+    this.showEditModal = true;
+  }
+
+  onCloseEditModal(): void {
+    this.showEditModal = false;
+    this.selectedRate = null;
+  }
+
+  onRateUpdated(updatedRate: Rate): void {
+    // Actualizar la valoración en la lista
+    const index = this.rates.findIndex(r => r.id === updatedRate.id);
+    if (index !== -1) {
+      this.rates[index] = updatedRate;
+    }
+    
+    // Actualizar también en la lista filtrada
+    const filteredIndex = this.filteredRates.findIndex(r => r.id === updatedRate.id);
+    if (filteredIndex !== -1) {
+      this.filteredRates[filteredIndex] = updatedRate;
+    }
+    
+    this.showEditModal = false;
+    this.selectedRate = null;
   }
 
   deleteRate(rate: Rate): void {

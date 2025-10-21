@@ -133,3 +133,18 @@
     </div>
   </div>
 </div>
+
+<!-- Modal para agregar valoración -->
+<app-add-rate-modal 
+  [isOpen]="showAddModal"
+  (close)="onCloseAddModal()"
+  (rateCreated)="onRateCreated($event)"
+></app-add-rate-modal>
+
+<!-- Modal para editar valoración -->
+<app-edit-rate-modal 
+  [isOpen]="showEditModal"
+  [rate]="selectedRate"
+  (close)="onCloseEditModal()"
+  (rateUpdated)="onRateUpdated($event)"
+></app-edit-rate-modal>

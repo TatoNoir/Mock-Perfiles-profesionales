@@ -1,0 +1,118 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Agregar Valoración</h2>
+      <button type="button" class="close-btn" (click)="onClose()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="addForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-group">
+        <label for="value">Valoración *</label>
+        <div class="rating-selector">
+          <div class="stars-display">
+            <span class="stars">{{ getStars(addForm.get('value')?.value || 5) }}</span>
+            <span class="value-text">({{ addForm.get('value')?.value || 5 }}/5)</span>
+          </div>
+          <div class="star-buttons">
+            <button 
+              type="button" 
+              *ngFor="let star of [1,2,3,4,5]" 
+              class="star-btn"
+              [class.active]="star <= (addForm.get('value')?.value || 5)"
+              (click)="onRatingChange(star)"
+            >
+              ★
+            </button>
+          </div>
+        </div>
+        <div class="error-message" *ngIf="addForm.get('value')?.invalid && addForm.get('value')?.touched">
+          <span *ngIf="addForm.get('value')?.errors?.['required']">La valoración es requerida</span>
+          <span *ngIf="addForm.get('value')?.errors?.['min']">La valoración debe ser al menos 1</span>
+          <span *ngIf="addForm.get('value')?.errors?.['max']">La valoración no puede ser mayor a 5</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="usuario@ejemplo.com"
+          [class.error]="addForm.get('email')?.invalid && addForm.get('email')?.touched"
+        />
+        <div class="error-message" *ngIf="addForm.get('email')?.invalid && addForm.get('email')?.touched">
+          <span *ngIf="addForm.get('email')?.errors?.['required']">El email es requerido</span>
+          <span *ngIf="addForm.get('email')?.errors?.['email']">Ingrese un email válido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          placeholder="Nombre del usuario"
+          [class.error]="addForm.get('name')?.invalid && addForm.get('name')?.touched"
+        />
+        <div class="error-message" *ngIf="addForm.get('name')?.invalid && addForm.get('name')?.touched">
+          <span *ngIf="addForm.get('name')?.errors?.['required']">El nombre es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="user_id">ID Usuario *</label>
+        <input 
+          type="number" 
+          id="user_id" 
+          formControlName="user_id" 
+          placeholder="ID del usuario"
+          min="1"
+          [class.error]="addForm.get('user_id')?.invalid && addForm.get('user_id')?.touched"
+        />
+        <div class="error-message" *ngIf="addForm.get('user_id')?.invalid && addForm.get('user_id')?.touched">
+          <span *ngIf="addForm.get('user_id')?.errors?.['required']">El ID de usuario es requerido</span>
+          <span *ngIf="addForm.get('user_id')?.errors?.['min']">El ID debe ser mayor a 0</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="comment">Comentario *</label>
+        <textarea 
+          id="comment" 
+          formControlName="comment" 
+          rows="4" 
+          placeholder="Escriba el comentario de la valoración..."
+          [class.error]="addForm.get('comment')?.invalid && addForm.get('comment')?.touched"
+        ></textarea>
+        <div class="error-message" *ngIf="addForm.get('comment')?.invalid && addForm.get('comment')?.touched">
+          <span *ngIf="addForm.get('comment')?.errors?.['required']">El comentario es requerido</span>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="error" class="form-error">
+        {{ error }}
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="onSubmit()" 
+        [disabled]="addForm.invalid || loading"
+      >
+        <span *ngIf="loading" class="loading-spinner"></span>
+        {{ loading ? 'Creando...' : 'Crear Valoración' }}
+      </button>
+    </div>
+  </div>
+</div>
