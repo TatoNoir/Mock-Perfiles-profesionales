@@ -6,6 +6,7 @@ import { UserProfessionalProfileComponent } from './components/features/users/pa
 import { ZonesComponent } from './components/features/zones/zones.component';
 import { ActivitiesComponent } from './components/features/activities/activities.component';
 import { CommentsComponent } from './components/features/comments/comments.component';
+import { RatesComponent } from './components/features/rates/rates.component';
 import { ProfessionalsPageComponent } from './pages/professionals/professionals-page.component';
 import { ProfessionalDetailPageComponent } from './pages/professionals/professional-detail-page.component';
 import { AccountPageComponent } from './pages/account/account-page.component';
@@ -52,6 +53,11 @@ export const routes: Routes = [
   { 
     path: 'comentarios', 
     component: CommentsComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'valoraciones', 
+    component: RatesComponent,
     canActivate: [AuthGuard]
   },
   { 

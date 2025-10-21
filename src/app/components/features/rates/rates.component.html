@@ -1,0 +1,135 @@
+<div class="rates-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1 class="title">Valoraciones</h1>
+      <button class="btn primary" (click)="addRate()">Agregar Valoración</button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label for="userIdFilter">ID Usuario:</label>
+        <input 
+          type="number" 
+          id="userIdFilter"
+          [(ngModel)]="filters.user_id" 
+          (ngModelChange)="onFilterChange()"
+          placeholder="Filtrar por ID de usuario"
+          class="filter-input"
+        >
+      </div>
+      
+      <div class="filter-group">
+        <label for="messageFilter">Mensaje:</label>
+        <input 
+          type="text" 
+          id="messageFilter"
+          [(ngModel)]="filters.message" 
+          (ngModelChange)="onFilterChange()"
+          placeholder="Filtrar por mensaje"
+          class="filter-input"
+        >
+      </div>
+      
+      <button 
+        class="btn secondary" 
+        (click)="clearFilters()"
+        [disabled]="!hasActiveFilters()"
+      >
+        Limpiar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de valoraciones -->
+  <div class="table-container">
+    <div class="loading" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Cargando valoraciones...</p>
+    </div>
+
+    <div class="error" *ngIf="error">
+      <p>{{ error }}</p>
+      <button class="btn primary" (click)="loadRates()">Reintentar</button>
+    </div>
+
+    <table class="rates-table" *ngIf="!loading && !error">
+      <thead>
+        <tr>
+          <th>ID Valoración</th>
+          <th>Usuario</th>
+          <th>Mail</th>
+          <th>Valor</th>
+          <th>Fecha Creación</th>
+          <th>Comentario</th>
+          <th>Respuesta</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rate of filteredRates; trackBy: trackByRateId">
+          <td class="id-cell">{{ rate.id }}</td>
+          <td class="user-cell">
+            <div class="user-info">
+              <span class="user-name">{{ rate.name }}</span>
+              <span class="user-id">ID: {{ rate.user_id }}</span>
+            </div>
+          </td>
+          <td class="email-cell">{{ rate.email }}</td>
+          <td class="value-cell">
+            <div class="rating-display">
+              <span class="stars">{{ getStars(rate.value) }}</span>
+              <span class="value-number">({{ rate.value }}/5)</span>
+            </div>
+          </td>
+          <td class="date-cell">
+            {{ rate.created_at ? formatDate(rate.created_at) : 'N/A' }}
+          </td>
+          <td class="comment-cell">
+            <div class="comment-content">
+              <p class="comment-text">{{ rate.comment }}</p>
+            </div>
+          </td>
+          <td class="answer-cell">
+            <div class="answer-content" *ngIf="rate.answer; else noAnswer">
+              <p class="answer-text">{{ rate.answer }}</p>
+            </div>
+            <ng-template #noAnswer>
+              <span class="no-answer">Sin respuesta</span>
+            </ng-template>
+          </td>
+          <td class="actions">
+            <button 
+              class="btn secondary" 
+              (click)="editRate(rate)" 
+              aria-label="Editar valoración" 
+              data-tooltip="Editar valoración"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+              </svg>
+            </button>
+            <button 
+              class="btn danger" 
+              (click)="deleteRate(rate)" 
+              aria-label="Eliminar valoración" 
+              data-tooltip="Eliminar valoración"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M6 7h12v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1h4v2H4V4h4l1-1z"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && !error && filteredRates.length === 0">
+      <p>No se encontraron valoraciones</p>
+      <button class="btn primary" (click)="addRate()">Agregar Primera Valoración</button>
+    </div>
+  </div>
+</div>
