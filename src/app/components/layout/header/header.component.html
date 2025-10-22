@@ -1,0 +1,14 @@
+<header class="header">
+  <div class="brand">
+      <img src="assets/images/logo.png" alt="Portal de Profesionales" class="logo" />
+    <h1 class="title">Portal de Profesionales</h1>
+  </div>
+  <div class="actions">
+    <div class="avatar" (click)="toggleDropdown()">MP</div>
+    <div class="dropdown" *ngIf="dropdownOpen">
+      <button class="dropdown-item" (click)="onMisDatos()">Mis Datos</button>
+      <div class="divider"></div>
+      <button class="dropdown-item danger" (click)="logout.emit()">Cerrar Sesión</button>
+    </div>
+  </div>
+</header>
