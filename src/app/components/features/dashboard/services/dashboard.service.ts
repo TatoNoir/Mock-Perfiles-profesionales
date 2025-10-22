@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
 import { ApiService } from '../../../../services/api.service';
 
@@ -227,77 +227,56 @@ export class DashboardService {
    * Combina datos de múltiples endpoints para el dashboard
    */
   private combineDashboardData(): Observable<DashboardData> {
-    return new Observable(observer => {
-      // Hacemos llamadas paralelas a todos los endpoints
-      const users$ = this.getUsersList();
-      const activities$ = this.getActivitiesList();
-      const questions$ = this.getQuestionsList();
-      const reviews$ = this.getReviewsList();
+    // Hacemos llamadas paralelas a todos los endpoints usando forkJoin
+    return forkJoin({
+      users: this.getUsersList(),
+      activities: this.getActivitiesList(),
+      questions: this.getQuestionsList(),
+      reviews: this.getReviewsList()
+    }).pipe(
+      map(({ users, activities, questions, reviews }) => {
+        // Calculamos las estadísticas
+        const stats: DashboardStats = {
+          totalProfessionals: users.pagination?.total || 0,
+          newRegistrationsThisWeek: this.calculateNewRegistrations(users.data || []),
+          contactsSent: questions.length, // Total de comentarios/preguntas
+          mostSearchedSpecialty: reviews.length.toString() // Total de valoraciones
+        };
 
-      // Combinamos todos los observables
-      users$.subscribe({
-        next: (usersResponse) => {
-          activities$.subscribe({
-            next: (activities) => {
-              questions$.subscribe({
-                next: (questions) => {
-                  reviews$.subscribe({
-                    next: (reviews) => {
-                      // Calculamos las estadísticas
-                      const stats: DashboardStats = {
-                        totalProfessionals: usersResponse.pagination.total,
-                        newRegistrationsThisWeek: this.calculateNewRegistrations(usersResponse.data),
-                        contactsSent: questions.length, // Total de comentarios/preguntas
-                        mostSearchedSpecialty: reviews.length.toString() // Total de valoraciones
-                      };
+        // Convertimos usuarios a formato RecentUser
+        const recentUsers: RecentUser[] = (users.data || [])
+          .slice(0, 4) // Solo los primeros 4
+          .map(user => ({
+            id: user.id,
+            name: user.first_name && user.last_name 
+              ? `${user.first_name} ${user.last_name}` 
+              : user.name || 'Sin nombre',
+            role: user.user_type?.name || 'Sin rol',
+            status: 'active' as const,
+            registrationDate: this.formatDate(user.created_at),
+            province: user.locality?.state?.name || 'Sin provincia',
+            locality: user.locality?.name || 'Sin localidad'
+          }));
 
-                      // Convertimos usuarios a formato RecentUser
-                      const recentUsers: RecentUser[] = usersResponse.data
-                        .slice(0, 4) // Solo los primeros 4
-                        .map(user => ({
-                          id: user.id,
-                          name: user.first_name && user.last_name 
-                            ? `${user.first_name} ${user.last_name}` 
-                            : user.name || 'Sin nombre',
-                          role: user.user_type?.name || 'Sin rol',
-                          status: 'active' as const,
-                          registrationDate: this.formatDate(user.created_at),
-                          province: user.locality?.state?.name || 'Sin provincia',
-                          locality: user.locality?.name || 'Sin localidad'
-                        }));
-
-                      const dashboardData: DashboardData = {
-                        stats,
-                        recentUsers
-                      };
-
-                      observer.next(dashboardData);
-                      observer.complete();
-                    },
-                    error: (error) => {
-                      console.error('Error fetching reviews:', error);
-                      observer.error(error);
-                    }
-                  });
-                },
-                error: (error) => {
-                  console.error('Error fetching questions:', error);
-                  observer.error(error);
-                }
-              });
-            },
-            error: (error) => {
-              console.error('Error fetching activities:', error);
-              observer.error(error);
-            }
-          });
-        },
-        error: (error) => {
-          console.error('Error fetching users:', error);
-          observer.error(error);
-        }
-      });
-    });
+        return {
+          stats,
+          recentUsers
+        };
+      }),
+      catchError(error => {
+        console.error('Error combining dashboard data:', error);
+        // En caso de error, retornamos datos por defecto
+        return of({
+          stats: {
+            totalProfessionals: 0,
+            newRegistrationsThisWeek: 0,
+            contactsSent: 0,
+            mostSearchedSpecialty: '0'
+          },
+          recentUsers: []
+        });
+      })
+    );
   }
 
   /**
