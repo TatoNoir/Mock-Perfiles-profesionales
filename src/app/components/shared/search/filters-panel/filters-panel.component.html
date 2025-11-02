@@ -1,0 +1,50 @@
+<section class="filters-card">
+  <div class="filters-row">
+    <div class="filters-left">
+      <div class="filter-group">
+        <label class="filter-label">Ubicación</label>
+        <input type="text" class="filter-input" placeholder="Ciudad">
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Especialidad/Rubro</label>
+        <select class="filter-select">
+          <option value="">Todas</option>
+          <option value="medico">Médico</option>
+          <option value="abogado">Abogado</option>
+          <option value="ingeniero">Ingeniero</option>
+          <option value="arquitecto">Arquitecto</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Disponibilidad</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox">
+            <span>Inmediata</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox">
+            <span>Esta semana</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox">
+            <span>Este mes</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="vertical-separator" aria-hidden="true"></div>
+
+    <div class="search-right">
+      <app-search-bar (search)="emitSearch($event)"></app-search-bar>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="apply-button">Buscar</button>
+    <button class="clear-button">Limpiar</button>
+  </div>
+</section>

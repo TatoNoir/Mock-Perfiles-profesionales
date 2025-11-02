@@ -1,0 +1,9 @@
+<div class="search-bar">
+  <input
+    type="text"
+    class="search-input"
+    placeholder="Buscar profesionales por nombre"
+    (input)="onInput($event)"
+  >
+  <button class="search-button" (click)="emitSearch()">Buscar</button>
+</div>

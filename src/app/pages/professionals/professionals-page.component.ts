@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FiltersPanelComponent } from '../../components/features/search/filters-panel.component';
+import { FiltersPanelComponent } from '../../components/shared/search/filters-panel/filters-panel.component';
 import { ProfessionalListComponent } from '../../components/features/professional-list/professional-list.component';
 import { Router } from '@angular/router';
 import { PROFESSIONALS } from '../../data/professionals.mock';

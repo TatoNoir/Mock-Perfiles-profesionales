@@ -1,0 +1,24 @@
+<div class="professional-list">
+  <h2 class="list-title">Profesionales Disponibles</h2>
+  <div class="professionals-grid">
+    <div class="professional-card" *ngFor="let professional of professionals" (click)="onSelect(professional)">
+      <div class="card-header">
+        <div class="avatar">{{ professional.initials }}</div>
+        <div class="info">
+          <h3 class="name">{{ professional.name }}</h3>
+          <p class="specialty">{{ professional.specialty }}</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="description">{{ professional.description }}</p>
+        <div class="tags">
+          <span class="tag" *ngFor="let skill of professional.skills">{{ skill }}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="experience">{{ professional.experience }} años exp.</span>
+        <button class="contact-button" (click)="$event.stopPropagation()">Contactar</button>
+      </div>
+    </div>
+  </div>
+</div>
