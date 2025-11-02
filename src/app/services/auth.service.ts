@@ -138,28 +138,6 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  async signUp(email: string, _password: string) {
-    await new Promise(r => setTimeout(r, 300));
-    const user: AuthUser = { 
-      id: 999, 
-      name: 'Usuario Nuevo',
-      email,
-      phone: '',
-      locality_id: 1,
-      profile: { id: 1, name: 'Usuario', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      locality: { id: 1, name: 'La Plata', short_code: 'LAP', state_id: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      address: null,
-      street: null,
-      street_number: null,
-      floor: null,
-      apartment: null,
-      profile_picture: null,
-      description: null
-    };
-    this.currentUserSubject.next(user);
-    return { user } as any;
-  }
-
   signIn(email: string, password: string): Observable<LoginResponse> {
     
     return this.apiService.post<LoginResponse>('/api/login', { email, password }).pipe(

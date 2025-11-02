@@ -16,18 +16,11 @@ export class LoginComponent {
   password = '';
   loading = false;
   errorMessage = '';
-  isLogin = true;
   showPassword = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  toggleMode() {
-    this.isLogin = !this.isLogin;
-    this.errorMessage = '';
-  }
-
-  async onSubmit() {
-    
+  onSubmit() {
     if (!this.email || !this.password) {
       this.errorMessage = 'Por favor completa todos los campos';
       return;
@@ -36,29 +29,20 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    if (this.isLogin) {
-      this.authService.signIn(this.email, this.password).subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.router.navigateByUrl('/dashboard');
-        },
-        error: (error) => {
-          console.error('❌ Error en login:', error);
-          this.errorMessage = error.error?.error || error.error || 'Error al iniciar sesión';
-          this.loading = false;
-        }
-      });
-    } else {
-      try {
-        await this.authService.signUp(this.email, this.password);
+    this.authService.signIn(this.email, this.password).subscribe({
+      next: (response) => {
         this.loading = false;
-        // this.router.navigateByUrl('/dashboard'); // Comentado temporalmente
-      } catch (error: any) {
-        this.errorMessage = error.message || 'Ocurrió un error. Por favor intenta de nuevo.';
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (error) => {
+        console.error('❌ Error en login:', error);
+        this.errorMessage = error.error?.error || error.error || 'Error al iniciar sesión';
         this.loading = false;
       }
-    }
+    });
   }
 
-  togglePassword() { this.showPassword = !this.showPassword; }
+  togglePassword() { 
+    this.showPassword = !this.showPassword; 
+  }
 }
