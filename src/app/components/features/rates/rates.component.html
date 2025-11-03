@@ -66,6 +66,7 @@
           <th>Fecha Creación</th>
           <th>Comentario</th>
           <th>Respuesta</th>
+          <th>Publicado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -100,6 +101,9 @@
             <ng-template #noAnswer>
               <span class="no-answer">Sin respuesta</span>
             </ng-template>
+          </td>
+          <td class="published-cell">
+            {{ rate.published ? 'Sí' : 'No' }}
           </td>
           <td class="actions">
             <button 

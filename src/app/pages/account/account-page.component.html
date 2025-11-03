@@ -16,11 +16,11 @@
     </div>
     <div class="row" *ngIf="u.profile">
       <div class="label">Perfil</div>
-      <div class="value">{{ u.profile?.name }}</div>
+      <div class="value">{{ u.profile.name }}</div>
     </div>
     <div class="row" *ngIf="u.locality">
       <div class="label">Localidad</div>
-      <div class="value">{{ u.locality?.name }}</div>
+      <div class="value">{{ u.locality.name }}</div>
     </div>
     <div class="row" *ngIf="u.address || u.street || u.street_number">
       <div class="label">Dirección</div>

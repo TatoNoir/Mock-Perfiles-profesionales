@@ -30,7 +30,6 @@ export interface ApiUserType {
 export interface GeoCountry { id: number; name: string; }
 export interface GeoState { id: number; name: string; }
 export interface GeoLocality { id: number; name: string; }
-export interface GeoZipCode { id: number; code: string; locality_id: number; locality?: GeoLocality }
 
 export interface ApiProvince {
   id: number;
@@ -316,18 +315,6 @@ export class UsersService {
         { id: 1, name: 'La Plata' },
         { id: 2, name: 'Capital Federal' }
       ]))
-    );
-  }
-
-  getZipCodesByCode(code: string) {
-    const qs = code ? `?code=${encodeURIComponent(code)}` : '';
-    return this.apiService.get<{ data: GeoZipCode[] } | GeoZipCode[]>(`/api/zip-codes${qs}`).pipe(
-      map((response: any) => {
-        if (response?.data && Array.isArray(response.data)) return response.data as GeoZipCode[];
-        if (Array.isArray(response)) return response as GeoZipCode[];
-        return [{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }];
-      }),
-      catchError(() => of([{ id: 1, code: code || '0000', locality_id: 0, locality: { id: 0, name: 'Desconocida' } }]))
     );
   }
 
