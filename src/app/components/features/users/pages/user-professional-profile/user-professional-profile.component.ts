@@ -5,6 +5,7 @@ import { ProfessionalProfile } from '../../../../../models/professional.model';
 import { UsersService, ApiUser, ApiQuestion, ApiReview, UsersResponse } from '../../services/users.service';
 import { CommentsModalComponent } from '../../modals/comments-modal/comments-modal.component';
 import { ReviewsModalComponent } from '../../modals/reviews-modal/reviews-modal.component';
+import { environment } from '../../../../../../environments/environment';
 
 @Component({
   selector: 'app-user-professional-profile',
@@ -244,5 +245,20 @@ export class UserProfessionalProfileComponent implements OnInit {
       stars.push(i <= value ? '★' : '☆');
     }
     return stars;
+  }
+
+  getProfilePictureUrl(profilePicture: string | null | undefined): string {
+    if (!profilePicture) {
+      return 'https://i.pravatar.cc/120?img=12';
+    }
+    // Si ya es una URL completa, retornarla tal cual
+    if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
+      return profilePicture;
+    }
+    // Si es una ruta relativa, construir la URL completa
+    const baseUrl = environment.apiUrl;
+    // Asegurar que la ruta relativa comience con /
+    const path = profilePicture.startsWith('/') ? profilePicture : `/${profilePicture}`;
+    return `${baseUrl}${path}`;
   }
 }
