@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { CommentsService, Comment, CommentFilters } from './services/comments.service';
+import { CommentsService, Comment, CommentFilters, CommentsResponse } from './services/comments.service';
 import { EditCommentModalComponent } from './modals/edit-comment-modal/edit-comment-modal.component';
 import { AddCommentModalComponent } from './modals/add-comment-modal/add-comment-modal.component';
 
@@ -15,7 +15,6 @@ import { AddCommentModalComponent } from './modals/add-comment-modal/add-comment
 })
 export class CommentsComponent implements OnInit {
   comments: Comment[] = [];
-  filteredComments: Comment[] = [];
   filters: CommentFilters = {};
   loading = false;
   error: string | null = null;
@@ -24,6 +23,11 @@ export class CommentsComponent implements OnInit {
   showEditModal = false;
   showAddModal = false;
   selectedComment: Comment | null = null;
+
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
 
   constructor(private commentsService: CommentsService) { }
 
@@ -35,10 +39,14 @@ export class CommentsComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.commentsService.getComments().subscribe({
-      next: (comments) => {
-        this.comments = comments;
-        this.applyFilters();
+    this.commentsService.getComments(this.currentPage, this.itemsPerPage)
+    .subscribe({
+      next: (response: CommentsResponse) => {
+        this.comments = response.data;
+        this.totalItems = response.pagination.total;
+        this.totalPages = response.pagination.last_page;
+        this.currentPage = response.pagination.current_page;
+        this.itemsPerPage = response.pagination.per_page;
         this.loading = false;
       },
       error: (error) => {
@@ -52,33 +60,38 @@ export class CommentsComponent implements OnInit {
   applyFilters(): void {
     if (this.hasActiveFilters()) {
       this.loading = true;
-      this.commentsService.getCommentsWithFilters(this.filters).subscribe({
-        next: (comments) => {
-          this.filteredComments = comments;
+      this.commentsService.getCommentsWithFilters(this.filters, this.currentPage, this.itemsPerPage).subscribe({
+        next: (response: CommentsResponse) => {
+          this.comments = response.data;
+          this.totalItems = response.pagination.total;
+          this.totalPages = response.pagination.last_page;
+          this.currentPage = response.pagination.current_page;
+          this.itemsPerPage = response.pagination.per_page;
           this.loading = false;
         },
-        error: (error) => {
+        error: () => {
           this.error = 'Error al filtrar los comentarios';
           this.loading = false;
-          console.error('Error filtering comments:', error);
         }
       });
     } else {
-      this.filteredComments = [...this.comments];
+      this.loadComments();
     }
   }
 
-  hasActiveFilters(): boolean {
-    return !!(this.filters.user_id || this.filters.message);
-  }
-
   onFilterChange(): void {
+    this.currentPage = 1
     this.applyFilters();
   }
 
   clearFilters(): void {
+    this.currentPage = 1
     this.filters = {};
-    this.filteredComments = [...this.comments];
+    this.loadComments()
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.filters.user_id || this.filters.message);
   }
 
   addComment(): void {
@@ -90,14 +103,8 @@ export class CommentsComponent implements OnInit {
   }
 
   onCommentCreated(newComment: Comment): void {
-    // Agregar el nuevo comentario a la lista
-    this.comments.unshift(newComment);
-    
-    // Actualizar también la lista filtrada si no hay filtros activos
-    if (!this.hasActiveFilters()) {
-      this.filteredComments.unshift(newComment);
-    }
-    
+    // Recargar la lista para mantener la paginación correcta
+    this.loadComments();
     this.showAddModal = false;
   }
 
@@ -112,18 +119,12 @@ export class CommentsComponent implements OnInit {
   }
 
   onCommentUpdated(updatedComment: Comment): void {
-    // Actualizar el comentario en la lista
-    const index = this.comments.findIndex(c => c.id === updatedComment.id);
-    if (index !== -1) {
-      this.comments[index] = updatedComment;
+    // Recargar la lista para mantener la paginación correcta
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadComments();
     }
-    
-    // Actualizar también en la lista filtrada
-    const filteredIndex = this.filteredComments.findIndex(c => c.id === updatedComment.id);
-    if (filteredIndex !== -1) {
-      this.filteredComments[filteredIndex] = updatedComment;
-    }
-    
     this.showEditModal = false;
     this.selectedComment = null;
   }
@@ -162,4 +163,32 @@ export class CommentsComponent implements OnInit {
   trackByCommentId(index: number, comment: Comment): number {
     return comment.id || index;
   }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadComments();
+    }
+  }
+
+  onItemsPerPageChange(itemsPerPage: number): void {
+    this.itemsPerPage = itemsPerPage;
+    this.currentPage = 1;
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadComments();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+  
 }

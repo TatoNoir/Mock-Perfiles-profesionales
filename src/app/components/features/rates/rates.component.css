@@ -395,3 +395,29 @@
     gap: 4px;
   }
 }
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.badge--published {
+  color: #1f7a3e;
+  background-color: #e8f5e8;
+  border-left: 3px solid #27ae60;
+}
+
+.badge--unpublished {
+  color: #6b7280;
+  background-color: #f3f4f6;
+  border-left: 3px solid #9ca3af;
+}
+
+/* Opcional: centrar columna Publicado */
+.published-cell {
+  text-align: center;
+}

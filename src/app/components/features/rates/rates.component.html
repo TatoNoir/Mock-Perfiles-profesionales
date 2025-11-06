@@ -66,7 +66,7 @@
           <th>Fecha Creación</th>
           <th>Comentario</th>
           <th>Respuesta</th>
-          <th>Publicado</th>
+          <th class="published-cell">Publicado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -103,7 +103,14 @@
             </ng-template>
           </td>
           <td class="published-cell">
-            {{ rate.published ? 'Sí' : 'No' }}
+            <span
+              class="badge"
+              [ngClass]="rate.published ? 'badge--published' : 'badge--unpublished'"
+              [attr.aria-label]="rate.published ? 'Publicado' : 'No publicado'"
+              [attr.title]="rate.published ? 'Publicado' : 'No publicado'"
+            >
+              {{ rate.published ? 'Publicado' : 'No publicado' }}
+            </span>
           </td>
           <td class="actions">
             <button 
