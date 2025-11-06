@@ -71,7 +71,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let rate of filteredRates; trackBy: trackByRateId">
+        <tr *ngFor="let rate of rates; trackBy: trackByRateId">
           <td class="id-cell">{{ rate.id }}</td>
           <td class="user-cell">
             <div class="user-info">
@@ -138,9 +138,82 @@
       </tbody>
     </table>
 
-    <div class="no-data" *ngIf="!loading && !error && filteredRates.length === 0">
+    <div class="no-data" *ngIf="!loading && !error && rates.length === 0">
       <p>No se encontraron valoraciones</p>
       <button class="btn primary" (click)="addRate()">Agregar Primera Valoración</button>
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="pagination" *ngIf="totalItems > 0">
+      <div class="pagination-info">
+        <span>Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ min(currentPage * itemsPerPage, totalItems) }} de {{ totalItems }} valoraciones</span>
+        <div class="items-per-page">
+          <label for="items-per-page">Por página:</label>
+          <select id="items-per-page" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange(itemsPerPage)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button 
+          class="btn secondary" 
+          (click)="onPageChange(1)" 
+          [disabled]="currentPage === 1"
+          title="Primera página"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/>
+          </svg>
+        </button>
+        
+        <button 
+          class="btn secondary" 
+          (click)="onPageChange(currentPage - 1)" 
+          [disabled]="currentPage === 1"
+          title="Página anterior"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
+        </button>
+        
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getPageNumbers()" 
+            class="btn page-btn" 
+            [class.active]="page === currentPage"
+            (click)="onPageChange(page)"
+          >
+            {{ page }}
+          </button>
+        </div>
+        
+        <button 
+          class="btn secondary" 
+          (click)="onPageChange(currentPage + 1)" 
+          [disabled]="currentPage === totalPages"
+          title="Página siguiente"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
+        </button>
+        
+        <button 
+          class="btn secondary" 
+          (click)="onPageChange(totalPages)" 
+          [disabled]="currentPage === totalPages"
+          title="Última página"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>

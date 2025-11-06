@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { RatesService, Rate, RateFilters } from './services/rates.service';
+import { RatesService, Rate, RateFilters, RatesResponse } from './services/rates.service';
 import { EditRateModalComponent } from './modals/edit-rate-modal/edit-rate-modal.component';
 import { AddRateModalComponent } from './modals/add-rate-modal/add-rate-modal.component';
 
@@ -15,7 +15,6 @@ import { AddRateModalComponent } from './modals/add-rate-modal/add-rate-modal.co
 })
 export class RatesComponent implements OnInit {
   rates: Rate[] = [];
-  filteredRates: Rate[] = [];
   filters: RateFilters = {};
   loading = false;
   error: string | null = null;
@@ -24,6 +23,12 @@ export class RatesComponent implements OnInit {
   showEditModal = false;
   showAddModal = false;
   selectedRate: Rate | null = null;
+
+  // Paginación
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
 
   constructor(private ratesService: RatesService) { }
 
@@ -35,10 +40,13 @@ export class RatesComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.ratesService.getRates().subscribe({
-      next: (rates) => {
-        this.rates = rates;
-        this.applyFilters();
+    this.ratesService.getRates(this.currentPage, this.itemsPerPage).subscribe({
+      next: (response: RatesResponse) => {
+        this.rates = response.data;
+        this.totalItems = response.pagination.total;
+        this.totalPages = response.pagination.last_page;
+        this.currentPage = response.pagination.current_page;
+        this.itemsPerPage = response.pagination.per_page;
         this.loading = false;
       },
       error: (error) => {
@@ -52,9 +60,13 @@ export class RatesComponent implements OnInit {
   applyFilters(): void {
     if (this.hasActiveFilters()) {
       this.loading = true;
-      this.ratesService.getRatesWithFilters(this.filters).subscribe({
-        next: (rates) => {
-          this.filteredRates = rates;
+      this.ratesService.getRatesWithFilters(this.filters, this.currentPage, this.itemsPerPage).subscribe({
+        next: (response: RatesResponse) => {
+          this.rates = response.data;
+          this.totalItems = response.pagination.total;
+          this.totalPages = response.pagination.last_page;
+          this.currentPage = response.pagination.current_page;
+          this.itemsPerPage = response.pagination.per_page;
           this.loading = false;
         },
         error: (error) => {
@@ -64,7 +76,7 @@ export class RatesComponent implements OnInit {
         }
       });
     } else {
-      this.filteredRates = [...this.rates];
+      this.loadRates();
     }
   }
 
@@ -73,12 +85,14 @@ export class RatesComponent implements OnInit {
   }
 
   onFilterChange(): void {
+    this.currentPage = 1;
     this.applyFilters();
   }
 
   clearFilters(): void {
+    this.currentPage = 1;
     this.filters = {};
-    this.filteredRates = [...this.rates];
+    this.loadRates();
   }
 
   addRate(): void {
@@ -90,14 +104,8 @@ export class RatesComponent implements OnInit {
   }
 
   onRateCreated(newRate: Rate): void {
-    // Agregar la nueva valoración a la lista
-    this.rates.unshift(newRate);
-    
-    // Actualizar también la lista filtrada si no hay filtros activos
-    if (!this.hasActiveFilters()) {
-      this.filteredRates.unshift(newRate);
-    }
-    
+    // Recargar la lista para mantener la paginación correcta
+    this.loadRates();
     this.showAddModal = false;
   }
 
@@ -112,18 +120,12 @@ export class RatesComponent implements OnInit {
   }
 
   onRateUpdated(updatedRate: Rate): void {
-    // Actualizar la valoración en la lista
-    const index = this.rates.findIndex(r => r.id === updatedRate.id);
-    if (index !== -1) {
-      this.rates[index] = updatedRate;
+    // Recargar la lista para mantener la paginación correcta
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadRates();
     }
-    
-    // Actualizar también en la lista filtrada
-    const filteredIndex = this.filteredRates.findIndex(r => r.id === updatedRate.id);
-    if (filteredIndex !== -1) {
-      this.filteredRates[filteredIndex] = updatedRate;
-    }
-    
     this.showEditModal = false;
     this.selectedRate = null;
   }
@@ -165,5 +167,32 @@ export class RatesComponent implements OnInit {
 
   trackByRateId(index: number, rate: Rate): number {
     return rate.id || index;
+  }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadRates();
+    }
+  }
+
+  onItemsPerPageChange(itemsPerPage: number): void {
+    this.itemsPerPage = itemsPerPage;
+    this.currentPage = 1;
+    if (this.hasActiveFilters()) {
+      this.applyFilters();
+    } else {
+      this.loadRates();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 }

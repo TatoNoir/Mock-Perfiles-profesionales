@@ -21,6 +21,16 @@ export interface RateFilters {
   message?: string;
 }
 
+export interface RatesResponse {
+  data: Rate[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,19 +38,24 @@ export class RatesService {
   constructor(private apiService: ApiService) { }
 
   // Listar todas las valoraciones
-  getRates(): Observable<Rate[]> {
-    return this.apiService.get<{ data: Rate[] }>('/api/reviews').pipe(
-      map(response => response.data || []),
+  getRates(page?: number, limit?: number): Observable<RatesResponse> {
+    const params: any = {};
+    if (page) {
+      params.page = page;
+    }
+    if (limit) {
+      params.limit = limit;
+    }
+    return this.apiService.get<RatesResponse>('/api/reviews', params).pipe(
       catchError(error => {
         console.error('Error fetching rates from API:', error);
-        // Fallback: retornar array vacío en caso de error
-        return of([]);
+        throw error;
       })
     );
   }
 
   // Filtrar valoraciones
-  getRatesWithFilters(filters: RateFilters): Observable<Rate[]> {
+  getRatesWithFilters(filters: RateFilters, page?: number, limit?: number): Observable<RatesResponse> {
     const params: any = {};
     
     if (filters.user_id) {
@@ -51,12 +66,17 @@ export class RatesService {
       params.message = filters.message;
     }
 
-    return this.apiService.get<{ data: Rate[] }>('/api/reviews', params).pipe(
-      map(response => response.data || []),
+    if (page) {
+      params.page = page;
+    }
+    if (limit) {
+      params.limit = limit;
+    }
+
+    return this.apiService.get<RatesResponse>('/api/reviews', params).pipe(
       catchError(error => {
         console.error('Error filtering rates from API:', error);
-        // Fallback: retornar array vacío en caso de error
-        return of([]);
+        throw error;
       })
     );
   }
