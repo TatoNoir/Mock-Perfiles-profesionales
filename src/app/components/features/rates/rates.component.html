@@ -23,15 +23,29 @@
       </div>
       
       <div class="filter-group">
-        <label for="messageFilter">Mensaje:</label>
+        <label for="searchFilter">Búsqueda:</label>
         <input 
           type="text" 
-          id="messageFilter"
-          [(ngModel)]="filters.message" 
+          id="searchFilter"
+          [(ngModel)]="filters.search" 
           (ngModelChange)="onFilterChange()"
-          placeholder="Filtrar por mensaje"
+          placeholder="Buscar por nombre, apellido, email"
           class="filter-input"
         >
+      </div>
+      
+      <div class="filter-group">
+        <label for="publishedFilter">Publicado:</label>
+        <select 
+          id="publishedFilter"
+          [(ngModel)]="filters.published" 
+          (ngModelChange)="onFilterChange()"
+          class="filter-input"
+        >
+          <option [ngValue]="null">Todos</option>
+          <option [ngValue]="1">Publicado</option>
+          <option [ngValue]="0">Sin publicar</option>
+        </select>
       </div>
       
       <button 

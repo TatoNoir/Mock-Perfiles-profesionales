@@ -81,7 +81,7 @@ export class RatesComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.filters.user_id || this.filters.message);
+    return !!(this.filters.user_id || this.filters.search || (this.filters.published !== null && this.filters.published !== undefined));
   }
 
   onFilterChange(): void {
@@ -91,7 +91,11 @@ export class RatesComponent implements OnInit {
 
   clearFilters(): void {
     this.currentPage = 1;
-    this.filters = {};
+    this.filters = {
+      user_id: undefined,
+      search: undefined,
+      published: null
+    };
     this.loadRates();
   }
 

@@ -18,7 +18,8 @@ export interface Rate {
 
 export interface RateFilters {
   user_id?: number;
-  message?: string;
+  search?: string;
+  published?: number | null; // 1 para publicado, 0 para sin publicar, null para todos
 }
 
 export interface RatesResponse {
@@ -59,11 +60,15 @@ export class RatesService {
     const params: any = {};
     
     if (filters.user_id) {
-      params.user_id = filters.user_id;
+      params.user_id = filters.user_id.toString();
     }
     
-    if (filters.message) {
-      params.message = filters.message;
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    
+    if (filters.published !== undefined && filters.published !== null) {
+      params.published = filters.published.toString();
     }
 
     if (page) {
