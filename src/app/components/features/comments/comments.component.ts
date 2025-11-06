@@ -85,13 +85,17 @@ export class CommentsComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.currentPage = 1
-    this.filters = {};
-    this.loadComments()
+    this.currentPage = 1;
+    this.filters = {
+      user_id: undefined,
+      search: undefined,
+      published: null
+    };
+    this.loadComments();
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.filters.user_id || this.filters.message);
+    return !!(this.filters.user_id || this.filters.search || (this.filters.published !== null && this.filters.published !== undefined));
   }
 
   addComment(): void {

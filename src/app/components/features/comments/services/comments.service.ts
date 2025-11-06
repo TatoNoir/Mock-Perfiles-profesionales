@@ -27,7 +27,8 @@ export interface CommentsResponse {
 
 export interface CommentFilters {
   user_id?: number;
-  message?: string;
+  search?: string;
+  published?: number | null; // 1 para publicado, 0 para sin publicar, null para todos
 }
 
 @Injectable({
@@ -88,19 +89,24 @@ export class CommentsService {
 
   // Filtrar comentarios
   getCommentsWithFilters(filters: CommentFilters, page: number = 1, limit: number = 10): Observable<CommentsResponse> {
-    const params = new URLSearchParams({
+    const params: any = {
       page: page.toString(),
-      limit: limit.toString(),
-      user_id: filters.user_id?.toString() || '',
-    });
+      limit: limit.toString()
+    };
     
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
-        params.append(key, value.toString());
-      }
-    });
+    if (filters.user_id) {
+      params.user_id = filters.user_id.toString();
+    }
+    
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    
+    if (filters.published !== undefined && filters.published !== null) {
+      params.published = filters.published.toString();
+    }
 
-    return this.apiService.get<CommentsResponse>(`/api/questions?${params}`).pipe(
+    return this.apiService.get<CommentsResponse>('/api/questions', params).pipe(
       map((response: any) => {
         if (response?.data && response?.pagination) {
           return response as CommentsResponse;
