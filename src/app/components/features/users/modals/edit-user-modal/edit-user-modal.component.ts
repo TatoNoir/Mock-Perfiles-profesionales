@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UsersService, CreateUserRequest, ApiUser, ApiActivity, ApiDocumentType, ApiUserType, GeoCountry, GeoState, GeoLocality } from '../../services/users.service';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { environment } from '../../../../../../environments/environment';
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -381,5 +382,49 @@ export class EditUserModalComponent implements OnInit, OnChanges {
     setTimeout(() => {
       this.showDropdown = false;
     }, 200);
+  }
+
+  getProfilePictureUrl(profilePicture: string | null | undefined): string {
+    if (!profilePicture) {
+      return 'https://i.pravatar.cc/120?img=12';
+    }
+    // Si ya es una URL completa, retornarla tal cual
+    if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
+      return profilePicture;
+    }
+    // Si es una ruta relativa, construir la URL completa
+    const baseUrl = environment.apiUrl;
+    // Asegurar que la ruta relativa comience con /
+    const path = profilePicture.startsWith('/') ? profilePicture : `/${profilePicture}`;
+    return `${baseUrl}${path}`;
+  }
+
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido');
+        return;
+      }
+      
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen debe ser menor a 5MB');
+        return;
+      }
+      
+      // Crear un objeto FileReader para leer la imagen
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        // Actualizar la imagen en el formulario (guardamos como base64 temporalmente)
+        // En producción, deberías subir el archivo al servidor y obtener la URL
+        const base64Image = e.target.result;
+        this.editForm.patchValue({
+          profile_picture: base64Image
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

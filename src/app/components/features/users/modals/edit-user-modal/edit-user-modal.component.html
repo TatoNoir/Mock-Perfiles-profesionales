@@ -106,6 +106,33 @@
       </div>
 
       <div class="form-group">
+        <label>Foto de Perfil</label>
+        <div class="avatar-container">
+          <img 
+            class="avatar" 
+            [src]="getProfilePictureUrl(editForm.get('profile_picture')?.value || user?.profile_picture)" 
+            alt="Foto del usuario" 
+          />
+          <div class="avatar-overlay">
+            <input 
+              type="file" 
+              id="profile-picture-edit" 
+              accept="image/*" 
+              (change)="onImageSelected($event)"
+              class="file-input"
+            />
+            <label for="profile-picture-edit" class="upload-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Cambiar foto
+            </label>
+          </div>
+        </div>
+        <small class="help-text">Haz clic en "Cambiar foto" para seleccionar una nueva imagen (máx. 5MB)</small>
+      </div>
+
+      <div class="form-group">
         <label for="address">Domicilio</label>
         <input type="text" id="address" formControlName="address" placeholder="Domicilio" />
       </div>
